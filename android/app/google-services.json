@@ -1,0 +1,169 @@
+{
+  "project_info": {
+    "project_number": "232181553323",
+    "firebase_url": "https://commer-ef151.firebaseio.com",
+    "project_id": "commer-ef151",
+    "storage_bucket": "commer-ef151.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:232181553323:android:b22ebeac82c93604",
+        "android_client_info": {
+          "package_name": "com.commer.admin.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "232181553323-82cqg0rgj4pmoqofjf625qtkmpva4u9b.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.commer.admin.app",
+            "certificate_hash": "8898a08aac6d1f9e17956fdb12cba035e42f6a9b"
+          }
+        },
+        {
+          "client_id": "232181553323-eilihkps148nu7dp45cole4mlr7pkf1d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAfW5Wqa5hgsUAzxsI22f9u3iimLNBzl0w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "232181553323-eilihkps148nu7dp45cole4mlr7pkf1d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:232181553323:android:e6d4eb36ec816d38",
+        "android_client_info": {
+          "package_name": "com.commer.negocios.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "232181553323-9fk9c8ouqi9bhhdvjmp1qv31rjiadocl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.commer.negocios.app",
+            "certificate_hash": "8898a08aac6d1f9e17956fdb12cba035e42f6a9b"
+          }
+        },
+        {
+          "client_id": "232181553323-bck43go1gntjs6fc6b4ghsiih88cqprk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.commer.negocios.app",
+            "certificate_hash": "7b578c877ec7d8ed83a54f7aa0b54a9219097c02"
+          }
+        },
+        {
+          "client_id": "232181553323-eilihkps148nu7dp45cole4mlr7pkf1d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAfW5Wqa5hgsUAzxsI22f9u3iimLNBzl0w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "232181553323-eilihkps148nu7dp45cole4mlr7pkf1d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      },
+      "admob_app_id": "ca-app-pub-8441738551183357~2259007309"
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:232181553323:android:712f9f9fbf38e8d1",
+        "android_client_info": {
+          "package_name": "com.commer.usuario.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "232181553323-munitgmfa70hr0uorvaoe6mcfek4anlt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.commer.usuario.app",
+            "certificate_hash": "fae860c02b8c3c487bab9f2716637f8c25b90922"
+          }
+        },
+        {
+          "client_id": "232181553323-eilihkps148nu7dp45cole4mlr7pkf1d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAfW5Wqa5hgsUAzxsI22f9u3iimLNBzl0w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "232181553323-eilihkps148nu7dp45cole4mlr7pkf1d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      },
+      "admob_app_id": "ca-app-pub-8441738551183357~7779761445"
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:232181553323:android:fc2050068134a8609b3fee",
+        "android_client_info": {
+          "package_name": "com.logicabooleana.commer.catalogo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "232181553323-hmft0oi05236qld01eo27bbli5og3eaa.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.logicabooleana.commer.catalogo",
+            "certificate_hash": "8898a08aac6d1f9e17956fdb12cba035e42f6a9b"
+          }
+        },
+        {
+          "client_id": "232181553323-eilihkps148nu7dp45cole4mlr7pkf1d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAfW5Wqa5hgsUAzxsI22f9u3iimLNBzl0w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "232181553323-eilihkps148nu7dp45cole4mlr7pkf1d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
