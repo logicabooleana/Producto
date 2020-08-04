@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:collection';
 
 import 'package:catalogo/services/preferencias_usuario.dart';
 import 'package:flutter/material.dart';
@@ -34,6 +33,9 @@ class Global {
   static final Map modelsPerfilNegocio = {
     PerfilNegocio: (data) => PerfilNegocio.fromMap(data),
   };
+  static final Map modelsPrecioProducto = {
+    Precio: (data) => Precio.fromMap(data),
+  };
   static final Map modelsProducto = {
     Producto: (data) => Producto.fromMap(data),
   };
@@ -66,6 +68,10 @@ class Global {
     return  Document<AdminUsuarioCuenta>(path: '/NEGOCIOS/$idNegocio/ADMINISTRADOR_NEGOCIOS/$idUserAdmin'); // '/APP/ARG/PRODUCTOS'
   }
   // Consultas DB ( Colecction )
+  static Collection<Precio> getListPreciosProducto( { String idProducto,String isoPAis="ARG"} ){
+    // Firestore References for Writes
+    return  Collection<Precio>(path: '/APP/$isoPAis/PRODUCTOS/$idProducto/REGISTRO_PRECIOS_$isoPAis'); // '/APP/ARG/PRODUCTOS'
+  }
   static Collection<PerfilNegocio> getListNegocioAdmin( { String idNegocio} ){
     // Firestore References for Writes
     return  Collection<PerfilNegocio>(path: '/USUARIOS/$idNegocio/ADMINISTRADOR_NEGOCIOS'); // '/APP/ARG/PRODUCTOS'
@@ -112,25 +118,32 @@ class ProviderPerfilNegocio with ChangeNotifier {
 //Creamos una clase "MyProvider" y le agregamos las capacidades de Change Notifier.
 
 String idMarca="";
-int _cantidadProductos =0; //Dentro de nuestro provider, creamos e inicializamos nuestra variable.
-List<String> hashMaplistaMarca = new List<String>();
+int _cantidadProductos =0; 
 
 //Creamos el método Get, para poder obtener el valor de mitexto
 int get getCantidadProductos =>_cantidadProductos; 
 String get getIdMarca =>idMarca;
-List<String> get getHashMaplistaMarca =>hashMaplistaMarca; 
 
 //Ahora creamos el método set para poder actualizar el valor de _mitexto, este método recibe un valor newTexto de tipo String
 set setCantidadProductos(int cantidadProductos ) {
   _cantidadProductos = cantidadProductos; 
   notifyListeners(); //notificamos a los widgets que esten escuchando el stream.
 }
-set setHashMaplistaMarca( List<String> hashMap ) {
-  hashMaplistaMarca = hashMap; 
-  notifyListeners(); //notificamos a los widgets que esten escuchando el stream.
-}
 set setIdMarca( String idmarca ) {
   idMarca = idmarca; 
+  notifyListeners(); //notificamos a los widgets que esten escuchando el stream.
+}
+}
+class ProviderMarcasProductos with ChangeNotifier {
+
+List<String> listMarcas = new List<String>();
+
+//Creamos el método Get, para poder obtener el valor de mitexto
+List<String> get getHashMaplistaMarca =>listMarcas; 
+
+//Ahora creamos el método set para poder actualizar el valor de _mitexto, este método recibe un valor newTexto de tipo String
+set setHashMaplistaMarca( List<String> hashMap ) {
+  listMarcas = hashMap; 
   notifyListeners(); //notificamos a los widgets que esten escuchando el stream.
 }
 }

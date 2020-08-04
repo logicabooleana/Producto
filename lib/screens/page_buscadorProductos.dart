@@ -1,5 +1,6 @@
 import 'package:catalogo/services/models.dart';
 import 'package:flutter/material.dart';
+import 'package:catalogo/screens/page_producto_view.dart';
 import 'package:catalogo/utils/utils.dart';
 
 class DataSearch extends SearchDelegate {
@@ -77,8 +78,14 @@ class DataSearch extends SearchDelegate {
             title: Text(product.titulo),
             subtitle: Text(product.descripcion),
             onTap: () {
-              //pelicula.uniqueId = "";
-              //Navigator.pushNamed(context, "detalles", arguments: pelicula);
+               Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (BuildContext context) => product != null
+                      ? ProductScreen(producto: product)
+                      : Scaffold(
+                          body: Center(child: Text("Se produjo un Error!"))),
+                ),
+              );
             },
           );
         });

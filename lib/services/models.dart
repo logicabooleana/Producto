@@ -128,6 +128,7 @@ class Producto {
     String subcategoria = ""; // ID de la subcategoria del producto
     Timestamp timestamp_actualizacion; // Marca de tiempo de actualizacion del precio del producto
     int tipo=0;
+    bool producto_precargado = false;
 
     // Values registros
     String signo_moneda;
@@ -145,6 +146,7 @@ class Producto {
     this.subcategoria, 
     this.timestamp_actualizacion, 
     this.cantidad_ventas,
+    this.producto_precargado,
     this.tipo,
     this.precio_venta,
     this.signo_moneda,
@@ -161,6 +163,7 @@ class Producto {
       categoria: data['categoria'] ?? '',
       subcategoria: data['subcategoria'] ?? '',
       timestamp_actualizacion: data['timestamp_actualizacion'] ,
+      producto_precargado: data['producto_precargado'] ?? false,
       tipo: data['tipo'] ?? 0,
       precio_venta: data['precio_venta'] ?? 0.0,
       signo_moneda: data['signo_moneda'] ?? '',

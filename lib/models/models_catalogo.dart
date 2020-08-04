@@ -1,5 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+class Precio{
+
+  String id_negocio="";
+  double precio=0.0;
+  Timestamp timestamp;
+  String moneda="";
+
+  Precio.fromMap(Map data) {
+    id_negocio = data['id_negocio'] ?? '';
+    precio = data['precio'] ?? 0.0;
+    timestamp = data['timestamp'];
+    moneda = data['moneda'] ?? '';
+  }
+}
 
 class Categoria {
     String id="";

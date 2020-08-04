@@ -48,6 +48,17 @@ class Document<T> {
     return ref.setData(Map<String, dynamic>.from(data), merge: true);
   }
 
+  // Models Precio Producto
+  Future<T> getDataPrecioProducto() {
+    return ref.get().then((v) => Global.modelsPrecioProducto[T](v.data) as T);
+  }
+  Stream<T> streamDataPrecioProducto() {
+    return ref.snapshots().map((v) => Global.modelsPrecioProducto[T](v.data) as T);
+  }
+  Future<void> upSetPrecioProducto(Map data) {
+    return ref.setData(Map<String, dynamic>.from(data), merge: true);
+  }
+
   // Models Producto
   Future<T> getDataProducto() {
     return ref.get().then((v) => Global.modelsProducto[T](v.data) as T);
@@ -79,6 +90,15 @@ class Collection<T> {
 
   Collection({ this.path }) {
     ref = _db.collection(path);
+  }
+
+  // Model Precios producto
+  Future<List<T>> getDataPreciosProductosAll() async {
+    var snapshots = await ref.orderBy("timestamp",descending: true).getDocuments();
+    return snapshots.documents.map((doc) => Global.modelsPrecioProducto[T](doc.data) as T ).toList();
+  }
+  Stream<List<T>> streamDataPreciosProductosAlll() {
+    return ref.snapshots().map((list) => list.documents.map((doc) => Global.modelsPrecioProducto[T](doc.data) as T) );
   }
 
   // Model Perfil Negocio

@@ -21,6 +21,7 @@ void main() async {
     MultiProvider(
        providers: [
         ChangeNotifierProvider(create: (_) => ProviderPerfilNegocio()),
+        ChangeNotifierProvider(create: (_) => ProviderMarcasProductos()),
       ],
       child:MyApp(),
     )
