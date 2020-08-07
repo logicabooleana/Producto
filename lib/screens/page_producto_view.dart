@@ -16,7 +16,6 @@ class ProductScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     
-    
     return Scaffold(
       appBar: AppBar(
         elevation: 0.0,
@@ -326,9 +325,14 @@ class ProductScreen extends StatelessWidget {
 }
 
 Future<String> getLocation({double latitude, double longitude}) async {
-    List<Placemark> placemark = await Geolocator().placemarkFromCoordinates(latitude, longitude);
+  if( latitude!=0.0 && latitude!=0.0 ){
 
+    List<Placemark> placemark = await Geolocator().placemarkFromCoordinates(latitude, longitude);
     return placemark[0].locality;
+  }
+    
+
+    return "ubicación desconocida";
   }
 
 class ProductoItemHorizontal extends StatelessWidget {
@@ -349,7 +353,7 @@ class ProductoItemHorizontal extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: () {
-            Navigator.of(context).push(
+            Navigator.of(context).pushReplacement(
               MaterialPageRoute(
                 builder: (BuildContext context) => producto != null
                     ? ProductScreen(producto: producto)

@@ -546,8 +546,7 @@ class _PageProfileState extends State<PageProfile> {
                                         sCategoria = Global
                                             .listCategoriasCatalogo[index]
                                             .nombre;
-                                        sIdCategoria = Global
-                                            .listCategoriasCatalogo[index].id;
+                                        sIdCategoria = Global.listCategoriasCatalogo[index].id;
                                         sIdMarca = "";
                                         Navigator.pop(
                                             context,
@@ -704,8 +703,7 @@ class _PageProfileState extends State<PageProfile> {
         }
       } else {
         // Carga los porductos de la categoria seleccionada
-        listProductosItems
-            .removeWhere((item) => item.categoria != sIdCategoria);
+        listProductosItems.removeWhere((item) => item.categoria != sIdCategoria);
         // Carga todas las marca de la categoria seleccionada
         for (int i = 0; i < listProductosItems.length; i++) {
           String value = listProductosItems[i].id_marca;
@@ -783,8 +781,7 @@ class _PageProfileState extends State<PageProfile> {
                   textAlign: TextAlign.center,
                 ),
               ]),
-              viewCircleImage(
-                  url: Global.oPerfilNegocio.imagen_perfil, radius: 100.0),
+              viewCircleImage(url: Global.oPerfilNegocio.imagen_perfil, radius: 75.0),
               Column(children: <Widget>[
                 Text(
                   Global.listProudctosNegocio.length.toString(),
