@@ -117,18 +117,38 @@ class Global {
 class ProviderPerfilNegocio with ChangeNotifier {
 //Creamos una clase "MyProvider" y le agregamos las capacidades de Change Notifier.
 
+PerfilNegocio perfilNegocio ;
 String idMarca="";
 int _cantidadProductos =0; 
 
 //Creamos el método Get, para poder obtener el valor de mitexto
 int get getCantidadProductos =>_cantidadProductos; 
 String get getIdMarca =>idMarca;
+PerfilNegocio get getCuentaNegocio =>perfilNegocio;
 
 //Ahora creamos el método set para poder actualizar el valor de _mitexto, este método recibe un valor newTexto de tipo String
 set setCantidadProductos(int cantidadProductos ) {
   _cantidadProductos = cantidadProductos; 
   notifyListeners(); //notificamos a los widgets que esten escuchando el stream.
 }
+set setIdMarca( String idmarca ) {
+  idMarca = idmarca; 
+  notifyListeners(); //notificamos a los widgets que esten escuchando el stream.
+}
+set setCuentaNegocio( PerfilNegocio cuenta ) {
+  perfilNegocio = cuenta; 
+  notifyListeners(); //notificamos a los widgets que esten escuchando el stream.
+}
+}
+class ProviderIdMarca with ChangeNotifier {
+//Creamos una clase "MyProvider" y le agregamos las capacidades de Change Notifier.
+
+String idMarca="";
+
+//Creamos el método Get, para poder obtener el valor de mitexto
+String get getIdMarca =>idMarca??"";
+
+//Ahora creamos el método set para poder actualizar el valor de _mitexto, este método recibe un valor newTexto de tipo String
 set setIdMarca( String idmarca ) {
   idMarca = idmarca; 
   notifyListeners(); //notificamos a los widgets que esten escuchando el stream.

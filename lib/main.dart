@@ -10,6 +10,8 @@ import 'screens/screens.dart';
 import 'package:catalogo/utils/dynamicTheme_lb.dart';
 import 'package:catalogo/services/preferencias_usuario.dart';
 import 'package:catalogo/screens/page_profile_negocio.dart';
+import 'package:catalogo/screens/page_principal.dart';
+
 
 void main() async {
   // convertimos esta funcion en asincronica para que cargue la app despues que cargue los datos de sharedPreferences
@@ -22,6 +24,7 @@ void main() async {
        providers: [
         ChangeNotifierProvider(create: (_) => ProviderPerfilNegocio()),
         ChangeNotifierProvider(create: (_) => ProviderMarcasProductos()),
+        ChangeNotifierProvider(create: (_) => ProviderIdMarca()),
       ],
       child:MyApp(),
     )
@@ -60,7 +63,7 @@ class MyApp extends StatelessWidget {
               // Named Routes
               routes: {
                 '/': (context) => LoginScreen(),
-                '/page_catalogo': (context) => PageProfile(), // CatalogoNegocio(),
+                '/page_catalogo': (context) => PagePrincipal(), // CatalogoNegocio(),
                 '/profile': (context) => ProfileScreen(),
                 '/about': (context) => AboutScreen(),
                 '/page_themeApp': (context) => PageThemePreferences(),
