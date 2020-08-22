@@ -849,7 +849,6 @@ class _PageProfileState extends State<PageProfile> {
                                         Marca marca = snapshot.data;
                                         return GestureDetector(
                                           onTap: () {
-                                            buildContext.read<ProviderPerfilNegocio>().setIdMarca = marca.id;
                                             setState(() {
                                               sCategoria = marca.titulo;
                                               sIdMarca = marca.id;

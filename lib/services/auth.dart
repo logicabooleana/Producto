@@ -75,8 +75,6 @@ class AuthService {
     return user;
   }
 
-
-
   // Sign out
   Future<void> signOut() {
     return _auth.signOut();

@@ -9,7 +9,6 @@ import 'services/services.dart';
 import 'screens/screens.dart';
 import 'package:catalogo/utils/dynamicTheme_lb.dart';
 import 'package:catalogo/services/preferencias_usuario.dart';
-import 'package:catalogo/screens/page_profile_negocio.dart';
 import 'package:catalogo/screens/page_principal.dart';
 
 
@@ -24,7 +23,7 @@ void main() async {
        providers: [
         ChangeNotifierProvider(create: (_) => ProviderPerfilNegocio()),
         ChangeNotifierProvider(create: (_) => ProviderMarcasProductos()),
-        ChangeNotifierProvider(create: (_) => ProviderIdMarca()),
+        ChangeNotifierProvider(create: (_) => ProviderCatalogo()),
       ],
       child:MyApp(),
     )

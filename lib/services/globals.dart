@@ -118,12 +118,10 @@ class ProviderPerfilNegocio with ChangeNotifier {
 //Creamos una clase "MyProvider" y le agregamos las capacidades de Change Notifier.
 
 PerfilNegocio perfilNegocio ;
-String idMarca="";
 int _cantidadProductos =0; 
 
 //Creamos el método Get, para poder obtener el valor de mitexto
 int get getCantidadProductos =>_cantidadProductos; 
-String get getIdMarca =>idMarca;
 PerfilNegocio get getCuentaNegocio =>perfilNegocio;
 
 //Ahora creamos el método set para poder actualizar el valor de _mitexto, este método recibe un valor newTexto de tipo String
@@ -131,29 +129,133 @@ set setCantidadProductos(int cantidadProductos ) {
   _cantidadProductos = cantidadProductos; 
   notifyListeners(); //notificamos a los widgets que esten escuchando el stream.
 }
-set setIdMarca( String idmarca ) {
-  idMarca = idmarca; 
-  notifyListeners(); //notificamos a los widgets que esten escuchando el stream.
-}
 set setCuentaNegocio( PerfilNegocio cuenta ) {
   perfilNegocio = cuenta; 
   notifyListeners(); //notificamos a los widgets que esten escuchando el stream.
 }
 }
-class ProviderIdMarca with ChangeNotifier {
+class ProviderCatalogo with ChangeNotifier {
 //Creamos una clase "MyProvider" y le agregamos las capacidades de Change Notifier.
 
-String idMarca="";
+  List<String> listMarcas = new List<String>();
+  List<Producto> listCatalogo=new List();
+  List<Producto> listCatalogoFilter=new List();
+  List<Producto> listCatalogoCategoria=new List();
+  String idMarca="";
+  String idCategoria="todos"; 
+  String nombreCategoria="Todos"; 
 
-//Creamos el método Get, para poder obtener el valor de mitexto
-String get getIdMarca =>idMarca??"";
+  //Creamos el método Get, para poder obtener el valor de mitexto
+  String get getIdMarca =>this.idMarca??"";
+  String get getIdCategoria =>this.idCategoria??"";
+  String get getNombreCategoria =>this.nombreCategoria??"Todos";
+  List<Producto> get getCatalogo =>listCatalogoFilter;
+  List<String> get getMarcas =>listMarcas??[];
 
-//Ahora creamos el método set para poder actualizar el valor de _mitexto, este método recibe un valor newTexto de tipo String
-set setIdMarca( String idmarca ) {
-  idMarca = idmarca; 
-  notifyListeners(); //notificamos a los widgets que esten escuchando el stream.
+  //Ahora creamos el método set para poder actualizar el valor de _mitexto, este método recibe un valor newTexto de tipo String
+  set setClean(bool clean){
+    if(clean){
+      listMarcas.clear();
+      listCatalogo.clear();
+      listCatalogoFilter.clear();
+      listCatalogoCategoria.clear();
+      idMarca="";
+      idCategoria="todos"; 
+      nombreCategoria="Todos"; 
+    }
+  }
+  set setIdMarca( String id ) {
+    this.idMarca = id; 
+    getFilterCatalogo(idCategoria:this.idCategoria,idMarca:this.idMarca );
+    notifyListeners(); //notificamos a los widgets que esten escuchando el stream.
+  }
+  set setCatalogo( List<Producto> list ) {
+    this.listCatalogo = list; 
+    getFilterCatalogo(idCategoria:this.idCategoria ,idMarca:this.idMarca);
+    notifyListeners(); //notificamos a los widgets que esten escuchando el stream.
+  }
+  set setIdCategoria( String idCategoria ) {
+    this.idCategoria = idCategoria; 
+    getFilterCatalogo(idCategoria:this.idCategoria,idMarca: this.idMarca );
+    notifyListeners(); //notificamos a los widgets que esten escuchando el stream.
+  }
+  set setNombreFiltro( String nombreCategoria ) {
+    this.nombreCategoria = nombreCategoria; 
+    notifyListeners(); //notificamos a los widgets que esten escuchando el stream.
+  }
+  int getNumeroDeProductosDeMarca({@required String id}){
+
+    int cantidad=0;
+    
+    for (Producto item in this.listCatalogo) {
+      if(item.id_marca==id){
+        cantidad++;
+      }
+    }
+
+    return cantidad;
+  }
+  void getFilterCatalogo({String idCategoria,String idMarca}){
+
+    List<Producto> lista =[];
+    if(idCategoria==""||idCategoria=="todos"){
+
+      for (var i = 0; i < this.listCatalogo.length; i++) {
+          
+        if(idMarca!=""){
+          if( idMarca==this.listCatalogo[i].id_marca ){lista.add(this.listCatalogo[i]); }
+        }else{
+          lista.add(this.listCatalogo[i]);
+        }
+      }
+      
+      this.listCatalogoFilter=lista;
+      // Carga las marca de los prosductos mostrados de la categoria
+      _updateMarcas(listaProductos:  lista);
+    }else{
+      for (var i = 0; i < this.listCatalogo.length; i++) {
+          
+        if(idCategoria!=""&& idMarca=="" ){
+          if(this.listCatalogo[i].categoria==idCategoria){ lista.add(this.listCatalogo[i]); listCatalogoCategoria.add(this.listCatalogo[i]); }
+        }else if(idCategoria!=""&& idMarca!=""){
+          if(this.listCatalogo[i].categoria==idCategoria){listCatalogoCategoria.add(this.listCatalogo[i]);if( idMarca==this.listCatalogo[i].id_marca ){lista.add(this.listCatalogo[i]); }}
+        }else if(idCategoria==""&& idMarca!=""){
+          if( idMarca==this.listCatalogo[i].id_marca ){lista.add(this.listCatalogo[i]); }
+        }
+      }
+      // Carga las marca de los prosductos mostrados de la categoria
+    _updateMarcas(listaProductos: lista);
+    this.listCatalogoFilter=lista;
+    }
+    
+
+  }
+
+  // extrae las marcas del catalogo
+  _updateMarcas({ List<Producto> listaProductos} ){
+
+    this.listMarcas.clear();
+    List<String>  marcas =[];
+
+    if( this.idCategoria==""|| this.idCategoria=="todos"){
+      for (var Producto in this.listCatalogo) {
+        if( Producto.id_marca!= null && Producto.id_marca != "" ){
+          marcas.add(Producto.id_marca);
+        }
+      }
+    }else if( this.idCategoria!="" ){
+      for (var Producto in this.listCatalogoCategoria) {
+        if( Producto.id_marca!= null && Producto.id_marca != "" ){
+          marcas.add(Producto.id_marca);
+        }
+      }
+    }
+
+
+    this.listMarcas=marcas.toSet().toList();
+  }
 }
-}
+
 class ProviderMarcasProductos with ChangeNotifier {
 
 List<String> listMarcas = new List<String>();
