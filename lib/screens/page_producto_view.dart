@@ -58,7 +58,7 @@ class ProductScreen extends StatelessWidget {
                       height: MediaQuery.of(context).size.width,
                       child: Center(
                         child: Text(
-                          "L",
+                          producto.titulo.substring(0,3),
                           style: TextStyle(
                               fontSize:
                                   MediaQuery.of(context).size.width * 0.25),
@@ -379,9 +379,9 @@ class ProductoItemHorizontal extends StatelessWidget {
                             placeholder: (context, url) => FadeInImage(
                                 fit: BoxFit.cover,
                                 image: AssetImage("assets/loading.gif"),
-                                placeholder: AssetImage("assets/loading.gif")),
-                            errorWidget: (context, url, error) =>
-                                Container(color: Colors.black12),
+                                placeholder: AssetImage("assets/loading.gif")
+                            ),
+                            errorWidget:(context,url,error)=>Container(color: Colors.black12),
                           )
                         : Container(color: Colors.black26),
                   ),

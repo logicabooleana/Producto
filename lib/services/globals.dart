@@ -211,7 +211,7 @@ class ProviderCatalogo with ChangeNotifier {
       
       this.listCatalogoFilter=lista;
       // Carga las marca de los prosductos mostrados de la categoria
-      _updateMarcas(listaProductos:  lista);
+      _updateMarcas(listaProductos:  this.listCatalogo);
     }else{
       for (var i = 0; i < this.listCatalogo.length; i++) {
           
@@ -224,7 +224,7 @@ class ProviderCatalogo with ChangeNotifier {
         }
       }
       // Carga las marca de los prosductos mostrados de la categoria
-    _updateMarcas(listaProductos: lista);
+    _updateMarcas(listaProductos: this.listCatalogo);
     this.listCatalogoFilter=lista;
     }
     
@@ -238,7 +238,7 @@ class ProviderCatalogo with ChangeNotifier {
     List<String>  marcas =[];
 
     if( this.idCategoria==""|| this.idCategoria=="todos"){
-      for (var Producto in this.listCatalogo) {
+      for (var Producto in listaProductos) {
         if( Producto.id_marca!= null && Producto.id_marca != "" ){
           marcas.add(Producto.id_marca);
         }

@@ -14,7 +14,7 @@ import 'package:provider/provider.dart';
 /* Dependencias */
 import 'package:catalogo/screens/widgets/widget_profile.dart';
 import 'package:catalogo/screens/widgets/widget_CatalogoGridList.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart'; 
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:catalogo/utils/dynamicTheme_lb.dart';
 import 'package:catalogo/services/services.dart';
 import 'package:catalogo/screens/page_buscadorProductos.dart';
@@ -51,7 +51,8 @@ class PagePrincipal extends StatelessWidget {
             ),
           )
         : FutureBuilder(
-            future: Global.getNegocio(idNegocio: Global.prefs.getIdNegocio).getDataPerfilNegocio(),
+            future: Global.getNegocio(idNegocio: Global.prefs.getIdNegocio)
+                .getDataPerfilNegocio(),
             builder: (c, snapshot) {
               if (snapshot.hasData) {
                 Global.oPerfilNegocio = snapshot.data;
@@ -69,7 +70,7 @@ class PagePrincipal extends StatelessWidget {
                     body: Center(child: CircularProgressIndicator()));
               }
             },
-          ); 
+          );
   }
 
   Scaffold scaffond(BuildContext buildContext, PerfilNegocio perfilNegocio) {
@@ -94,7 +95,8 @@ class PagePrincipal extends StatelessWidget {
                             ? perfilNegocio.nombre_negocio
                             : perfilNegocio.username,
                     style: TextStyle(
-                        color: Theme.of(buildContext).textTheme.bodyText1.color)),
+                        color:
+                            Theme.of(buildContext).textTheme.bodyText1.color)),
                 Icon(Icons.keyboard_arrow_down),
               ],
             ),
@@ -104,15 +106,17 @@ class PagePrincipal extends StatelessWidget {
           DynamicTheme.of(buildContext).getIConButton(buildContext),
           IconButton(
               icon: Icon(Icons.tune),
-              onPressed: () => Navigator.pushNamed(buildContext, '/page_themeApp')),
+              onPressed: () =>
+                  Navigator.pushNamed(buildContext, '/page_themeApp')),
         ],
       ),
       body: FutureBuilder(
-        future: Global.getCatalogoNegocio(idNegocio: perfilNegocio.id).getDataProductoAll(),
+        future: Global.getCatalogoNegocio(idNegocio: perfilNegocio.id)
+            .getDataProductoAll(),
         builder: (c, snapshot) {
           if (snapshot.hasData) {
-            Global.listProudctosNegocio=snapshot.data;
-            buildContext.read<ProviderCatalogo>().setCatalogo=snapshot.data;
+            Global.listProudctosNegocio = snapshot.data;
+            buildContext.read<ProviderCatalogo>().setCatalogo = snapshot.data;
             return defaultTabController(buildContext: buildContext);
           } else {
             return Center(child: CircularProgressIndicator());
@@ -273,9 +277,13 @@ class PagePrincipal extends StatelessWidget {
                                               idNegocio: perfilNegocio.id),
                                           onTap: () {
                                             if (perfilNegocio.id != "") {
-                                              Global.oPerfilNegocio = perfilNegocio;
-                                              buildContext .read<ProviderPerfilNegocio>().setCuentaNegocio = perfilNegocio;
-                                              prefs.setIdNegocio =perfilNegocio.id.toString();
+                                              Global.oPerfilNegocio =
+                                                  perfilNegocio;
+                                              buildContext
+                                                  .read<ProviderPerfilNegocio>()
+                                                  .setCuentaNegocio = perfilNegocio;
+                                              prefs.setIdNegocio =
+                                                  perfilNegocio.id.toString();
                                               Navigator.pop(context);
                                             }
                                           },
@@ -342,10 +350,16 @@ class PagePrincipal extends StatelessWidget {
                                             idNegocio: perfilNegocio.id),
                                         onTap: () {
                                           if (perfilNegocio.id != "") {
-                                            Global.oPerfilNegocio = perfilNegocio;
-                                            buildContext.read<ProviderPerfilNegocio>() .setCuentaNegocio = perfilNegocio;
-                                            buildContext.read<ProviderCatalogo>().setClean=true;
-                                            prefs.setIdNegocio =perfilNegocio.id.toString();
+                                            Global.oPerfilNegocio =
+                                                perfilNegocio;
+                                            buildContext
+                                                .read<ProviderPerfilNegocio>()
+                                                .setCuentaNegocio = perfilNegocio;
+                                            buildContext
+                                                .read<ProviderCatalogo>()
+                                                .setClean = true;
+                                            prefs.setIdNegocio =
+                                                perfilNegocio.id.toString();
                                             Navigator.pop(context);
                                           }
                                         },
@@ -383,13 +397,13 @@ class PagePrincipal extends StatelessWidget {
               delegate: SliverChildListDelegate([
                 WidgetProfile(),
                 SizedBox(height: 12.0),
-          Global.listProudctosNegocio.length == 0
-              ? Container()
-              : widgetsListaHorizontalMarcas(buildContext:buildContext ),
-          Global.listProudctosNegocio.length == 0
-              ? Container()
-              : widgetBuscadorView(buildContext: buildContext),
-          SizedBox(height: 12.0),
+                Global.listProudctosNegocio.length == 0
+                    ? Container()
+                    : widgetsListaHorizontalMarcas(buildContext: buildContext),
+                Global.listProudctosNegocio.length == 0
+                    ? Container()
+                    : widgetBuscadorView(buildContext: buildContext),
+                SizedBox(height: 12.0),
               ]),
             ),
           ];
@@ -405,7 +419,7 @@ class PagePrincipal extends StatelessWidget {
                   ? Colors.white
                   : Colors.black,
               onTap: (value) => showSelectCategoria(buildContext: buildContext),
-              tabs: [ 
+              tabs: [
                 Consumer<ProviderCatalogo>(
                   child: Tab(text: "Todos"),
                   builder: (context, catalogo, child) {
@@ -431,14 +445,17 @@ class PagePrincipal extends StatelessWidget {
   void showSelectCategoria({@required BuildContext buildContext}) {
     // muestre la hoja inferior modal
     showModalBottomSheet(
-        shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
         backgroundColor: Theme.of(buildContext).canvasColor,
         context: buildContext,
         builder: (ctx) {
           return ClipRRect(
             child: Container(
               child: FutureBuilder(
-                future: Global.getCatalogoCategorias(idNegocio: Global.oPerfilNegocio.id).getDataCategoriaAll(),
+                future: Global.getCatalogoCategorias(
+                        idNegocio: Global.oPerfilNegocio.id)
+                    .getDataCategoriaAll(),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     Global.listCategoriasCatalogo = snapshot.data;
@@ -490,9 +507,15 @@ class PagePrincipal extends StatelessWidget {
                                           title: Text("Mostrar todos",
                                               style: TextStyle(fontSize: 16.0)),
                                           onTap: () {
-                                            buildContext.read<ProviderCatalogo>().setIdCategoria = "todos";
-                                            buildContext.read<ProviderCatalogo>().setNombreFiltro = "Todos";
-                                            buildContext.read<ProviderCatalogo>().setIdMarca = "";
+                                            buildContext
+                                                .read<ProviderCatalogo>()
+                                                .setIdCategoria = "todos";
+                                            buildContext
+                                                .read<ProviderCatalogo>()
+                                                .setNombreFiltro = "Todos";
+                                            buildContext
+                                                .read<ProviderCatalogo>()
+                                                .setIdMarca = "";
                                             Navigator.pop(
                                                 context,
                                                 Global.listCategoriasCatalogo[
@@ -532,10 +555,21 @@ class PagePrincipal extends StatelessWidget {
                                     dense: true,
                                     title: Text(categoria.nombre),
                                     onTap: () {
-                                      buildContext.read<ProviderCatalogo>().setNombreFiltro =Global.listCategoriasCatalogo[index].nombre;
-                                      buildContext.read<ProviderCatalogo>().setIdCategoria=Global.listCategoriasCatalogo[index].id;
-                                      buildContext.read<ProviderCatalogo>().setIdMarca="";
-                                      Navigator.pop(context,Global.listCategoriasCatalogo[index]);
+                                      buildContext
+                                              .read<ProviderCatalogo>()
+                                              .setNombreFiltro =
+                                          Global.listCategoriasCatalogo[index]
+                                              .nombre;
+                                      buildContext
+                                              .read<ProviderCatalogo>()
+                                              .setIdCategoria =
+                                          Global
+                                              .listCategoriasCatalogo[index].id;
+                                      buildContext
+                                          .read<ProviderCatalogo>()
+                                          .setIdMarca = "";
+                                      Navigator.pop(context,
+                                          Global.listCategoriasCatalogo[index]);
                                     },
                                   ),
                                   Divider(endIndent: 12.0, indent: 12.0),
@@ -574,10 +608,21 @@ class PagePrincipal extends StatelessWidget {
                                     dense: true,
                                     title: Text(categoria.nombre),
                                     onTap: () {
-                                      buildContext.read<ProviderCatalogo>().setNombreFiltro =Global.listCategoriasCatalogo[index].nombre;
-                                      buildContext.read<ProviderCatalogo>().setIdCategoria=Global.listCategoriasCatalogo[index].id;
-                                      buildContext.read<ProviderCatalogo>().setIdMarca="";
-                                      Navigator.pop(context,Global.listCategoriasCatalogo[index]);
+                                      buildContext
+                                              .read<ProviderCatalogo>()
+                                              .setNombreFiltro =
+                                          Global.listCategoriasCatalogo[index]
+                                              .nombre;
+                                      buildContext
+                                              .read<ProviderCatalogo>()
+                                              .setIdCategoria =
+                                          Global
+                                              .listCategoriasCatalogo[index].id;
+                                      buildContext
+                                          .read<ProviderCatalogo>()
+                                          .setIdMarca = "";
+                                      Navigator.pop(context,
+                                          Global.listCategoriasCatalogo[index]);
                                     },
                                   ),
                                   Divider(endIndent: 12.0, indent: 12.0),
@@ -620,92 +665,97 @@ class PagePrincipal extends StatelessWidget {
     );
   }
 
-
   Widget widgetsListaHorizontalMarcas({@required BuildContext buildContext}) {
-
-    
-  /* Declarar variables */
-  List<Color> colorGradientInstagram = [
-     Color.fromRGBO(129, 52, 175, 1.0),
-     Color.fromRGBO(129, 52, 175, 1.0),
-     Color.fromRGBO(221, 42, 123, 1.0),
-     Color.fromRGBO(68, 0, 71, 1.0)
+    /* Declarar variables */
+    List<Color> colorGradientInstagram = [
+      Color.fromRGBO(129, 52, 175, 1.0),
+      Color.fromRGBO(129, 52, 175, 1.0),
+      Color.fromRGBO(221, 42, 123, 1.0),
+      Color.fromRGBO(68, 0, 71, 1.0)
     ];
 
-    return SizedBox(
-      height: 110.0,
-      child: Column(
-        children: <Widget>[
-          Flexible(
-            child: Consumer<ProviderCatalogo>(
-              builder: (context, catalogo, child) => Stack(
-                children: [
-                  ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: catalogo.getMarcas.length,
-                      itemBuilder: (BuildContext c, int index) {
-                        return Container(
-                          width: 81.0,
-                          height: 100.0,
-                          padding: EdgeInsets.all(5.0),
-                          child: new Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Stack(
-                                alignment: Alignment.bottomCenter,
-                                children: <Widget>[
-                                  FutureBuilder(
-                                    future: Global.getMarca(idMarca:catalogo.getMarcas[index]).getDataMarca(),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.hasData) {
-                                        Marca marca = snapshot.data;
-                                        return GestureDetector(
-                                          onTap: () {
-                                            buildContext.read<ProviderCatalogo>().setIdMarca = marca.id;
-                                            buildContext.read<ProviderCatalogo>().setNombreFiltro = marca.titulo;
-                                          },
-                                          child: Column(
-                                            children: <Widget>[
-                                              DashedCircle(
-                                                dashes: catalogo.getNumeroDeProductosDeMarca(id:marca.id ),
-                                                gradientColor:  colorGradientInstagram,
-                                                child: Padding(
-                                                padding: EdgeInsets.all(5.0),
-                                                child: viewCircleImage(url: marca.url_imagen,radius: 30),
-                                              ),
-                                                ),
-                                              SizedBox(
-                                                height: 8.0,
-                                              ),
-                                              Text(marca.titulo,
-                                                  style: TextStyle(
-                                                      fontSize: catalogo.getIdMarca==marca.id?14:12,
-                                                      fontWeight: catalogo.getIdMarca==marca.id?FontWeight.bold:FontWeight.normal),
-                                                  overflow: TextOverflow.fade,
-                                                  softWrap: false)
-                                            ],
-                                          ),
-                                        );
-                                      } else {
-                                        return Container();
-                                      }
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        );
-                      }),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
+    return Consumer<ProviderCatalogo>(
+      builder: (context, catalogo, child){
+        if( catalogo.getMarcas.length==0){return Container();}
+        return SizedBox(
+        height: 110.0,
+                child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: catalogo.getMarcas.length,
+            itemBuilder: (BuildContext c, int index) {
+              return Container(
+                width: 81.0,
+                height: 100.0,
+                padding: EdgeInsets.all(5.0),
+                child: new Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Stack(
+                      alignment: Alignment.bottomCenter,
+                      children: <Widget>[
+                        FutureBuilder(
+                          future: Global.getMarca(
+                                  idMarca: catalogo.getMarcas[index])
+                              .getDataMarca(),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              Marca marca = snapshot.data;
+                              return GestureDetector(
+                                onTap: () {
+                                  buildContext
+                                      .read<ProviderCatalogo>()
+                                      .setIdMarca = marca.id;
+                                  buildContext
+                                      .read<ProviderCatalogo>()
+                                      .setNombreFiltro = marca.titulo;
+                                },
+                                child: Column(
+                                  children: <Widget>[
+                                    DashedCircle(
+                                      dashes:
+                                          catalogo.getNumeroDeProductosDeMarca(
+                                              id: marca.id),
+                                      gradientColor: colorGradientInstagram,
+                                      child: Padding(
+                                        padding: EdgeInsets.all(5.0),
+                                        child: viewCircleImage(
+                                            url: marca.url_imagen, radius: 30),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 8.0,
+                                    ),
+                                    Text(marca.titulo,
+                                        style: TextStyle(
+                                            fontSize:
+                                                catalogo.getIdMarca == marca.id
+                                                    ? 14
+                                                    : 12,
+                                            fontWeight:
+                                                catalogo.getIdMarca == marca.id
+                                                    ? FontWeight.bold
+                                                    : FontWeight.normal),
+                                        overflow: TextOverflow.fade,
+                                        softWrap: false)
+                                  ],
+                                ),
+                              );
+                            } else {
+                              return Container();
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            }),
+      );
+      }
+      
     );
   }
-
 
   Widget dividerOpciones() {
     return Column(
@@ -723,4 +773,3 @@ class PagePrincipal extends StatelessWidget {
     );
   }
 }
-

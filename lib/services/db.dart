@@ -129,7 +129,13 @@ class Collection<T> {
   // Model Categoria
   Future<List<T>> getDataCategoriaAll() async {
     var snapshots = await ref.getDocuments();
-    return snapshots.documents.map((doc) => Global.modelsCategoria[T](doc.data) as T ).toList();
+    return snapshots.documents.map((doc) {
+      var map = new Map();
+      map=doc.data;
+      // valor de id del documento  por si es nulo
+      map["id"]=doc.documentID;
+      return Global.modelsCategoria[T](map) as T;
+      } ).toList();
   }
   Stream<List<T>> streamDataCategoriaAll() {
     return ref.snapshots().map((list) => list.documents.map((doc) => Global.modelsCategoria[T](doc.data) as T) );
