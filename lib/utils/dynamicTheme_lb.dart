@@ -18,8 +18,8 @@ import 'dart:async';
 /* Paquetes externos */
 import 'package:animate_do/animate_do.dart'; /* paquete externo // animate_do: ^[version] */
 import 'package:shared_preferences/shared_preferences.dart'; /* paquete externo // shared_preferences: ^[version] */
-
 export 'package:animate_do/animate_do.dart';
+
 
 typedef ThemedWidgetBuilder = Widget Function(BuildContext context, ThemeData data);
 typedef ThemeDataWithBrightnessBuilder = ThemeData Function(Brightness brightness);
@@ -41,6 +41,8 @@ class DynamicTheme extends StatefulWidget {
 class DynamicThemeState extends State<DynamicTheme> {
 
   /* Declarar variables */
+  Color colorBlack=Color.fromARGB(255, 20, 20, 20);
+  Color colorLight=Color.fromARGB(255, 238, 238, 238);
   ThemeData _themeData;
   Brightness _brightness=Brightness.light;
   /* ids */
@@ -53,15 +55,14 @@ class DynamicThemeState extends State<DynamicTheme> {
   void initState() {
     super.initState();
     _brightness = widget.defaultBrightness;
-    _themeData = widget.data(_brightness);
-    /* Carga el brillo del tema */
+    setBrightness(_brightness);
+    /* Carga el brillo del tema de las preferecias del usuario */
     loadBrightness().then((bool dark) {
-      _brightness = dark ? Brightness.dark : Brightness.light;
-      _themeData = widget.data(_brightness);
+      setBrightness(dark ? Brightness.dark : Brightness.light);
       /* Carga el color primario de tema */
 
       /* Barra de navegación del sistema ( personalización ) */
-          SystemUiOverlayStyle mySystemTheme = SystemUiOverlayStyle.dark.copyWith( 
+      SystemUiOverlayStyle mySystemTheme = SystemUiOverlayStyle.dark.copyWith( 
             systemNavigationBarColor: _brightness == Brightness.dark?Colors.black:Colors.white,
             systemNavigationBarIconBrightness: _brightness == Brightness.dark?Brightness.light:Brightness.dark,
             statusBarBrightness: Theme.of(context).brightness == Brightness.dark?Brightness.light:Brightness.dark,
@@ -88,8 +89,9 @@ class DynamicThemeState extends State<DynamicTheme> {
 
   /* SET ( Birrlo del tema ) */
   Future<void> setBrightness(Brightness brightness) async {
+    
     setState(() {
-      _themeData = widget.data(brightness).copyWith(primaryColor: _themeData.primaryColor,accentColor: _themeData.accentColor);
+      _themeData = widget.data(brightness).copyWith(primaryColor: _themeData.primaryColor,accentColor: _themeData.accentColor,scaffoldBackgroundColor: brightness==Brightness.dark?colorBlack:colorLight,canvasColor: brightness==Brightness.dark?colorBlack:colorLight);
       _brightness = brightness;
     });
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -173,8 +175,7 @@ class DynamicThemeState extends State<DynamicTheme> {
     return  IconButton(
       icon: brightness == Brightness.dark? const Icon(Icons.brightness_3, size: 24.0): const Icon(Icons.brightness_7,size: 24.0), 
       onPressed: (){ 
-        setBrightness( 
-          Theme.of(context).brightness==Brightness.dark?Brightness.light:Brightness.dark ); 
+        setBrightness(Theme.of(context).brightness==Brightness.dark?Brightness.light:Brightness.dark ); 
           /* Barra de navegación del sistema ( personalización ) */
           SystemUiOverlayStyle mySystemTheme = SystemUiOverlayStyle.dark.copyWith( 
             systemNavigationBarColor: _brightness == Brightness.dark?Colors.black:Colors.white,

@@ -63,6 +63,34 @@ class PerfilNegocio {
     geopoint = data['geopoint'];
     codigo_postal = data['codigo_postal'];
   }
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "username": username,
+        "imagen_perfil": imagen_perfil,
+        "nombre_negocio": nombre_negocio,
+        "telefono": telefono,
+        "categoria": categoria,
+        "categoria_nombre": categoria_nombre,
+        "sitio_web": sitio_web,
+        "descripcion": descripcion,
+        "timestamp_creation": timestamp_creation,
+        "timestamp_login": timestamp_login,
+        "signo_moneda": signo_moneda,
+        "cuenta_privada": cuenta_privada,
+        "horario": horario,
+        "bloqueo": bloqueo,
+        "mensaje_bloqueo": mensaje_bloqueo,
+        "cuenta_activa": cuenta_activa,
+        "cuenta_verificada": cuenta_verificada,
+        "geolocation": geolocation,
+        "codigo_pais": codigo_pais,
+        "pais": pais,
+        "provincia": provincia,
+        "ciudad": ciudad,
+        "geopoint": geopoint,
+        "codigo_postal": codigo_postal,
+        
+    };
 }
 
 class AdminUsuarioCuenta {

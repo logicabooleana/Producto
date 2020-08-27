@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:catalogo/services/preferencias_usuario.dart';
 import 'package:flutter/material.dart';
+import 'package:loadany/loadany_widget.dart';
 
 import 'services.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -135,8 +136,10 @@ set setCuentaNegocio( PerfilNegocio cuenta ) {
 }
 }
 class ProviderCatalogo with ChangeNotifier {
-//Creamos una clase "MyProvider" y le agregamos las capacidades de Change Notifier.
-
+  //Creamos una clase "MyProvider" y le agregamos las capacidades de Change Notifier.
+  
+  LoadStatus statusCargaGridListCatalogo = LoadStatus.normal;
+  List<Producto> cataloLoadMore = new List<Producto>();
   List<String> listMarcas = new List<String>();
   List<Producto> listCatalogo=new List();
   List<Producto> listCatalogoFilter=new List();
@@ -149,7 +152,7 @@ class ProviderCatalogo with ChangeNotifier {
   String get getIdMarca =>this.idMarca??"";
   String get getIdCategoria =>this.idCategoria??"";
   String get getNombreCategoria =>this.nombreCategoria??"Todos";
-  List<Producto> get getCatalogo =>listCatalogoFilter;
+  List<Producto> get getCatalogo =>cataloLoadMore;
   List<String> get getMarcas =>listMarcas??[];
 
   //Ahora creamos el método set para poder actualizar el valor de _mitexto, este método recibe un valor newTexto de tipo String
@@ -169,15 +172,16 @@ class ProviderCatalogo with ChangeNotifier {
     getFilterCatalogo(idCategoria:this.idCategoria,idMarca:this.idMarca );
     notifyListeners(); //notificamos a los widgets que esten escuchando el stream.
   }
+  
   set setCatalogo( List<Producto> list ) {
     this.listCatalogo = list; 
     getFilterCatalogo(idCategoria:this.idCategoria ,idMarca:this.idMarca);
-    notifyListeners(); //notificamos a los widgets que esten escuchando el stream.
+    //notifyListeners(); //notificamos a los widgets que esten escuchando el stream.
   }
   set setIdCategoria( String idCategoria ) {
     this.idCategoria = idCategoria; 
     getFilterCatalogo(idCategoria:this.idCategoria,idMarca: this.idMarca );
-    notifyListeners(); //notificamos a los widgets que esten escuchando el stream.
+    notifyListeners();
   }
   set setNombreFiltro( String nombreCategoria ) {
     this.nombreCategoria = nombreCategoria; 
@@ -198,6 +202,10 @@ class ProviderCatalogo with ChangeNotifier {
   void getFilterCatalogo({String idCategoria,String idMarca}){
 
     List<Producto> lista =[];
+    this.listCatalogoFilter.clear();
+    this.listCatalogoCategoria.clear();
+    statusCargaGridListCatalogo = LoadStatus.normal;
+
     if(idCategoria==""||idCategoria=="todos"){
 
       for (var i = 0; i < this.listCatalogo.length; i++) {
@@ -208,26 +216,33 @@ class ProviderCatalogo with ChangeNotifier {
           lista.add(this.listCatalogo[i]);
         }
       }
-      
       this.listCatalogoFilter=lista;
       // Carga las marca de los prosductos mostrados de la categoria
-      _updateMarcas(listaProductos:  this.listCatalogo);
     }else{
       for (var i = 0; i < this.listCatalogo.length; i++) {
           
         if(idCategoria!=""&& idMarca=="" ){
-          if(this.listCatalogo[i].categoria==idCategoria){ lista.add(this.listCatalogo[i]); listCatalogoCategoria.add(this.listCatalogo[i]); }
+          if(this.listCatalogo[i].categoria==idCategoria){ 
+            lista.add(this.listCatalogo[i]); 
+           listCatalogoCategoria.add(this.listCatalogo[i]); 
+          }
         }else if(idCategoria!=""&& idMarca!=""){
           if(this.listCatalogo[i].categoria==idCategoria){listCatalogoCategoria.add(this.listCatalogo[i]);if( idMarca==this.listCatalogo[i].id_marca ){lista.add(this.listCatalogo[i]); }}
         }else if(idCategoria==""&& idMarca!=""){
           if( idMarca==this.listCatalogo[i].id_marca ){lista.add(this.listCatalogo[i]); }
         }
       }
-      // Carga las marca de los prosductos mostrados de la categoria
-    _updateMarcas(listaProductos: this.listCatalogo);
+
     this.listCatalogoFilter=lista;
     }
-    
+    // Carga las marca de los prosductos mostrados de la categoria
+    _updateMarcas(listaProductos:  this.listCatalogoFilter);
+    this.cataloLoadMore.clear();
+    for (var i = 0; i < 15; ++i) {
+        if( this.cataloLoadMore.length < this.listCatalogoFilter.length ){
+          this.cataloLoadMore.add(this.listCatalogoFilter[ i]);
+        }
+    } //notificamos a los widgets que esten escuchando el stream.
 
   }
 
@@ -238,7 +253,7 @@ class ProviderCatalogo with ChangeNotifier {
     List<String>  marcas =[];
 
     if( this.idCategoria==""|| this.idCategoria=="todos"){
-      for (var Producto in listaProductos) {
+      for (var Producto in this.listCatalogo) {
         if( Producto.id_marca!= null && Producto.id_marca != "" ){
           marcas.add(Producto.id_marca);
         }
@@ -253,6 +268,27 @@ class ProviderCatalogo with ChangeNotifier {
 
 
     this.listMarcas=marcas.toSet().toList();
+  }
+
+  Future<void> getLoadMore() async {
+    statusCargaGridListCatalogo = LoadStatus.loading;
+     notifyListeners();
+    Timer.periodic(Duration(milliseconds: 2000), (Timer timer) {
+      timer.cancel();
+      int length = cataloLoadMore.length;
+      for (var i = 0; i < 15; ++i) {
+        if( cataloLoadMore.length < this.listCatalogoFilter.length ){
+          cataloLoadMore.add(listCatalogoFilter[length + i]);
+        }
+      }
+
+      if (cataloLoadMore.length >= listCatalogoFilter.length) {
+        statusCargaGridListCatalogo = LoadStatus.completed;
+      } else {
+        statusCargaGridListCatalogo = LoadStatus.normal;
+      }
+      notifyListeners();
+    });
   }
 }
 

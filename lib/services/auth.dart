@@ -45,12 +45,11 @@ class AuthService {
     }
   }
 
-  /// Sign in with Google
+  /// Inicia sesión con Google
   Future<FirebaseUser> googleSignIn() async {
     try {
       GoogleSignInAccount googleSignInAccount = await _googleSignIn.signIn();
-      GoogleSignInAuthentication googleAuth =
-          await googleSignInAccount.authentication;
+      GoogleSignInAuthentication googleAuth =await googleSignInAccount.authentication;
 
       final AuthCredential credential = GoogleAuthProvider.getCredential(
         accessToken: googleAuth.accessToken,
@@ -75,8 +74,9 @@ class AuthService {
     return user;
   }
 
-  // Sign out
-  Future<void> signOut() {
-    return _auth.signOut();
+  // Sign out // desconectar
+  Future<void> signOut() async {
+    await _googleSignIn.signOut();
+    return await  _auth.signOut();
   }
 }

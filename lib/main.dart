@@ -10,6 +10,7 @@ import 'screens/screens.dart';
 import 'package:catalogo/utils/dynamicTheme_lb.dart';
 import 'package:catalogo/services/preferencias_usuario.dart';
 import 'package:catalogo/screens/page_principal.dart';
+import 'package:catalogo/screens/profileCuenta.dart';
 
 
 void main() async {
@@ -62,11 +63,14 @@ class MyApp extends StatelessWidget {
               // Named Routes
               routes: {
                 '/': (context) => LoginScreen(),
+                'init': (context) => MyApp(),
                 '/page_catalogo': (context) => PagePrincipal(), // CatalogoNegocio(),
                 '/profile': (context) => ProfileScreen(),
+                '/profilCuenta': (context) => ProfileCuenta(),
                 '/about': (context) => AboutScreen(),
                 '/page_themeApp': (context) => PageThemePreferences(),
               },
+              
             ),
           );
         });

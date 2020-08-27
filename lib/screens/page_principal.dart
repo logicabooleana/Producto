@@ -9,9 +9,12 @@ import 'package:catalogo/services/preferencias_usuario.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/cupertino.dart';
 
 /* Dependencias */
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:catalogo/screens/widgets/widget_profile.dart';
 import 'package:catalogo/screens/widgets/widget_CatalogoGridList.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -40,17 +43,38 @@ class PagePrincipal extends StatelessWidget {
     return Global.prefs.getIdNegocio == ""
         ? Scaffold(
             body: Center(
-              child: RaisedButton(
-                child: Text("Seleccionar cuenta"),
-                onPressed: () => selectCuenta(buildContext),
-                color: Colors.red,
-                textColor: Colors.white,
-                splashColor: Colors.grey,
-                padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  RaisedButton(
+                    child: Text("Seleccionar cuenta"),
+                    onPressed: () => selectCuenta(buildContext),
+                    color: Colors.red,
+                    textColor: Colors.white,
+                    splashColor: Colors.grey,
+                    padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                  ),
+                  RaisedButton(
+                    child: Text("Cerrar sesion"),
+                    onPressed: () async {
+                      //TODO: Mejorar el metodo de cerrar sesion
+                                  showAlertDialog(buildContext);
+                                  Global.prefs.setIdNegocio = "";
+                                  AuthService auth = AuthService();
+                                  await auth.signOut();
+                                  Future.delayed(
+                                      const Duration(milliseconds: 800), () {
+                                    Navigator.pushReplacementNamed(
+                                        buildContext, '/');
+                                  });
+                    },
+                  ),
+                ],
               ),
             ),
           )
-        : FutureBuilder(
+        
+         : FutureBuilder(
             future: Global.getNegocio(idNegocio: Global.prefs.getIdNegocio)
                 .getDataPerfilNegocio(),
             builder: (c, snapshot) {
@@ -110,10 +134,9 @@ class PagePrincipal extends StatelessWidget {
                   Navigator.pushNamed(buildContext, '/page_themeApp')),
         ],
       ),
-      body: FutureBuilder(
-        future: Global.getCatalogoNegocio(idNegocio: perfilNegocio.id)
-            .getDataProductoAll(),
-        builder: (c, snapshot) {
+      body: new StreamBuilder(
+        stream: Global.getCatalogoNegocio(idNegocio: perfilNegocio.id).streamDataProductoAll(),
+        builder: (context, snapshot) {
           if (snapshot.hasData) {
             Global.listProudctosNegocio = snapshot.data;
             buildContext.read<ProviderCatalogo>().setCatalogo = snapshot.data;
@@ -123,27 +146,54 @@ class PagePrincipal extends StatelessWidget {
           }
         },
       ),
-      floatingActionButton: AnimatedFloatingActionButton(
-        fabButtons: fabButtons(buildContext),
-        animatedIconData: AnimatedIcons.menu_close,
+      
+      /* FutureBuilder(
+        future: Global.getCatalogoNegocio(idNegocio: perfilNegocio.id).getDataProductoAll(),
+        builder: (c, snapshot) {
+          if (snapshot.hasData) {
+            Global.listProudctosNegocio = snapshot.data;
+            buildContext.read<ProviderCatalogo>().setCatalogo = snapshot.data;
+            return defaultTabController(buildContext: buildContext);
+          } else {
+            return Center(child: CircularProgressIndicator());
+          }
+        },
+      ), */
+      floatingActionButton: FloatingActionButton(
+        heroTag: "Escanear codigo",
+        child:  Image(color: Colors.white,height: 30.0, width: 30.0,image: AssetImage('assets/barcode.png'), fit: BoxFit.contain), 
+        tooltip: 'Escanea el codigo del producto',
+        onPressed: ()=> scanBarcodeNormal(),
       ),
     );
   }
+String _scanBarcode = 'Unknown';
+startBarcodeScanStream() async {
+    FlutterBarcodeScanner.getBarcodeStreamReceiver(
+            "#ff6666", "Cancel", true, ScanMode.BARCODE)
+        .listen((barcode) => print(barcode));
+  }
 
-  List<Widget> fabButtons(BuildContext context) {
-    return <Widget>[
-      FloatingActionButton(
-        heroTag: "Escanear codigo",
-        child: Icon(Icons.border_clear),
-        tooltip: 'Escanea el codigo del producto',
-        onPressed: () {},
-      ),
-      FloatingActionButton(
-          heroTag: "Agregar",
-          child: Icon(Icons.add),
-          tooltip: 'Crea tu propio catálogo',
-          onPressed: () {}),
-    ];
+
+  // Platform messages are asynchronous, so we initialize in an async method.
+  Future<void> scanBarcodeNormal() async {
+    String barcodeScanRes;
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    try {
+      barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
+          "#ff6666", "Cancel", true, ScanMode.BARCODE);
+      print(barcodeScanRes);
+    } on PlatformException {
+      barcodeScanRes = 'Failed to get platform version.';
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    //if (!mounted) return;
+
+    _scanBarcode = barcodeScanRes;
+    print(_scanBarcode);
   }
 
   /* Devuelve una widget de una barra para buscar */
@@ -299,6 +349,108 @@ class PagePrincipal extends StatelessWidget {
                             ],
                           );
                         }
+                        if (index == Global.listAdminPerfilNegocio.length - 1) {
+                          return Column(
+                            children: <Widget>[
+                              FutureBuilder(
+                                future: Global.getNegocio(
+                                        idNegocio: Global
+                                            .listAdminPerfilNegocio[index].id)
+                                    .getDataPerfilNegocio(),
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasData) {
+                                    PerfilNegocio perfilNegocio = snapshot.data;
+                                    return Column(
+                                      children: <Widget>[
+                                        ListTile(
+                                          leading: perfilNegocio
+                                                          .imagen_perfil ==
+                                                      "" ||
+                                                  perfilNegocio.imagen_perfil ==
+                                                      "default"
+                                              ? CircleAvatar(
+                                                  backgroundColor:
+                                                      Colors.black26,
+                                                  radius: 24.0,
+                                                  child: Text(
+                                                      perfilNegocio
+                                                          .nombre_negocio
+                                                          .substring(0, 1),
+                                                      style: TextStyle(
+                                                          fontSize: 18.0,
+                                                          color: Colors.white,
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                )
+                                              : CachedNetworkImage(
+                                                  imageUrl: perfilNegocio
+                                                      .imagen_perfil,
+                                                  placeholder: (context, url) =>
+                                                      const CircleAvatar(
+                                                    backgroundColor:
+                                                        Colors.grey,
+                                                    radius: 24.0,
+                                                  ),
+                                                  imageBuilder:
+                                                      (context, image) =>
+                                                          CircleAvatar(
+                                                    backgroundImage: image,
+                                                    radius: 24.0,
+                                                  ),
+                                                ),
+                                          dense: true,
+                                          title: Text(
+                                              perfilNegocio.nombre_negocio),
+                                          subtitle: _getAdminUserData(
+                                              idNegocio: perfilNegocio.id),
+                                          onTap: () {
+                                            if (perfilNegocio.id != "") {
+                                              Global.oPerfilNegocio =
+                                                  perfilNegocio;
+                                              buildContext
+                                                  .read<ProviderPerfilNegocio>()
+                                                  .setCuentaNegocio = perfilNegocio;
+                                              prefs.setIdNegocio =
+                                                  perfilNegocio.id.toString();
+                                              Navigator.pop(context);
+                                            }
+                                          },
+                                        ),
+                                        Divider(endIndent: 12.0, indent: 12.0),
+                                      ],
+                                    );
+                                  } else {
+                                    return ListTile(title: Text("Cargando..."));
+                                  }
+                                },
+                              ),
+                              ListTile(
+                                contentPadding: EdgeInsets.symmetric(
+                                    vertical: 15.0, horizontal: 15.0),
+                                leading: CircleAvatar(
+                                  radius: 24.0,
+                                  child: Icon(Icons.close),
+                                ),
+                                dense: true,
+                                title: Text("Cerrar sesión",
+                                    style: TextStyle(fontSize: 16.0)),
+                                onTap: () async {
+
+                                  //TODO: Mejorar el metodo de cerrar sesion
+                                  showAlertDialog(buildContext);
+                                  Global.prefs.setIdNegocio = "";
+                                  AuthService auth = AuthService();
+                                  await auth.signOut();
+                                  Future.delayed(
+                                      const Duration(milliseconds: 800), () {
+                                    Navigator.pushReplacementNamed(
+                                        buildContext, '/');
+                                  });
+                                },
+                              ),
+                            ],
+                          );
+                        }
                         return Column(
                           children: <Widget>[
                             FutureBuilder(
@@ -386,6 +538,24 @@ class PagePrincipal extends StatelessWidget {
         });
   }
 
+  showAlertDialog(BuildContext context) {
+    AlertDialog alert = AlertDialog(
+      content: new Row(
+        children: [
+          CircularProgressIndicator(),
+          Container(margin: EdgeInsets.only(left: 5), child: Text("Loading")),
+        ],
+      ),
+    );
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
   Widget defaultTabController({@required BuildContext buildContext}) {
     return DefaultTabController(
       length: 1,
@@ -409,6 +579,36 @@ class PagePrincipal extends StatelessWidget {
           ];
         },
         /* La vista de pestaña va aqui */
+        /* body:Consumer<ProviderCatalogo>(
+                  child: Tab(text: "Todos"),
+                  builder: (context, catalogo, child) {
+                    return Column(
+          children: <Widget>[
+            Divider(height: 0.0),
+            TabBar(
+              indicatorColor: Theme.of(buildContext).accentColor,
+              indicatorWeight: 5.0,
+              labelColor: Theme.of(buildContext).brightness == Brightness.dark
+                  ? Colors.white
+                  : Colors.black,
+              onTap: (value) => showSelectCategoria(buildContext: buildContext),
+              tabs: [
+                Tab(text: catalogo.getNombreCategoria??Tab(text:"Todos")),
+              ],
+            ),
+            Divider(height: 0.0),
+            Expanded(
+              child: TabBarView(
+                children: [
+                  //MyHomePage(title: 'Flutter LoadMore Demo'),
+                  WidgetCatalogoGridList(catalogoParametro: catalogo.getCatalogo),
+                ],
+              ),
+            ),
+          ],
+        );
+                  },
+                ), */
         body: Column(
           children: <Widget>[
             Divider(height: 0.0),
@@ -433,11 +633,12 @@ class PagePrincipal extends StatelessWidget {
               child: TabBarView(
                 children: [
                   WidgetCatalogoGridList(),
+                  
                 ],
               ),
             ),
           ],
-        ),
+        ), 
       ),
     );
   }
@@ -674,12 +875,13 @@ class PagePrincipal extends StatelessWidget {
       Color.fromRGBO(68, 0, 71, 1.0)
     ];
 
-    return Consumer<ProviderCatalogo>(
-      builder: (context, catalogo, child){
-        if( catalogo.getMarcas.length==0){return Container();}
-        return SizedBox(
+    return Consumer<ProviderCatalogo>(builder: (context, catalogo, child) {
+      if (catalogo.getMarcas.length == 0) {
+        return Container();
+      }
+      return SizedBox(
         height: 110.0,
-                child: ListView.builder(
+        child: ListView.builder(
             scrollDirection: Axis.horizontal,
             itemCount: catalogo.getMarcas.length,
             itemBuilder: (BuildContext c, int index) {
@@ -741,7 +943,15 @@ class PagePrincipal extends StatelessWidget {
                                 ),
                               );
                             } else {
-                              return Container();
+                              return DashedCircle(
+                                dashes: 1,
+                                gradientColor: colorGradientInstagram,
+                                child: Padding(
+                                  padding: EdgeInsets.all(5.0),
+                                  child: viewCircleImage(
+                                      url: "default", radius: 30),
+                                ),
+                              );
                             }
                           },
                         ),
@@ -752,9 +962,7 @@ class PagePrincipal extends StatelessWidget {
               );
             }),
       );
-      }
-      
-    );
+    });
   }
 
   Widget dividerOpciones() {

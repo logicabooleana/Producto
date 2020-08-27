@@ -123,7 +123,7 @@ class Collection<T> {
     return snapshots.documents.map((doc) => Global.modelsProducto[T](doc.data) as T ).toList();
   }
   Stream<List<T>> streamDataProductoAll() {
-    return ref.snapshots().map((list) => list.documents.map((doc) => Global.modelsProducto[T](doc.data) as T) );
+    return ref.snapshots().map((list) => list.documents.map((doc) => Global.modelsProducto[T](doc.data) as T).toList() );
   }
 
   // Model Categoria
