@@ -2,8 +2,8 @@
 
 import 'dart:ui';
 
-import 'package:animated_floatactionbuttons/animated_floatactionbuttons.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:catalogo/screens/profile.dart';
 import 'package:catalogo/screens/widgets/widget_circle_border.dart';
 import 'package:catalogo/services/preferencias_usuario.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +14,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
 
 /* Dependencias */
+import 'package:catalogo/screens/page_producto_view.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:catalogo/screens/widgets/widget_profile.dart';
 import 'package:catalogo/screens/widgets/widget_CatalogoGridList.dart';
@@ -31,14 +32,15 @@ import 'package:catalogo/models/models_catalogo.dart';
 class PagePrincipal extends StatelessWidget {
   /* Declarar variables */
   double get randHeight => math.Random().nextInt(100).toDouble();
-  FirebaseUser firebaseUser;
+  User firebaseUser;
   PreferenciasUsuario prefs;
   final AuthService auth = AuthService();
 
   @override
   Widget build(BuildContext buildContext) {
     prefs = new PreferenciasUsuario();
-    firebaseUser = Provider.of<FirebaseUser>(buildContext);
+    firebaseUser = Provider.of<User>(buildContext);
+
 
     return Global.prefs.getIdNegocio == ""
         ? Scaffold(
@@ -58,23 +60,20 @@ class PagePrincipal extends StatelessWidget {
                     child: Text("Cerrar sesion"),
                     onPressed: () async {
                       //TODO: Mejorar el metodo de cerrar sesion
-                                  showAlertDialog(buildContext);
-                                  Global.prefs.setIdNegocio = "";
-                                  AuthService auth = AuthService();
-                                  await auth.signOut();
-                                  Future.delayed(
-                                      const Duration(milliseconds: 800), () {
-                                    Navigator.pushReplacementNamed(
-                                        buildContext, '/');
-                                  });
+                      showAlertDialog(buildContext);
+                      Global.prefs.setIdNegocio = "";
+                      AuthService auth = AuthService();
+                      await auth.signOut();
+                      Future.delayed(const Duration(milliseconds: 800), () {
+                        Navigator.pushReplacementNamed(buildContext, '/');
+                      });
                     },
                   ),
                 ],
               ),
             ),
           )
-        
-         : FutureBuilder(
+        : FutureBuilder(
             future: Global.getNegocio(idNegocio: Global.prefs.getIdNegocio)
                 .getDataPerfilNegocio(),
             builder: (c, snapshot) {
@@ -121,17 +120,58 @@ class PagePrincipal extends StatelessWidget {
                     style: TextStyle(
                         color:
                             Theme.of(buildContext).textTheme.bodyText1.color)),
-                Icon(Icons.keyboard_arrow_down),
+                Icon(Icons.keyboard_arrow_down)
               ],
             ),
           ),
         ),
         actions: <Widget>[
           DynamicTheme.of(buildContext).getIConButton(buildContext),
-          IconButton(
-              icon: Icon(Icons.tune),
-              onPressed: () =>
-                  Navigator.pushNamed(buildContext, '/page_themeApp')),
+          Container(
+            padding:EdgeInsets.all(12.0) ,
+            child: InkWell(
+              customBorder: new CircleBorder(),
+              splashColor: Colors.red,
+              onTap: (){
+                Navigator.of(buildContext).push(MaterialPageRoute(
+                                builder: (BuildContext context) =>ProfileScreen()
+                              ));
+              },
+              child: CircleAvatar(
+                radius: 17,
+                child: CircleAvatar(
+                  radius: 15,
+                  backgroundColor: Colors.white,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10000.0),
+                    child: CachedNetworkImage(
+                      width: 35.0,
+                      height: 35.0,
+                      fadeInDuration: Duration(milliseconds: 200),
+                      fit: BoxFit.cover,
+                      imageUrl: firebaseUser.photoUrl,
+                      placeholder: (context, url) => FadeInImage(
+                          image: AssetImage("assets/loading.gif"),
+                          placeholder: AssetImage("assets/loading.gif")),
+                      errorWidget: (context, url, error) => Container(
+                        color: Colors.grey,
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.width,
+                        child: Center(
+                          child: Text(
+                            firebaseUser.displayName.substring(0, 1),
+                            style: TextStyle(
+                                fontSize: 16.0),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  
+                ),
+              ),
+            ),
+          ),
         ],
       ),
       body: new StreamBuilder(
@@ -146,37 +186,25 @@ class PagePrincipal extends StatelessWidget {
           }
         },
       ),
-      
-      /* FutureBuilder(
-        future: Global.getCatalogoNegocio(idNegocio: perfilNegocio.id).getDataProductoAll(),
-        builder: (c, snapshot) {
-          if (snapshot.hasData) {
-            Global.listProudctosNegocio = snapshot.data;
-            buildContext.read<ProviderCatalogo>().setCatalogo = snapshot.data;
-            return defaultTabController(buildContext: buildContext);
-          } else {
-            return Center(child: CircularProgressIndicator());
-          }
-        },
-      ), */
       floatingActionButton: FloatingActionButton(
         heroTag: "Escanear codigo",
-        child:  Image(color: Colors.white,height: 30.0, width: 30.0,image: AssetImage('assets/barcode.png'), fit: BoxFit.contain), 
+        child: Image(
+            color: Colors.white,
+            height: 30.0,
+            width: 30.0,
+            image: AssetImage('assets/barcode.png'),
+            fit: BoxFit.contain),
         tooltip: 'Escanea el codigo del producto',
-        onPressed: ()=> scanBarcodeNormal(),
+        onPressed: () {
+          scanBarcodeNormal(context: buildContext);
+        }
       ),
     );
   }
-String _scanBarcode = 'Unknown';
-startBarcodeScanStream() async {
-    FlutterBarcodeScanner.getBarcodeStreamReceiver(
-            "#ff6666", "Cancel", true, ScanMode.BARCODE)
-        .listen((barcode) => print(barcode));
-  }
 
-
+  String _scanBarcode = '';
   // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> scanBarcodeNormal() async {
+  Future<void> scanBarcodeNormal({ @required BuildContext context}) async {
     String barcodeScanRes;
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
@@ -191,9 +219,20 @@ startBarcodeScanStream() async {
     // message was in flight, we want to discard the reply rather than calling
     // setState to update our non-existent appearance.
     //if (!mounted) return;
-
     _scanBarcode = barcodeScanRes;
-    print(_scanBarcode);
+    bool coincidencia = false;
+    for (ProductoNegocio producto in Global.listProudctosNegocio ) {
+      if( producto.codigo == _scanBarcode){
+        coincidencia=true;
+        Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (BuildContext context) => ProductScreen(producto: producto),
+                ),
+              );
+        break;
+      }
+    }
+  
   }
 
   /* Devuelve una widget de una barra para buscar */
@@ -241,19 +280,19 @@ startBarcodeScanStream() async {
   void selectCuenta(BuildContext buildContext) {
     // muestre la hoja inferior modal
     showModalBottomSheet(
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+        shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
         backgroundColor: Theme.of(buildContext).canvasColor,
         context: buildContext,
         builder: (ctx) {
           return ClipRRect(
             child: Container(
               child: FutureBuilder(
-                future: Global.getListNegocioAdmin(idNegocio: firebaseUser.uid)
-                    .getDataAdminPerfilNegocioAll(),
+                future: Global.getListNegocioAdmin(idNegocio: firebaseUser.uid).getDataAdminPerfilNegocioAll(),
                 builder: (c, snapshot) {
                   if (snapshot.hasData) {
+
                     Global.listAdminPerfilNegocio = snapshot.data;
+
                     return ListView.builder(
                       padding: EdgeInsets.symmetric(vertical: 15.0),
                       shrinkWrap: true,
@@ -435,7 +474,6 @@ startBarcodeScanStream() async {
                                 title: Text("Cerrar sesión",
                                     style: TextStyle(fontSize: 16.0)),
                                 onTap: () async {
-
                                   //TODO: Mejorar el metodo de cerrar sesion
                                   showAlertDialog(buildContext);
                                   Global.prefs.setIdNegocio = "";
@@ -578,37 +616,6 @@ startBarcodeScanStream() async {
             ),
           ];
         },
-        /* La vista de pestaña va aqui */
-        /* body:Consumer<ProviderCatalogo>(
-                  child: Tab(text: "Todos"),
-                  builder: (context, catalogo, child) {
-                    return Column(
-          children: <Widget>[
-            Divider(height: 0.0),
-            TabBar(
-              indicatorColor: Theme.of(buildContext).accentColor,
-              indicatorWeight: 5.0,
-              labelColor: Theme.of(buildContext).brightness == Brightness.dark
-                  ? Colors.white
-                  : Colors.black,
-              onTap: (value) => showSelectCategoria(buildContext: buildContext),
-              tabs: [
-                Tab(text: catalogo.getNombreCategoria??Tab(text:"Todos")),
-              ],
-            ),
-            Divider(height: 0.0),
-            Expanded(
-              child: TabBarView(
-                children: [
-                  //MyHomePage(title: 'Flutter LoadMore Demo'),
-                  WidgetCatalogoGridList(catalogoParametro: catalogo.getCatalogo),
-                ],
-              ),
-            ),
-          ],
-        );
-                  },
-                ), */
         body: Column(
           children: <Widget>[
             Divider(height: 0.0),
@@ -633,12 +640,11 @@ startBarcodeScanStream() async {
               child: TabBarView(
                 children: [
                   WidgetCatalogoGridList(),
-                  
                 ],
               ),
             ),
           ],
-        ), 
+        ),
       ),
     );
   }
@@ -914,14 +920,11 @@ startBarcodeScanStream() async {
                                 child: Column(
                                   children: <Widget>[
                                     DashedCircle(
-                                      dashes:
-                                          catalogo.getNumeroDeProductosDeMarca(
-                                              id: marca.id),
+                                      dashes:catalogo.getNumeroDeProductosDeMarca(id: marca.id),
                                       gradientColor: colorGradientInstagram,
                                       child: Padding(
                                         padding: EdgeInsets.all(5.0),
-                                        child: viewCircleImage(
-                                            url: marca.url_imagen, radius: 30),
+                                        child: viewCircleImage(url: marca.url_imagen, radius: 30),
                                       ),
                                     ),
                                     SizedBox(

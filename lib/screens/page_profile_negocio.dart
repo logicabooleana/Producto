@@ -652,7 +652,7 @@ class _PageProfileState extends State<PageProfile> {
         Global.listProudctosNegocio.length;
     buildContext.read<ProviderMarcasProductos>().listMarcas.clear();
 
-    List<Producto> listProductosItems = Global.listProudctosNegocio;
+    List<ProductoNegocio> listProductosItems = Global.listProudctosNegocio;
     List<String> listMarcas = new List<String>();
 
     // Refactoriza la lista de productos segun la categoria y/o marca
@@ -973,7 +973,7 @@ class _PageProfileState extends State<PageProfile> {
 }
 
 class ProductoItem extends StatelessWidget {
-  final Producto producto;
+  final ProductoNegocio producto;
   final double width;
   const ProductoItem({Key key, this.producto,this.width=double.infinity}) : super(key: key);
 

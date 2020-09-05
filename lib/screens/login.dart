@@ -1,8 +1,8 @@
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../services/services.dart';
-import 'package:apple_sign_in/apple_sign_in.dart';
 
 class LoginScreen extends StatefulWidget {
   createState() => LoginScreenState();
@@ -10,21 +10,27 @@ class LoginScreen extends StatefulWidget {
 
 class LoginScreenState extends State<LoginScreen> {
   AuthService auth = AuthService();
+  
 
   @override
   void initState() {
     super.initState();
-    auth.getUser.then(
-      (user) {
-        if (user != null) {
+
+
+    auth.user.first.then((value) {
+      if (value!= null) {
           Navigator.pushReplacementNamed(context, '/page_catalogo');
+          //Navigator.of(context).pushNamedAndRemoveUntil('/page_catalogo', (Route<dynamic> route) => false);
         }
-      },
-    );
+    });
+     
   }
+
 
   @override
   Widget build(BuildContext context) {
+
+    //return Center(child: Text("data",textDirection: TextDirection.rtl),);
     return Scaffold(
       body: Container(
         padding: EdgeInsets.all(30),
@@ -33,39 +39,28 @@ class LoginScreenState extends State<LoginScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            FlutterLogo(
-              size: 150,
-            ),
+            Image.asset('assets/barcode.png',width: 100.0,height: 100.0,color: Colors.white,),
             Text(
-              'Login to Start',
-              style: Theme.of(context).textTheme.headline,
+              'Catalogo',
+              style: Theme.of(context).textTheme.headline4,
               textAlign: TextAlign.center,
             ),
-            Text('Your Tagline'),
+            Text('👋'),
             LoginButton(
-              text: 'LOGIN WITH GOOGLE',
+              text: 'INICIAR SESIÓN CON GOOGLE',
               icon: FontAwesomeIcons.google,
               color: Colors.black45,
               loginMethod: auth.googleSignIn,
             ),
-            FutureBuilder<Object>(
-              future: auth.appleSignInAvailable,
-              builder: (context, snapshot) {
-                if (snapshot.data == true) {
-                  return AppleSignInButton(
-                    onPressed: () async { 
-                      FirebaseUser user = await auth.appleSignIn();
-                      if (user != null) {
-                        Navigator.pushReplacementNamed(context, '/page_catalogo');
-                      }
-                    },
-                  );
-                } else {
-                  return Container();
-                }
-              },
+            Row(
+              crossAxisAlignment:CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Image.asset('assets/ic_launcher_commer.png',width: 30.0,height: 30.0),
+                SizedBox(width: 8.0,),
+                Text("Commer",style: TextStyle(fontSize: 18.0),),
+              ],
             ),
-            LoginButton(text: 'Continue as Guest', loginMethod: auth.anonLogin)
           ],
         ),
       ),

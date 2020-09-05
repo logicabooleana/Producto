@@ -7,12 +7,26 @@ class Precio{
   Timestamp timestamp;
   String moneda="";
 
+   Precio({ 
+    this.id_negocio, 
+    this.precio, 
+    this.timestamp, 
+    this.moneda, 
+    });
+
   Precio.fromMap(Map data) {
     id_negocio = data['id_negocio'] ?? '';
     precio = data['precio'] ?? 0.0;
     timestamp = data['timestamp'];
     moneda = data['moneda'] ?? '';
   }
+  Map<String, dynamic> toJson() => {
+        "id_negocio": id_negocio,
+        "precio": precio,
+        "timestamp": timestamp,
+        "moneda": moneda,
+        
+    };
 }
 
 class Categoria {
@@ -30,7 +44,7 @@ class Categoria {
     return Categoria(
       id: data['id'] ?? '',
       nombre: data['nombre'] ?? '',
-      url_imagen: data['url_imagen'] ?? '',
+      url_imagen: data['url_imagen'] ?? 'default',
     );
   }
 
@@ -55,7 +69,7 @@ class Marca {
     id= data['id'] ?? '';
       titulo= data['titulo'] ?? '';
       descripcion= data['descripcion'] ?? '';
-      url_imagen= data['url_imagen'] ?? '';
+      url_imagen= data['url_imagen'] ?? 'default';
       codigo_empresa= data['codigo_empresa'] ?? '';
       timestamp_seleccion= data['timestamp_seleccion'] ;
       id_usuario_creador= data['id_usuario_creador'] ?? '';

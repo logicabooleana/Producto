@@ -13,10 +13,9 @@ import 'package:catalogo/models/models_profile.dart';
 /// Static global state. Immutable services that do not care about build context. 
 class Global {
   // App Data
-  static final String title = 'Fireship';
   static PerfilNegocio oPerfilNegocio;
   static List<PerfilNegocio> listAdminPerfilNegocio=new List();
-  static List<Producto> listProudctosNegocio=new List();
+  static List<ProductoNegocio> listProudctosNegocio=new List();
   static List<Seguidor> listSeguidoresRef=new List();
   static List<Categoria> listCategoriasCatalogo=new List();
   static PreferenciasUsuario prefs = new PreferenciasUsuario();
@@ -38,7 +37,7 @@ class Global {
     Precio: (data) => Precio.fromMap(data),
   };
   static final Map modelsProducto = {
-    Producto: (data) => Producto.fromMap(data),
+    ProductoNegocio: (data) => ProductoNegocio.fromMap(data),
   };
   static final Map modelsCategoria = {
     Categoria: (data) => Categoria.fromMap(data),
@@ -49,14 +48,18 @@ class Global {
   
 
   // Firestore References for Writes
-  static final Collection<Producto> listProductos = Collection<Producto>(path: 'PRODUCTOS');
+  static final Collection<ProductoNegocio> listProductos = Collection<ProductoNegocio>(path: 'PRODUCTOS');
 
   // Consultas DB ( Dodument )
   static Document<Marca> getMarca( { @required String idMarca,String isoPais="ARG"} ){
     // Firestore References for Writes
     return  Document<Marca>(path: '/APP/ARG/MARCAS/$idMarca');
   }
-  static Document<PerfilNegocio> getNegocio( { String idNegocio} ){
+  static Document<Precio> getPreciosProducto( { @required String idNegocio,@required String idProducto,String isoPAis="ARG"} ){
+    // Firestore References for Writes
+    return  Document<Precio>(path: '/APP/$isoPAis/PRODUCTOS/$idProducto/REGISTRO_PRECIOS_$isoPAis/$idNegocio'); // '/APP/ARG/PRODUCTOS'
+  }
+  static Document<PerfilNegocio> getNegocio( {@required String idNegocio} ){
     // Firestore References for Writes
     return  Document<PerfilNegocio>(path: '/NEGOCIOS/$idNegocio'); // '/APP/ARG/PRODUCTOS'
   }
@@ -68,6 +71,15 @@ class Global {
     // Firestore References for Writes
     return  Document<AdminUsuarioCuenta>(path: '/NEGOCIOS/$idNegocio/ADMINISTRADOR_NEGOCIOS/$idUserAdmin'); // '/APP/ARG/PRODUCTOS'
   }
+  static Document<AdminUsuarioCuenta> getDataProductoNegocio( { @required String idNegocio , @required String idProducto } ){
+    // Firestore References for Writes
+    return  Document<AdminUsuarioCuenta>(path: '/NEGOCIOS/$idNegocio/EXTENSION_CATALOGO/$idProducto'); // '/APP/ARG/PRODUCTOS'
+  }
+  static Document<Producto> getProductosPrecargado({ String idProducto,String isoPAis="ARG"} ){
+    // Firestore References for Writes
+    return  Document<Producto>(path: '/APP/$isoPAis/PRODUCTOS/$idProducto'); 
+  }
+
   // Consultas DB ( Colecction )
   static Collection<Precio> getListPreciosProducto( { String idProducto,String isoPAis="ARG"} ){
     // Firestore References for Writes
@@ -77,23 +89,27 @@ class Global {
     // Firestore References for Writes
     return  Collection<PerfilNegocio>(path: '/USUARIOS/$idNegocio/ADMINISTRADOR_NEGOCIOS'); // '/APP/ARG/PRODUCTOS'
   }
-  static Collection<Producto> getListSeguidores( { String idNegocio} ){
+  static Collection<ProductoNegocio> getListSeguidores( { String idNegocio} ){
     // Firestore References for Writes
-    return  Collection<Producto>(path: '/NEGOCIOS/$idNegocio/SEGUIDORES'); 
+    return  Collection<ProductoNegocio>(path: '/NEGOCIOS/$idNegocio/SEGUIDORES'); 
   }
-  static Collection<Producto> getCatalogoNegocio( { String idNegocio} ){
+  static Collection<ProductoNegocio> getCatalogoNegocio( { String idNegocio} ){
     // Firestore References for Writes
-    return  Collection<Producto>(path: '/NEGOCIOS/$idNegocio/EXTENSION_CATALOGO'); // '/APP/ARG/PRODUCTOS'
+    return  Collection<ProductoNegocio>(path: '/NEGOCIOS/$idNegocio/EXTENSION_CATALOGO'); // '/APP/ARG/PRODUCTOS'
   }
   static Collection<Categoria> getCatalogoCategorias( { String idNegocio} ){
     // Firestore References for Writes
     return  Collection<Categoria>(path: '/NEGOCIOS/$idNegocio/EXTENSION_CATALOGO_CATEGORIA'); // '/APP/ARG/PRODUCTOS'
   }
+  static Collection<Producto> getProductosPrecargadoAll({ String idProducto,String isoPAis="ARG"} ){
+    // Firestore References for Writes
+    return  Collection<Producto>(path: '/APP/$isoPAis/PRODUCTOS/$idProducto'); 
+  }
 
 
   // Funciones
-  static Future<List<Producto>> getSeach( { String seach} ) async{
-    List<Producto> resutlList ;
+  static Future<List<ProductoNegocio>> getSeach( { String seach} ) async{
+    List<ProductoNegocio> resutlList ;
     for (int i = 0; i < listProudctosNegocio.length; i++) { //listData[i]['titulo']
       if ( true) {
         resutlList.add(listProudctosNegocio[i]);
@@ -139,11 +155,11 @@ class ProviderCatalogo with ChangeNotifier {
   //Creamos una clase "MyProvider" y le agregamos las capacidades de Change Notifier.
   
   LoadStatus statusCargaGridListCatalogo = LoadStatus.normal;
-  List<Producto> cataloLoadMore = new List<Producto>();
+  List<ProductoNegocio> cataloLoadMore = new List<ProductoNegocio>();
   List<String> listMarcas = new List<String>();
-  List<Producto> listCatalogo=new List();
-  List<Producto> listCatalogoFilter=new List();
-  List<Producto> listCatalogoCategoria=new List();
+  List<ProductoNegocio> listCatalogo=new List();
+  List<ProductoNegocio> listCatalogoFilter=new List();
+  List<ProductoNegocio> listCatalogoCategoria=new List();
   String idMarca="";
   String idCategoria="todos"; 
   String nombreCategoria="Todos"; 
@@ -152,7 +168,7 @@ class ProviderCatalogo with ChangeNotifier {
   String get getIdMarca =>this.idMarca??"";
   String get getIdCategoria =>this.idCategoria??"";
   String get getNombreCategoria =>this.nombreCategoria??"Todos";
-  List<Producto> get getCatalogo =>cataloLoadMore;
+  List<ProductoNegocio> get getCatalogo =>cataloLoadMore;
   List<String> get getMarcas =>listMarcas??[];
 
   //Ahora creamos el método set para poder actualizar el valor de _mitexto, este método recibe un valor newTexto de tipo String
@@ -173,7 +189,7 @@ class ProviderCatalogo with ChangeNotifier {
     notifyListeners(); //notificamos a los widgets que esten escuchando el stream.
   }
   
-  set setCatalogo( List<Producto> list ) {
+  set setCatalogo( List<ProductoNegocio> list ) {
     this.listCatalogo = list; 
     getFilterCatalogo(idCategoria:this.idCategoria ,idMarca:this.idMarca);
     //notifyListeners(); //notificamos a los widgets que esten escuchando el stream.
@@ -191,7 +207,7 @@ class ProviderCatalogo with ChangeNotifier {
 
     int cantidad=0;
     
-    for (Producto item in this.listCatalogo) {
+    for (ProductoNegocio item in this.listCatalogo) {
       if(item.id_marca==id){
         cantidad++;
       }
@@ -201,7 +217,7 @@ class ProviderCatalogo with ChangeNotifier {
   }
   void getFilterCatalogo({String idCategoria,String idMarca}){
 
-    List<Producto> lista =[];
+    List<ProductoNegocio> lista =[];
     this.listCatalogoFilter.clear();
     this.listCatalogoCategoria.clear();
     statusCargaGridListCatalogo = LoadStatus.normal;
@@ -247,7 +263,7 @@ class ProviderCatalogo with ChangeNotifier {
   }
 
   // extrae las marcas del catalogo
-  _updateMarcas({ List<Producto> listaProductos} ){
+  _updateMarcas({ List<ProductoNegocio> listaProductos} ){
 
     this.listMarcas.clear();
     List<String>  marcas =[];

@@ -57,9 +57,10 @@ class PerfilNegocio {
     cuenta_verificada = data['cuenta_verificada'];
     geolocation = data['geolocation'];
     codigo_pais = data['codigo_pais'];
-    pais = data['pais'];
-    provincia = data['provincia'];
+    direccion = data['direccion'];
     ciudad = data['ciudad'];
+    provincia = data['provincia'];
+    pais = data['pais'];
     geopoint = data['geopoint'];
     codigo_postal = data['codigo_postal'];
   }

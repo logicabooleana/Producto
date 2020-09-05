@@ -54,7 +54,7 @@ class DataSearch extends SearchDelegate {
     if (query.isEmpty) {
       return Container(child: Center(child: Icon(Icons.search)));
     }
-    List<Producto> resutlList = new List();
+    List<ProductoNegocio> resutlList = new List();
     for (int i = 0; i < listOBJ.length; i++) {
       if (Buscardor.buscar(listOBJ[i].titulo, query)) {
         resutlList.add(listOBJ[i]);
@@ -66,7 +66,7 @@ class DataSearch extends SearchDelegate {
     return ListView.builder(
         itemCount: resutlList.length,
         itemBuilder: (context, index) {
-          final Producto product = resutlList[index];
+          final ProductoNegocio product = resutlList[index];
           return ListTile(
             leading: FadeInImage(
               image: NetworkImage(product.urlimagen),

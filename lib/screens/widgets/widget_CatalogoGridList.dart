@@ -38,8 +38,8 @@ class _WidgetCatalogoGridListState extends State<WidgetCatalogoGridList> {
 /* Generamos una GridList de los productos */
   Widget _gridListProductos( {BuildContext buildContext, ProviderCatalogo providerCatalogo}) {
     //Provider ( set )
-    buildContext.read<ProviderPerfilNegocio>().setCantidadProductos =Global.listProudctosNegocio.length;
-    buildContext.read<ProviderMarcasProductos>().listMarcas.clear();
+    //buildContext.read<ProviderPerfilNegocio>().setCantidadProductos =Global.listProudctosNegocio.length;
+    //buildContext.read<ProviderMarcasProductos>().listMarcas.clear();
 
     return providerCatalogo.getCatalogo.length != 0
         ? LoadAny(
@@ -71,7 +71,13 @@ class _WidgetCatalogoGridListState extends State<WidgetCatalogoGridList> {
 }
 
 class ProductoItem extends StatelessWidget {
-  final Producto producto;
+
+
+
+
+
+  
+  final ProductoNegocio producto;
   final double width;
   const ProductoItem({Key key, this.producto, this.width = double.infinity})
       : super(key: key);
@@ -84,8 +90,7 @@ class ProductoItem extends StatelessWidget {
         tag: producto.id,
         child: Card(
           elevation: 1,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+          shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
           clipBehavior: Clip.antiAlias,
           child: InkWell(
             onTap: () {
@@ -93,8 +98,7 @@ class ProductoItem extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (BuildContext context) => producto != null
                       ? ProductScreen(producto: producto)
-                      : Scaffold(
-                          body: Center(child: Text("Se produjo un Error!"))),
+                      : Scaffold(body: Center(child: Text("Se produjo un Error!"))),
                 ),
               );
             },
@@ -120,7 +124,7 @@ class ProductoItem extends StatelessWidget {
 
 class WidgetImagenProducto extends StatelessWidget {
   const WidgetImagenProducto({@required this.producto});
-  final Producto producto;
+  final ProductoNegocio producto;
 
   @override
   Widget build(BuildContext context) {
@@ -149,7 +153,7 @@ class WidgetImagenProducto extends StatelessWidget {
 
 class WidgetContentInfo extends StatelessWidget {
   const WidgetContentInfo({@required this.producto});
-  final Producto producto;
+  final ProductoNegocio producto;
 
   @override
   Widget build(BuildContext context) {

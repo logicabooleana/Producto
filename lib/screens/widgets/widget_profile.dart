@@ -162,8 +162,10 @@ Widget viewCircleImage({@required String url, double radius = 85.0}) {
             backgroundImage: image,
             radius: radius,
           ),
+          errorWidget: (context, url, error) => Icon(Icons.error),
         );
 }
+
 
 /* Crea una vista de la descripción del perfil */
 Widget descripcion({@required BuildContext buildContext}) {
