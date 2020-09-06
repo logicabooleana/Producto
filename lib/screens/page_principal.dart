@@ -149,7 +149,7 @@ class PagePrincipal extends StatelessWidget {
                       height: 35.0,
                       fadeInDuration: Duration(milliseconds: 200),
                       fit: BoxFit.cover,
-                      imageUrl: firebaseUser.photoUrl,
+                      imageUrl: firebaseUser.photoURL,
                       placeholder: (context, url) => FadeInImage(
                           image: AssetImage("assets/loading.gif"),
                           placeholder: AssetImage("assets/loading.gif")),

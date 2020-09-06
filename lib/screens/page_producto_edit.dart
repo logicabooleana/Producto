@@ -1,10 +1,14 @@
 
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:catalogo/services/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:catalogo/services/globals.dart';
 import 'package:catalogo/models/models_catalogo.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ProductEdit extends StatefulWidget {
 
@@ -70,10 +74,9 @@ class _ProductEditState extends State<ProductEdit> {
           ],
         ),
         actions: <Widget>[
-          IconButton(icon: saveIndicador==false?Icon(Icons.check):Container(width: 24.0,height: 24.0,child: CircularProgressIndicator(backgroundColor: Colors.white,),),
-            onPressed: () {
-              guardar();
-            },)
+          IconButton(icon: saveIndicador==false
+            ?Icon(Icons.check):Container(width: 24.0,height: 24.0,child: CircularProgressIndicator(backgroundColor: Colors.white,),),
+              onPressed: () {guardar();}),
         ],
       ),
       body: SingleChildScrollView(
@@ -87,17 +90,17 @@ class _ProductEditState extends State<ProductEdit> {
       ),
     );
   }
-/* 
+
   String urlIamgen="";
   PickedFile _imageFile;
   dynamic _pickImageError;
   String _retrieveDataError;
-  final ImagePicker _picker = ImagePicker(); */
+  final ImagePicker _picker = ImagePicker(); 
   
   Widget widgetsImagen(){
     return Column(
       children: [
-        true?Container(
+        _imageFile==null?Container(
                   height: MediaQuery.of(context).size.width,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(0.0),
@@ -138,31 +141,37 @@ class _ProductEditState extends State<ProductEdit> {
                       ),
                     ),
                   ),
-                ):Container(),//:Image.file(File(_imageFile.path)),
-        Row(
-        mainAxisAlignment: MainAxisAlignment.start,
+                ):_previewImage(),
+        producto.verificado==false
+        ?Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
-          FloatingActionButton(
-            onPressed: () {
-              //_onImageButtonPressed(ImageSource.gallery, context: context);
-            },
-            heroTag: 'image0',
-            tooltip: 'Pick Image from gallery',
-            child: const Icon(Icons.photo_library),
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+              child: FloatingActionButton(
+              onPressed: () {
+                _onImageButtonPressed(ImageSource.gallery, context: context);
+              },
+              heroTag: 'image0',
+              tooltip: 'Elegir imagen de la galería',
+              child: const Icon(Icons.photo_library),
+            ),
           ),
           Padding(
-            padding: const EdgeInsets.only(top: 16.0),
+            padding: const EdgeInsets.all(12.0),
             child: FloatingActionButton(
               onPressed: () {
-                //_onImageButtonPressed(ImageSource.camera, context: context);
+                _onImageButtonPressed(ImageSource.camera, context: context);
               },
               heroTag: 'image1',
-              tooltip: 'Take a Photo',
+              tooltip: 'Toma una foto',
               child: const Icon(Icons.camera_alt),
             ),
           ),
         ],
-      ),
+      )
+      :Container(),
       ],
     );
   }
@@ -174,8 +183,6 @@ class _ProductEditState extends State<ProductEdit> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          
-          SizedBox(height: 16.0),
           TextField(
             enabled: !producto.verificado,
             onChanged: (value) => producto.titulo = value,
@@ -223,35 +230,50 @@ class _ProductEditState extends State<ProductEdit> {
     setState(() {
       saveIndicador=true;
     });
-    /* urlIamgen="";
+     urlIamgen="";
+
+    // Si la "PickedFile" es distinto nulo procede a guardar la imagen en la base de dato de almacenamiento
     if( _imageFile != null ){
       StorageReference ref = FirebaseStorage.instance.ref().child(Global.oPerfilNegocio.id).child("EXTENSION_CATALOGO").child(producto.id);
       StorageUploadTask uploadTask = ref.putFile(File(_imageFile.path));
+      // obtenemos la url de la imagen guardada
       urlIamgen = await (await uploadTask.onComplete).ref.getDownloadURL();
-    } */
+      // TODO: Por el momento los datos del producto se guarda junto a la referencia de la cuenta del negocio
+      producto.urlimagen=urlIamgen;
+    } 
 
     // TODO: Por defecto verificado es TRUE // Cambiar esto cuando se lanze a producción
     producto.verificado=true;
-    registraPrecio();
+    updateProductoGlobal();
+    // Firebase set
     await Global.getDataProductoNegocio(idNegocio: Global.prefs.getIdNegocio,idProducto: producto.id).upSetProducto(producto.toJson());
+    
     Navigator.pop(context);
-
   }
-  void registraPrecio()async{
+  void updateProductoGlobal()async{
 
-
-
-    Precio precio = new Precio(id_negocio: Global.oPerfilNegocio.id,precio: producto.precio_venta,moneda: producto.signo_moneda,timestamp: Timestamp.fromDate(new DateTime.now()));
+    // Valores para registrar el precio
+    Precio precio = new Precio(
+      id_negocio: Global.oPerfilNegocio.id,
+      precio: producto.precio_venta,
+      moneda: producto.signo_moneda,
+      timestamp: Timestamp.fromDate(new DateTime.now())
+    );
+    // Firebase set
     await Global.getPreciosProducto(idNegocio: Global.oPerfilNegocio.id,idProducto: producto.id, isoPAis: "ARG").upSetPrecioProducto(precio.toJson());
+    
     Map timestampUpdatePrecio;
-    /* if(urlIamgen==""){
-      timestampUpdatePrecio={'timestamp_actualizacion':Timestamp.fromDate(new DateTime.now())}; 
+    if(urlIamgen==""){
+      timestampUpdatePrecio={
+        'timestamp_actualizacion':Timestamp.fromDate(new DateTime.now())
+      }; 
     }else{
       timestampUpdatePrecio={
         'timestamp_actualizacion':Timestamp.fromDate(new DateTime.now()),
         'urlimagen':urlIamgen
       }; 
-    } */
+    }
+    // Firebase set
     await Global.getProductosPrecargado(idProducto: producto.id, isoPAis: "ARG").upSetPrecioProducto(timestampUpdatePrecio);
   }
   
@@ -260,9 +282,6 @@ class _ProductEditState extends State<ProductEdit> {
 
 
 
-
-
-/* 
 
 
   void _onImageButtonPressed(ImageSource source, {BuildContext context}) async {
@@ -309,7 +328,6 @@ class _ProductEditState extends State<ProductEdit> {
     }
     return null;
   }
-
   Future<void> retrieveLostData() async {
     final LostData response = await _picker.getLostData();
     if (response.isEmpty) {
@@ -323,6 +341,4 @@ class _ProductEditState extends State<ProductEdit> {
       _retrieveDataError = response.exception.code;
     }
   }
-}
- */
 }
