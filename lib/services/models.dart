@@ -16,7 +16,7 @@ class Option {
 
 
 
-class ProductoNegocio extends Producto {
+class ProductoNegocio  {
 
     // valores del producto
     String id="";
@@ -103,7 +103,7 @@ class ProductoNegocio extends Producto {
       categoria: data['categoria'] ?? '',
       subcategoria: data['subcategoria'] ?? '',
       timestamp_actualizacion: data['timestamp_actualizacion'] ,
-      timestamp_creation: data['timestamp_creation'] ?? false,
+      timestamp_creation: data['timestamp_creation'] ,
       // valores de la cuenta 
       producto_precargado: data['producto_precargado'] ?? true,
       habilitado: data['habilitado'] ?? true,
@@ -124,22 +124,22 @@ class ProductoNegocio extends Producto {
   }
 
   Map<String, dynamic> toJson() => {
-        "id": id,
-        "verificado": verificado,
-        "id_marca": id_marca,
-        "urlimagen": urlimagen,
-        "titulo": titulo,
-        "descripcion": descripcion,
-        "codigo": codigo,
-        "categoria": categoria,
-        "subcategoria": subcategoria,
+        "id": id??"",
+        "verificado": verificado??"",
+        "id_marca": id_marca??"",
+        "urlimagen": urlimagen??"",
+        "titulo": titulo??"",
+        "descripcion": descripcion??"",
+        "codigo": codigo??"",
+        "categoria": categoria??"",
+        "subcategoria": subcategoria??"",
         "timestamp_creation": timestamp_creation,
         "timestamp_creation": timestamp_creation,
         "producto_precargado": producto_precargado,
         "habilitado": habilitado,
-        "precio_venta": precio_venta,
-        "precio_compra": precio_compra,
-        "precio_comparacion": precio_comparacion,
+        "precio_venta": precio_venta??0.0,
+        "precio_compra": precio_compra??0.0,
+        "precio_comparacion": precio_comparacion??0.0,
         "control_stock": control_stock,
         "cantidad_ventas": cantidad_ventas,
         "iva_aplicado": iva_aplicado,
@@ -191,7 +191,7 @@ class Producto {
       categoria: data['categoria'] ?? '',
       subcategoria: data['subcategoria'] ?? '',
       timestamp_actualizacion: data['timestamp_actualizacion'] ,
-      timestamp_creation: data['timestamp_creation'] ?? false,
+      timestamp_creation: data['timestamp_creation'] ,
     );
   }
   ProductoNegocio convertProductoNegocio(){

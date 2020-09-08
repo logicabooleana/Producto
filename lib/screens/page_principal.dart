@@ -2,6 +2,7 @@
 
 import 'dart:ui';
 
+import 'package:animated_floatactionbuttons/animated_floatactionbuttons.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:catalogo/screens/profile.dart';
 import 'package:catalogo/screens/widgets/widget_circle_border.dart';
@@ -14,6 +15,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
 
 /* Dependencias */
+import 'package:catalogo/screens/widgets/widgetSeachCode.dart';
 import 'package:catalogo/screens/page_producto_view.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:catalogo/screens/widgets/widget_profile.dart';
@@ -74,8 +76,7 @@ class PagePrincipal extends StatelessWidget {
             ),
           )
         : FutureBuilder(
-            future: Global.getNegocio(idNegocio: Global.prefs.getIdNegocio)
-                .getDataPerfilNegocio(),
+            future: Global.getNegocio(idNegocio: Global.prefs.getIdNegocio).getDataPerfilNegocio(),
             builder: (c, snapshot) {
               if (snapshot.hasData) {
                 Global.oPerfilNegocio = snapshot.data;
@@ -181,12 +182,15 @@ class PagePrincipal extends StatelessWidget {
             Global.listProudctosNegocio = snapshot.data;
             buildContext.read<ProviderCatalogo>().setCatalogo = snapshot.data;
             return defaultTabController(buildContext: buildContext);
-          } else {
+          }else{
             return Center(child: CircularProgressIndicator());
           }
         },
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton:AnimatedFloatingActionButton(
+        //Fab list
+        fabButtons: <Widget>[
+            FloatingActionButton(
         heroTag: "Escanear codigo",
         child: Image(
             color: Colors.white,
@@ -197,8 +201,20 @@ class PagePrincipal extends StatelessWidget {
         tooltip: 'Escanea el codigo del producto',
         onPressed: () {
           scanBarcodeNormal(context: buildContext);
-        }
-      ),
+        }),
+        FloatingActionButton(
+        heroTag: "Escribir codigo",
+        child: Icon(Icons.edit),
+        tooltip: 'Escribe el codigo del producto',
+        onPressed: () {
+          Navigator.of(buildContext).push(MaterialPageRoute(
+                        builder: (BuildContext context) => WidgetSeachCode(),
+                      ));
+        })
+        ],
+        colorEndAnimation: Colors.grey,
+        animatedIconData: AnimatedIcons.menu_close //To principal button
+    ),
     );
   }
 
@@ -234,7 +250,6 @@ class PagePrincipal extends StatelessWidget {
     }
   
   }
-
   /* Devuelve una widget de una barra para buscar */
   Widget widgetBuscadorView({@required BuildContext buildContext}) {
     return Padding(
@@ -595,11 +610,13 @@ class PagePrincipal extends StatelessWidget {
   }
 
   Widget defaultTabController({@required BuildContext buildContext}) {
+    
     return DefaultTabController(
       length: 1,
       child: NestedScrollView(
         /* le permite crear una lista de elementos que se desplazarían hasta que el cuerpo alcanzara la parte superior */
         headerSliverBuilder: (context, _) {
+          
           return [
             SliverList(
               delegate: SliverChildListDelegate([
@@ -902,9 +919,7 @@ class PagePrincipal extends StatelessWidget {
                       alignment: Alignment.bottomCenter,
                       children: <Widget>[
                         FutureBuilder(
-                          future: Global.getMarca(
-                                  idMarca: catalogo.getMarcas[index])
-                              .getDataMarca(),
+                          future: Global.getMarca(idMarca: catalogo.getMarcas[index]).getDataMarca(),
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
                               Marca marca = snapshot.data;

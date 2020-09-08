@@ -61,6 +61,9 @@ class Document<T> {
   Future<T> getDataProducto() {
     return ref.get().then((v) => Global.modelsProducto[T](v.data()) as T);
   }
+  Future<T> getDataProductoGlobal() {
+    return ref.get().then((v) => Global.modelsProductoGlobal[T](v.data()) as T);
+  }
   Stream<T> streamDataProducto() {
     return ref.snapshots().map((v) => Global.modelsProducto[T](v.data()) as T);
   }
@@ -121,7 +124,7 @@ class Collection<T> {
     return snapshots.docs.map((doc) => Global.modelsProducto[T](doc.data()) as T ).toList();
   }
   Stream<List<T>> streamDataProductoAll() {
-    return ref.snapshots().map((list) => list.docs.map((doc) => Global.modelsProducto[T](doc.data()) as T).toList() );
+    return ref.snapshots().map( (list) => list.docs.map((doc) => Global.modelsProducto[T](doc.data()) as T).toList() );
   }
 
   // Model Categoria

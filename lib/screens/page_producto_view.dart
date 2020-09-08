@@ -49,6 +49,8 @@ class ProductScreen extends StatelessWidget {
   }
 
   Padding WidgetDescripcion(BuildContext context) {
+
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
@@ -87,7 +89,7 @@ class ProductScreen extends StatelessWidget {
                   height: 50,
                   child: RaisedButton.icon(
                     onPressed: () {
-                      Navigator.of(context).push(MaterialPageRoute(
+                      Navigator.of(context).pushReplacement(MaterialPageRoute(
                         builder: (BuildContext context) => producto != null
                             ? ProductEdit(producto: producto)
                             : Scaffold(
@@ -140,6 +142,7 @@ class WidgetImagen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return Container(
       height: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(

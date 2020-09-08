@@ -39,6 +39,9 @@ class Global {
   static final Map modelsProducto = {
     ProductoNegocio: (data) => ProductoNegocio.fromMap(data),
   };
+  static final Map modelsProductoGlobal = {
+    Producto: (data) => Producto.fromMap(data),
+  };
   static final Map modelsCategoria = {
     Categoria: (data) => Categoria.fromMap(data),
   };
@@ -75,9 +78,10 @@ class Global {
     // Firestore References for Writes
     return  Document<AdminUsuarioCuenta>(path: '/NEGOCIOS/$idNegocio/EXTENSION_CATALOGO/$idProducto'); // '/APP/ARG/PRODUCTOS'
   }
-  static Document<Producto> getProductosPrecargado({ String idProducto,String isoPAis="ARG"} ){
+  static Document<Producto> getProductosPrecargado({ String idProducto="",String isoPAis="ARG"} ){
     // Firestore References for Writes
-    return  Document<Producto>(path: '/APP/$isoPAis/PRODUCTOS/$idProducto'); 
+    if(idProducto==null){idProducto="";}
+    return  Document<Producto>(path: '/APP/ARG/PRODUCTOS/$idProducto'); 
   }
 
   // Consultas DB ( Colecction )
@@ -116,6 +120,22 @@ class Global {
       }
     }
     return resutlList;
+  }
+  // Funciones
+  static Future<List<ProductoNegocio>> updateProductos({@required List<ProductoNegocio> listaProductos })  async{
+    
+    List<ProductoNegocio> nuevaLista=[];
+    listaProductos.forEach((element)  {
+      getProductosPrecargado(idProducto:element.id).getDataProductoGlobal().then((value) {
+        element.urlimagen=value.urlimagen;
+      });
+      nuevaLista.add(element);
+    });
+    /* for (int i = 0; i < listaProductos.length; i++) {
+      Producto producto = await getProductosPrecargado(idProducto: listaProductos[i].id).getDataProductoGlobal();
+        listaProductos[i].urlimagen=producto.urlimagen;
+    } */
+    return nuevaLista;
   }
 
 

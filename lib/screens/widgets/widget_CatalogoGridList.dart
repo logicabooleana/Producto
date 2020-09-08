@@ -9,11 +9,7 @@ import 'package:provider/provider.dart';
 
 import '../page_producto_view.dart';
 
-
-
 class WidgetCatalogoGridList extends StatefulWidget {
-
-
   @override
   _WidgetCatalogoGridListState createState() {
     return _WidgetCatalogoGridListState();
@@ -21,8 +17,6 @@ class WidgetCatalogoGridList extends StatefulWidget {
 }
 
 class _WidgetCatalogoGridListState extends State<WidgetCatalogoGridList> {
-
-  
   @override
   Widget build(BuildContext context) {
     return Consumer<ProviderCatalogo>(
@@ -30,13 +24,15 @@ class _WidgetCatalogoGridListState extends State<WidgetCatalogoGridList> {
         child: Text("Cargando..."),
       ),
       builder: (comsumerContext, catalogo, child) {
-        return _gridListProductos(buildContext: context, providerCatalogo: catalogo);
+        return _gridListProductos(
+            buildContext: context, providerCatalogo: catalogo);
       },
     );
   }
 
 /* Generamos una GridList de los productos */
-  Widget _gridListProductos( {BuildContext buildContext, ProviderCatalogo providerCatalogo}) {
+  Widget _gridListProductos(
+      {BuildContext buildContext, ProviderCatalogo providerCatalogo}) {
     //Provider ( set )
     //buildContext.read<ProviderPerfilNegocio>().setCantidadProductos =Global.listProudctosNegocio.length;
     //buildContext.read<ProviderMarcasProductos>().listMarcas.clear();
@@ -47,7 +43,11 @@ class _WidgetCatalogoGridListState extends State<WidgetCatalogoGridList> {
             status: providerCatalogo.statusCargaGridListCatalogo,
             loadingMsg: 'Cargando...',
             errorMsg: 'errorMsg',
-            finishMsg: providerCatalogo.listCatalogoFilter.length==1? providerCatalogo.listCatalogoFilter.length.toString()+" resultado":providerCatalogo.listCatalogoFilter.length.toString()+" resultados",
+            finishMsg: providerCatalogo.listCatalogoFilter.length == 1
+                ? providerCatalogo.listCatalogoFilter.length.toString() +
+                    " resultado"
+                : providerCatalogo.listCatalogoFilter.length.toString() +
+                    " resultados",
             child: CustomScrollView(
               slivers: <Widget>[
                 SliverGrid(
@@ -56,7 +56,8 @@ class _WidgetCatalogoGridListState extends State<WidgetCatalogoGridList> {
                   ),
                   delegate: SliverChildBuilderDelegate(
                     (BuildContext context, int index) {
-                      return ProductoItem(producto: providerCatalogo.getCatalogo[index]);
+                      return ProductoItem(
+                          producto: providerCatalogo.getCatalogo[index]);
                     },
                     childCount: providerCatalogo.getCatalogo.length,
                   ),
@@ -67,16 +68,10 @@ class _WidgetCatalogoGridListState extends State<WidgetCatalogoGridList> {
         : Expanded(
             child: Center(child: Text("Sin productos")),
           );
-  } 
+  }
 }
 
 class ProductoItem extends StatelessWidget {
-
-
-
-
-
-  
   final ProductoNegocio producto;
   final double width;
   const ProductoItem({Key key, this.producto, this.width = double.infinity})
@@ -84,13 +79,28 @@ class ProductoItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+   /*  return FutureBuilder(
+      initialData: producto,
+      future: Global.getProductosPrecargado(idProducto: producto.id).getDataProductoGlobal(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          Producto productoGlobal = snapshot.data;
+
+          return Center(child: Text(productoGlobal.titulo),);
+        } else {
+          return Center(child: CircularProgressIndicator());
+        }
+      },
+    ); */
+
     return Container(
       width: width,
       child: Hero(
         tag: producto.id,
         child: Card(
           elevation: 1,
-          shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
           clipBehavior: Clip.antiAlias,
           child: InkWell(
             onTap: () {
@@ -98,7 +108,8 @@ class ProductoItem extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (BuildContext context) => producto != null
                       ? ProductScreen(producto: producto)
-                      : Scaffold(body: Center(child: Text("Se produjo un Error!"))),
+                      : Scaffold(
+                          body: Center(child: Text("Se produjo un Error!"))),
                 ),
               );
             },
@@ -211,4 +222,3 @@ class WidgetContentInfo extends StatelessWidget {
     );
   }
 }
-
