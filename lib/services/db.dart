@@ -62,7 +62,10 @@ class Document<T> {
     return ref.get().then((v) => Global.modelsProducto[T](v.data()) as T);
   }
   Future<T> getDataProductoGlobal() {
-    return ref.get().then((v) => Global.modelsProductoGlobal[T](v.data()) as T);
+    return ref.get().then((v){
+      if(v.exists==false){ return  null; }
+      return Global.modelsProductoGlobal[T](v.data()) as T;
+    });
   }
   Stream<T> streamDataProducto() {
     return ref.snapshots().map((v) => Global.modelsProducto[T](v.data()) as T);

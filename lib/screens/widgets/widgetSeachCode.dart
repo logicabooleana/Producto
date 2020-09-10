@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:catalogo/services/globals.dart';
 
 class WidgetSeachCode extends StatefulWidget {
   WidgetSeachCode({Key key}) : super(key: key);
@@ -13,6 +15,8 @@ class _WidgetSeachCodeState extends State<WidgetSeachCode> {
   TextStyle textStyle = new TextStyle(fontSize: 30.0);
   TextEditingController controllerTextEdit_comparacion;
   bool buscando=false;
+  String textoTextResult="";
+  String texto="";
 
    @override
   void dispose() {
@@ -39,7 +43,8 @@ class _WidgetSeachCodeState extends State<WidgetSeachCode> {
           children: [
             TextField(
               keyboardType: TextInputType.number,
-              onChanged: (value) =>codigoBar=value,
+              onChanged: (value) 
+              =>codigoBar=value,
               decoration: InputDecoration(
                   border: OutlineInputBorder(),
                   labelText: "Código"),
@@ -50,13 +55,30 @@ class _WidgetSeachCodeState extends State<WidgetSeachCode> {
               onPressed: () {
                 setState(() {
                   buscando=true;
+                  getIdProducto(id:codigoBar??"");
                 });
               },
               child: Text("Buscar"),
             ):CircularProgressIndicator(),
+            Text(texto),
           ],
         ),
       ),
     );
+  }
+
+  void getIdProducto({@required String id }) {
+
+    Global.getProductosPrecargado(idProducto: id).getDataProductoGlobal().then((event){
+      if (event!= null) {
+      texto=event.titulo;
+      buscando=false;
+      setState(() {});
+    }else{
+      texto="No existe!";
+      buscando=false;
+      setState(() {});
+    }
+    }); 
   }
 }

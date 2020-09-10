@@ -79,20 +79,6 @@ class ProductoItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-   /*  return FutureBuilder(
-      initialData: producto,
-      future: Global.getProductosPrecargado(idProducto: producto.id).getDataProductoGlobal(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          Producto productoGlobal = snapshot.data;
-
-          return Center(child: Text(productoGlobal.titulo),);
-        } else {
-          return Center(child: CircularProgressIndicator());
-        }
-      },
-    ); */
-
     return Container(
       width: width,
       child: Hero(
