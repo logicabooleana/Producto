@@ -84,6 +84,9 @@ class Document<T> {
   Future<void> upSetMarca(Map data) {
     return ref.set(Map<String, dynamic>.from(data), SetOptions(merge: true));
   }
+  Future<void> upSetCategoria(Map data) {
+    return ref.set(Map<String, dynamic>.from(data), SetOptions(merge: true));
+  }
 
 }
 

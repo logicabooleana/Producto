@@ -54,6 +54,7 @@ dependencies:
   flutter_barcode_scanner: ^1.0.1
   loading_gifs: ^0.2.3
   image_picker: ^0.6.7+7
+  modal_bottom_sheet: ^0.2.0+1 # Crea impresionantes y poderosas hojas inferiores modales.
   
 flutter_icons:
   android: true

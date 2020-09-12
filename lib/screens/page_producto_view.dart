@@ -11,13 +11,23 @@ import 'package:catalogo/services/globals.dart';
 import 'package:geolocator/geolocator.dart';
 
 class ProductScreen extends StatelessWidget {
+
   String sSignoMoneda;
-  final ProductoNegocio producto;
+  ProductoNegocio producto;
+  bool productoEnCatalogo=false;
 
   ProductScreen({this.producto, this.sSignoMoneda});
 
   @override
   Widget build(BuildContext context) {
+
+    for (ProductoNegocio item in Global.listProudctosNegocio) {
+      if(item.id==producto.id){
+        producto=item;
+        productoEnCatalogo=true;
+        break;
+      }
+    }
     return Scaffold(
       appBar: AppBar(
         elevation: 0.0,
@@ -41,7 +51,7 @@ class ProductScreen extends StatelessWidget {
             WidgetImagen(producto: producto),
             WidgetDescripcion(context),
             WidgetUltimosPrecios(producto: producto),
-            WidgetOtrosProductos(producto: producto),
+            productoEnCatalogo?WidgetOtrosProductos(producto: producto):Container(),
           ],
         ),
       ),
@@ -76,7 +86,7 @@ class ProductScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              producto.precio_venta != 0.0
+              producto.precio_venta != null&&producto.precio_venta != 0.0
                   ? Text(
                       Publicaciones.getFormatoPrecio(monto: producto.precio_venta),
                       style: TextStyle(height: 2, fontSize: 24, fontWeight: FontWeight.bold),
@@ -98,8 +108,7 @@ class ProductScreen extends StatelessWidget {
                       ));
                     },
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(35.0))),
-                    label: Text('Editar',
-                        style: TextStyle(fontSize: 18.0, color: Colors.white)),
+                    label: Text(productoEnCatalogo?'Editar':"Agregar", style: TextStyle(fontSize: 18.0, color: Colors.white)),
                     icon: Container(), // Icon( Icons.add,color: Colors.white),
                     textColor: Colors.white,
                   ),
@@ -164,7 +173,7 @@ class WidgetImagen extends StatelessWidget {
             height: MediaQuery.of(context).size.width,
             fadeInDuration: Duration(milliseconds: 200),
             fit: BoxFit.cover,
-            imageUrl: producto.urlimagen,
+            imageUrl: producto.urlimagen??"default",
             placeholder: (context, url) => FadeInImage(
                 image: AssetImage("assets/loading.gif"),
                 placeholder: AssetImage("assets/loading.gif")),

@@ -78,6 +78,16 @@ class Global {
     // Firestore References for Writes
     return  Document<AdminUsuarioCuenta>(path: '/NEGOCIOS/$idNegocio/EXTENSION_CATALOGO/$idProducto'); // '/APP/ARG/PRODUCTOS'
   }
+  static Document<Categoria> getDataCatalogoCategoria( { @required String idNegocio,@required String idCategoria} ){
+    // Firestore References for Writes
+    if(idNegocio==null){idNegocio="";}
+    return  Document<Categoria>(path: '/NEGOCIOS/$idNegocio/EXTENSION_CATALOGO_CATEGORIA/$idCategoria'); 
+  }
+  static Document<Categoria> getDataCatalogoSubcategoria( { @required String idNegocio,@required String idCategoria,@required String idSubcategoria} ){
+    // Firestore References for Writes
+    if(idNegocio==null){idNegocio="";}
+    return  Document<Categoria>(path: '/NEGOCIOS/$idNegocio/EXTENSION_CATALOGO_CATEGORIA/$idCategoria/SUBCATEGORIA/$idSubcategoria'); 
+  }
   static Document<Producto> getProductosPrecargado({ String idProducto="",String isoPAis="ARG"} ){
     // Firestore References for Writes
     if(idProducto==null){idProducto="";}
@@ -104,6 +114,10 @@ class Global {
   static Collection<Categoria> getCatalogoCategorias( { String idNegocio} ){
     // Firestore References for Writes
     return  Collection<Categoria>(path: '/NEGOCIOS/$idNegocio/EXTENSION_CATALOGO_CATEGORIA'); // '/APP/ARG/PRODUCTOS'
+  }
+  static Collection<Categoria> getCatalogoSubcategorias( { @required String idNegocio,@required String idCategoria} ){
+    // Firestore References for Writes
+    return  Collection<Categoria>(path: '/NEGOCIOS/$idNegocio/EXTENSION_CATALOGO_CATEGORIA/$idCategoria/SUBCATEGORIA'); // '/APP/ARG/PRODUCTOS'
   }
   static Collection<Producto> getProductosPrecargadoAll({ String idProducto,String isoPAis="ARG"} ){
     // Firestore References for Writes
@@ -258,12 +272,12 @@ class ProviderCatalogo with ChangeNotifier {
       for (var i = 0; i < this.listCatalogo.length; i++) {
           
         if(idCategoria!=""&& idMarca=="" ){
-          if(this.listCatalogo[i].categoria==idCategoria){ 
+          if(this.listCatalogo[i].categoria==idCategoria||this.listCatalogo[i].subcategoria==idCategoria){ 
             lista.add(this.listCatalogo[i]); 
            listCatalogoCategoria.add(this.listCatalogo[i]); 
           }
         }else if(idCategoria!=""&& idMarca!=""){
-          if(this.listCatalogo[i].categoria==idCategoria){listCatalogoCategoria.add(this.listCatalogo[i]);if( idMarca==this.listCatalogo[i].id_marca ){lista.add(this.listCatalogo[i]); }}
+          if(this.listCatalogo[i].categoria==idCategoria||this.listCatalogo[i].subcategoria==idCategoria){listCatalogoCategoria.add(this.listCatalogo[i]);if( idMarca==this.listCatalogo[i].id_marca ){lista.add(this.listCatalogo[i]); }}
         }else if(idCategoria==""&& idMarca!=""){
           if( idMarca==this.listCatalogo[i].id_marca ){lista.add(this.listCatalogo[i]); }
         }

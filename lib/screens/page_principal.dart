@@ -4,9 +4,6 @@ import 'dart:ui';
 
 import 'package:animated_floatactionbuttons/animated_floatactionbuttons.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:catalogo/screens/profile.dart';
-import 'package:catalogo/screens/widgets/widget_circle_border.dart';
-import 'package:catalogo/services/preferencias_usuario.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'package:firebase_auth/firebase_auth.dart';
@@ -15,6 +12,9 @@ import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
 
 /* Dependencias */
+import 'package:catalogo/screens/profile.dart';
+import 'package:catalogo/screens/widgets/widget_circle_border.dart';
+import 'package:catalogo/services/preferencias_usuario.dart';
 import 'package:catalogo/screens/widgets/widgetSeachCode.dart';
 import 'package:catalogo/screens/page_producto_view.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
@@ -27,7 +27,7 @@ import 'package:catalogo/screens/page_buscadorProductos.dart';
 import 'package:catalogo/models/models_profile.dart';
 import 'package:catalogo/services/globals.dart';
 import 'package:catalogo/models/models_catalogo.dart';
-
+import 'package:catalogo/screens/widgets/widgets_categoria.dart';
 /*  DESCRIPCIÓN */
 /*  Pantalla principal de la aplicación Catalogo app  */
 
@@ -42,7 +42,6 @@ class PagePrincipal extends StatelessWidget {
   Widget build(BuildContext buildContext) {
     prefs = new PreferenciasUsuario();
     firebaseUser = Provider.of<User>(buildContext);
-
 
     return Global.prefs.getIdNegocio == ""
         ? Scaffold(
@@ -76,7 +75,8 @@ class PagePrincipal extends StatelessWidget {
             ),
           )
         : FutureBuilder(
-            future: Global.getNegocio(idNegocio: Global.prefs.getIdNegocio).getDataPerfilNegocio(),
+            future: Global.getNegocio(idNegocio: Global.prefs.getIdNegocio)
+                .getDataPerfilNegocio(),
             builder: (c, snapshot) {
               if (snapshot.hasData) {
                 Global.oPerfilNegocio = snapshot.data;
@@ -129,14 +129,13 @@ class PagePrincipal extends StatelessWidget {
         actions: <Widget>[
           DynamicTheme.of(buildContext).getIConButton(buildContext),
           Container(
-            padding:EdgeInsets.all(12.0) ,
+            padding: EdgeInsets.all(12.0),
             child: InkWell(
               customBorder: new CircleBorder(),
               splashColor: Colors.red,
-              onTap: (){
+              onTap: () {
                 Navigator.of(buildContext).push(MaterialPageRoute(
-                                builder: (BuildContext context) =>ProfileScreen()
-                              ));
+                    builder: (BuildContext context) => ProfileScreen()));
               },
               child: CircleAvatar(
                 radius: 17,
@@ -161,14 +160,12 @@ class PagePrincipal extends StatelessWidget {
                         child: Center(
                           child: Text(
                             firebaseUser.displayName.substring(0, 1),
-                            style: TextStyle(
-                                fontSize: 16.0),
+                            style: TextStyle(fontSize: 16.0),
                           ),
                         ),
                       ),
                     ),
                   ),
-                  
                 ),
               ),
             ),
@@ -176,51 +173,52 @@ class PagePrincipal extends StatelessWidget {
         ],
       ),
       body: new StreamBuilder(
-        stream: Global.getCatalogoNegocio(idNegocio: perfilNegocio.id).streamDataProductoAll(),
+        stream: Global.getCatalogoNegocio(idNegocio: perfilNegocio.id)
+            .streamDataProductoAll(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             Global.listProudctosNegocio = snapshot.data;
             buildContext.read<ProviderCatalogo>().setCatalogo = snapshot.data;
             return defaultTabController(buildContext: buildContext);
-          }else{
+          } else {
             return Center(child: CircularProgressIndicator());
           }
         },
       ),
-      floatingActionButton:AnimatedFloatingActionButton(
-        //Fab list
-        fabButtons: <Widget>[
+      floatingActionButton: AnimatedFloatingActionButton(
+          //Fab list
+          fabButtons: <Widget>[
             FloatingActionButton(
-        heroTag: "Escanear codigo",
-        child: Image(
-            color: Colors.white,
-            height: 30.0,
-            width: 30.0,
-            image: AssetImage('assets/barcode.png'),
-            fit: BoxFit.contain),
-        tooltip: 'Escanea el codigo del producto',
-        onPressed: () {
-          scanBarcodeNormal(context: buildContext);
-        }),
-        FloatingActionButton(
-        heroTag: "Escribir codigo",
-        child: Icon(Icons.edit),
-        tooltip: 'Escribe el codigo del producto',
-        onPressed: () {
-          Navigator.of(buildContext).push(MaterialPageRoute(
-                        builder: (BuildContext context) => WidgetSeachCode(),
-                      ));
-        })
-        ],
-        colorEndAnimation: Colors.grey,
-        animatedIconData: AnimatedIcons.menu_close //To principal button
-    ),
+                heroTag: "Escanear codigo",
+                child: Image(
+                    color: Colors.white,
+                    height: 30.0,
+                    width: 30.0,
+                    image: AssetImage('assets/barcode.png'),
+                    fit: BoxFit.contain),
+                tooltip: 'Escanea el codigo del producto',
+                onPressed: () {
+                  scanBarcodeNormal(context: buildContext);
+                }),
+            FloatingActionButton(
+                heroTag: "Escribir codigo",
+                child: Icon(Icons.edit),
+                tooltip: 'Escribe el codigo del producto',
+                onPressed: () {
+                  Navigator.of(buildContext).push(MaterialPageRoute(
+                    builder: (BuildContext context) => WidgetSeachCode(),
+                  ));
+                })
+          ],
+          colorEndAnimation: Colors.grey,
+          animatedIconData: AnimatedIcons.menu_close //To principal button
+          ),
     );
   }
 
   String _scanBarcode = '';
   // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> scanBarcodeNormal({ @required BuildContext context}) async {
+  Future<void> scanBarcodeNormal({@required BuildContext context}) async {
     String barcodeScanRes;
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
@@ -237,19 +235,20 @@ class PagePrincipal extends StatelessWidget {
     //if (!mounted) return;
     _scanBarcode = barcodeScanRes;
     bool coincidencia = false;
-    for (ProductoNegocio producto in Global.listProudctosNegocio ) {
-      if( producto.codigo == _scanBarcode){
-        coincidencia=true;
+    for (ProductoNegocio producto in Global.listProudctosNegocio) {
+      if (producto.codigo == _scanBarcode) {
+        coincidencia = true;
         Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (BuildContext context) => ProductScreen(producto: producto),
-                ),
-              );
+          MaterialPageRoute(
+            builder: (BuildContext context) =>
+                ProductScreen(producto: producto),
+          ),
+        );
         break;
       }
     }
-  
   }
+
   /* Devuelve una widget de una barra para buscar */
   Widget widgetBuscadorView({@required BuildContext buildContext}) {
     return Padding(
@@ -295,17 +294,18 @@ class PagePrincipal extends StatelessWidget {
   void selectCuenta(BuildContext buildContext) {
     // muestre la hoja inferior modal
     showModalBottomSheet(
-        shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
         backgroundColor: Theme.of(buildContext).canvasColor,
         context: buildContext,
         builder: (ctx) {
           return ClipRRect(
             child: Container(
               child: FutureBuilder(
-                future: Global.getListNegocioAdmin(idNegocio: firebaseUser.uid).getDataAdminPerfilNegocioAll(),
+                future: Global.getListNegocioAdmin(idNegocio: firebaseUser.uid)
+                    .getDataAdminPerfilNegocioAll(),
                 builder: (c, snapshot) {
                   if (snapshot.hasData) {
-
                     Global.listAdminPerfilNegocio = snapshot.data;
 
                     return ListView.builder(
@@ -610,13 +610,11 @@ class PagePrincipal extends StatelessWidget {
   }
 
   Widget defaultTabController({@required BuildContext buildContext}) {
-    
     return DefaultTabController(
       length: 1,
       child: NestedScrollView(
         /* le permite crear una lista de elementos que se desplazarían hasta que el cuerpo alcanzara la parte superior */
         headerSliverBuilder: (context, _) {
-          
           return [
             SliverList(
               delegate: SliverChildListDelegate([
@@ -642,7 +640,18 @@ class PagePrincipal extends StatelessWidget {
               labelColor: Theme.of(buildContext).brightness == Brightness.dark
                   ? Colors.white
                   : Colors.black,
-              onTap: (value) => showSelectCategoria(buildContext: buildContext),
+              onTap: (value) {
+                showModalBottomSheet(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20.0)),
+                    backgroundColor: Theme.of(buildContext).canvasColor,
+                    context: buildContext,
+                    builder: (ctx) {
+                      return ClipRRect(
+                        child: ViewCategoria(buildContext: buildContext,),
+                      );
+                    });
+              },
               tabs: [
                 Consumer<ProviderCatalogo>(
                   child: Tab(text: "Todos"),
@@ -664,204 +673,6 @@ class PagePrincipal extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  void showSelectCategoria({@required BuildContext buildContext}) {
-    // muestre la hoja inferior modal
-    showModalBottomSheet(
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
-        backgroundColor: Theme.of(buildContext).canvasColor,
-        context: buildContext,
-        builder: (ctx) {
-          return ClipRRect(
-            child: Container(
-              child: FutureBuilder(
-                future: Global.getCatalogoCategorias(
-                        idNegocio: Global.oPerfilNegocio.id)
-                    .getDataCategoriaAll(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    Global.listCategoriasCatalogo = snapshot.data;
-                    if (Global.listCategoriasCatalogo.length == 0) {
-                      return ListTile(
-                        contentPadding: EdgeInsets.symmetric(
-                            vertical: 15.0, horizontal: 15.0),
-                        leading: CircleAvatar(
-                          radius: 24.0,
-                          child: Icon(Icons.add),
-                        ),
-                        dense: true,
-                        title: Text("Crear categoría"),
-                        onTap: () {
-                          //Navigator.pop(context,Global.listCategoriasCatalogo[index]);
-                        },
-                      );
-                    }
-                    return ListView.builder(
-                      padding: EdgeInsets.symmetric(vertical: 15.0),
-                      shrinkWrap: true,
-                      itemCount: Global.listCategoriasCatalogo.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        Categoria categoria =
-                            Global.listCategoriasCatalogo[index];
-                        return index == 0
-                            ? Column(
-                                children: <Widget>[
-                                  ListTile(
-                                    leading: CircleAvatar(
-                                      radius: 24.0,
-                                      child: Icon(Icons.add),
-                                    ),
-                                    dense: true,
-                                    title: Text("Crear nueva categoría",
-                                        style: TextStyle(fontSize: 16.0)),
-                                    onTap: () {},
-                                  ),
-                                  Global.listCategoriasCatalogo != 0
-                                      ? Divider(endIndent: 12.0, indent: 12.0)
-                                      : Container(),
-                                  Global.listCategoriasCatalogo != 0
-                                      ? ListTile(
-                                          leading: CircleAvatar(
-                                            radius: 24.0,
-                                            child: Icon(Icons.all_inclusive),
-                                          ),
-                                          dense: true,
-                                          title: Text("Mostrar todos",
-                                              style: TextStyle(fontSize: 16.0)),
-                                          onTap: () {
-                                            buildContext
-                                                .read<ProviderCatalogo>()
-                                                .setIdCategoria = "todos";
-                                            buildContext
-                                                .read<ProviderCatalogo>()
-                                                .setNombreFiltro = "Todos";
-                                            buildContext
-                                                .read<ProviderCatalogo>()
-                                                .setIdMarca = "";
-                                            Navigator.pop(
-                                                context,
-                                                Global.listCategoriasCatalogo[
-                                                    index]);
-                                          },
-                                        )
-                                      : Container(),
-                                  Divider(endIndent: 12.0, indent: 12.0),
-                                  ListTile(
-                                    leading: categoria.url_imagen == "" ||
-                                            categoria.url_imagen == "default"
-                                        ? CircleAvatar(
-                                            backgroundColor: Colors.black26,
-                                            radius: 24.0,
-                                            child: Text(
-                                                categoria.nombre
-                                                    .substring(0, 1),
-                                                style: TextStyle(
-                                                    fontSize: 18.0,
-                                                    color: Colors.white,
-                                                    fontWeight:
-                                                        FontWeight.bold)),
-                                          )
-                                        : CachedNetworkImage(
-                                            imageUrl: categoria.url_imagen,
-                                            placeholder: (context, url) =>
-                                                const CircleAvatar(
-                                              backgroundColor: Colors.grey,
-                                              radius: 24.0,
-                                            ),
-                                            imageBuilder: (context, image) =>
-                                                CircleAvatar(
-                                              backgroundImage: image,
-                                              radius: 24.0,
-                                            ),
-                                          ),
-                                    dense: true,
-                                    title: Text(categoria.nombre),
-                                    onTap: () {
-                                      buildContext
-                                              .read<ProviderCatalogo>()
-                                              .setNombreFiltro =
-                                          Global.listCategoriasCatalogo[index]
-                                              .nombre;
-                                      buildContext
-                                              .read<ProviderCatalogo>()
-                                              .setIdCategoria =
-                                          Global
-                                              .listCategoriasCatalogo[index].id;
-                                      buildContext
-                                          .read<ProviderCatalogo>()
-                                          .setIdMarca = "";
-                                      Navigator.pop(context,
-                                          Global.listCategoriasCatalogo[index]);
-                                    },
-                                  ),
-                                  Divider(endIndent: 12.0, indent: 12.0),
-                                ],
-                              )
-                            : Column(
-                                children: <Widget>[
-                                  ListTile(
-                                    leading: categoria.url_imagen == "" ||
-                                            categoria.url_imagen == "default"
-                                        ? CircleAvatar(
-                                            backgroundColor: Colors.black26,
-                                            radius: 24.0,
-                                            child: Text(
-                                                categoria.nombre
-                                                    .substring(0, 1),
-                                                style: TextStyle(
-                                                    fontSize: 18.0,
-                                                    color: Colors.white,
-                                                    fontWeight:
-                                                        FontWeight.bold)),
-                                          )
-                                        : CachedNetworkImage(
-                                            imageUrl: categoria.url_imagen,
-                                            placeholder: (context, url) =>
-                                                const CircleAvatar(
-                                              backgroundColor: Colors.grey,
-                                              radius: 24.0,
-                                            ),
-                                            imageBuilder: (context, image) =>
-                                                CircleAvatar(
-                                              backgroundImage: image,
-                                              radius: 24.0,
-                                            ),
-                                          ),
-                                    dense: true,
-                                    title: Text(categoria.nombre),
-                                    onTap: () {
-                                      buildContext
-                                              .read<ProviderCatalogo>()
-                                              .setNombreFiltro =
-                                          Global.listCategoriasCatalogo[index]
-                                              .nombre;
-                                      buildContext
-                                              .read<ProviderCatalogo>()
-                                              .setIdCategoria =
-                                          Global
-                                              .listCategoriasCatalogo[index].id;
-                                      buildContext
-                                          .read<ProviderCatalogo>()
-                                          .setIdMarca = "";
-                                      Navigator.pop(context,
-                                          Global.listCategoriasCatalogo[index]);
-                                    },
-                                  ),
-                                  Divider(endIndent: 12.0, indent: 12.0),
-                                ],
-                              );
-                      },
-                    );
-                  } else {
-                    return Center(child: Text("Cargando..."));
-                  }
-                },
-              ),
-            ),
-          );
-        });
   }
 
   Widget _getAdminUserData({@required String idNegocio}) {
@@ -919,7 +730,9 @@ class PagePrincipal extends StatelessWidget {
                       alignment: Alignment.bottomCenter,
                       children: <Widget>[
                         FutureBuilder(
-                          future: Global.getMarca(idMarca: catalogo.getMarcas[index]).getDataMarca(),
+                          future: Global.getMarca(
+                                  idMarca: catalogo.getMarcas[index])
+                              .getDataMarca(),
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
                               Marca marca = snapshot.data;
@@ -935,11 +748,14 @@ class PagePrincipal extends StatelessWidget {
                                 child: Column(
                                   children: <Widget>[
                                     DashedCircle(
-                                      dashes:catalogo.getNumeroDeProductosDeMarca(id: marca.id),
+                                      dashes:
+                                          catalogo.getNumeroDeProductosDeMarca(
+                                              id: marca.id),
                                       gradientColor: colorGradientInstagram,
                                       child: Padding(
                                         padding: EdgeInsets.all(5.0),
-                                        child: viewCircleImage(url: marca.url_imagen, radius: 30),
+                                        child: viewCircleImage(
+                                            url: marca.url_imagen, radius: 30),
                                       ),
                                     ),
                                     SizedBox(
@@ -964,11 +780,10 @@ class PagePrincipal extends StatelessWidget {
                               return DashedCircle(
                                 dashes: 1,
                                 gradientColor: colorGradientInstagram,
-                                child: Padding(
-                                  padding: EdgeInsets.all(5.0),
-                                  child: viewCircleImage(
-                                      url: "default", radius: 30),
-                                ),
+                                child:CircleAvatar(
+          backgroundColor: Colors.black26,
+          radius: 30,
+        ),
                               );
                             }
                           },

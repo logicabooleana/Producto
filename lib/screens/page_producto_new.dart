@@ -8,69 +8,60 @@ import 'package:catalogo/services/globals.dart';
 import 'package:catalogo/models/models_catalogo.dart';
 import 'package:image_picker/image_picker.dart';
 
-class ProductEdit extends StatefulWidget {
-  final String sSignoMoneda;
-  final ProductoNegocio producto;
-  ProductEdit({this.producto, this.sSignoMoneda});
+class ProductNew extends StatefulWidget {
+  final String id;
+  ProductNew({@required this.id});
 
   @override
-  _ProductEditState createState() => _ProductEditState(producto);
+  _ProductNewState createState() => _ProductNewState(id: id);
 }
 
-class _ProductEditState extends State<ProductEdit> {
-  TextEditingController controllerTextEdit_titulo;
-
-  TextEditingController controllerTextEdit_descripcion;
-  TextEditingController controllerTextEdit_precio_venta;
-  TextEditingController controllerTextEdit_compra;
-  TextEditingController controllerTextEdit_comparacion;
+class _ProductNewState extends State<ProductNew> {
 
   bool saveIndicador = false;
-  ProductoNegocio producto;
-  _ProductEditState(this.producto);
+  ProductoNegocio productoNegocio=new ProductoNegocio();
+  Producto producto=new Producto();
+  String id;
+  _ProductNewState({@required this.id});
+
+  String urlIamgen = "";
+  PickedFile _imageFile;
+  dynamic _pickImageError;
+  String _retrieveDataError;
+  final ImagePicker _picker = ImagePicker();
+
+  // Toma los pixeles del ancho y alto de la pantalla
+  Size screenSize;
 
   @override
   void initState() {
+    productoNegocio.id=widget.id;
+    producto.id=widget.id;
     super.initState();
-    controllerTextEdit_titulo = TextEditingController(text: producto.titulo);
-    controllerTextEdit_descripcion =
-        TextEditingController(text: producto.descripcion);
-    controllerTextEdit_precio_venta =
-        TextEditingController(text: producto.precio_venta.toString());
-    controllerTextEdit_compra =
-        TextEditingController(text: producto.precio_compra.toString());
-    controllerTextEdit_comparacion =
-        TextEditingController(text: producto.precio_comparacion.toString());
   }
 
   @override
   void dispose() {
-    controllerTextEdit_titulo.dispose();
-    controllerTextEdit_descripcion.dispose();
-    controllerTextEdit_precio_venta.dispose();
-    controllerTextEdit_compra.dispose();
-    controllerTextEdit_comparacion.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    screenSize= MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
         elevation: 0.0,
         backgroundColor: Theme.of(context).canvasColor,
-        iconTheme: Theme.of(context)
-            .iconTheme
-            .copyWith(color: Theme.of(context).textTheme.bodyText1.color),
+        iconTheme: Theme.of(context).iconTheme.copyWith(color: Theme.of(context).textTheme.bodyText1.color),
         title: Row(
           children: <Widget>[
-            producto.verificado == true
+            productoNegocio.verificado == true
                 ? Padding(
                     padding: EdgeInsets.only(right: 3.0),
                     child: new Image.asset('assets/icon_verificado.png',
                         width: 16.0, height: 16.0))
                 : new Container(),
-            Text(widget.producto.id,
+            Text(widget.id,
                 style: TextStyle(
                     fontSize: 18.0,
                     color: Theme.of(context).textTheme.bodyText1.color)),
@@ -88,22 +79,11 @@ class _ProductEditState extends State<ProductEdit> {
                       ),
                     ),
               onPressed: () {
-                guardar();
+                //guardar();
               }),
         ],
       ),
-      body: FutureBuilder(
-        future: Global.getProductosPrecargado(idProducto: this.producto.id).getDataProductoGlobal(),
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (snapshot.hasData) {
-
-            Producto productoGlobal = snapshot.data;
-            this.producto.urlimagen=productoGlobal.urlimagen;
-            this.producto.titulo=productoGlobal.titulo;
-            this.producto.descripcion=productoGlobal.descripcion;
-            this.producto.verificado=productoGlobal.verificado;
-
-            return SingleChildScrollView(
+      body:SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -111,20 +91,9 @@ class _ProductEditState extends State<ProductEdit> {
                   widgetFormEditText(),
                 ],
               ),
-            );
-          } else {
-            return Center(child: CircularProgressIndicator());
-          }
-        },
-      ),
+            ),
     );
   }
-
-  String urlIamgen = "";
-  PickedFile _imageFile;
-  dynamic _pickImageError;
-  String _retrieveDataError;
-  final ImagePicker _picker = ImagePicker();
 
   Widget widgetsImagen() {
     return Column(
@@ -142,38 +111,30 @@ class _ProductEditState extends State<ProductEdit> {
                     ),
                   ],
                 ),
-                child: Hero(
-                  tag: widget.producto.id,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(0.0),
-                    child: CachedNetworkImage(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(0.0),
+                  child: CachedNetworkImage(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.width,
+                    fadeInDuration: Duration(milliseconds: 200),
+                    fit: BoxFit.cover,
+                    imageUrl:this.productoNegocio.urlimagen??"default",
+                    placeholder: (context, url) => FadeInImage(
+                        image: AssetImage("assets/loading.gif"),
+                        placeholder: AssetImage("assets/loading.gif")),
+                    errorWidget: (context, url, error) => Container(
+                      color: Colors.grey,
                       width: MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.width,
-                      fadeInDuration: Duration(milliseconds: 200),
-                      fit: BoxFit.cover,
-                      imageUrl: widget.producto.urlimagen,
-                      placeholder: (context, url) => FadeInImage(
-                          image: AssetImage("assets/loading.gif"),
-                          placeholder: AssetImage("assets/loading.gif")),
-                      errorWidget: (context, url, error) => Container(
-                        color: Colors.grey,
-                        width: MediaQuery.of(context).size.width,
-                        height: MediaQuery.of(context).size.width,
-                        child: Center(
-                          child: Text(
-                            widget.producto.titulo.substring(0, 3),
-                            style: TextStyle(
-                                fontSize:
-                                    MediaQuery.of(context).size.width * 0.25),
-                          ),
-                        ),
+                      child: Center(
+                        child: Icon(Icons.image),
                       ),
                     ),
                   ),
                 ),
               )
             : _previewImage(),
-        true //producto.verificado==false
+          true //producto.verificado==false
             ? Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -217,51 +178,53 @@ class _ProductEditState extends State<ProductEdit> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           TextField(
-            enabled: !producto.verificado,
-            onChanged: (value) => producto.titulo = value,
+            enabled: !productoNegocio.verificado,
+            onChanged: (value) {
+              productoNegocio.titulo = value;
+              producto.titulo = value;
+            },
             decoration: InputDecoration(
                 border: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.green, width: 2)),
                 labelText: "Titulo"),
             style: textStyle,
-            controller: controllerTextEdit_titulo,
           ),
           SizedBox(height: 16.0),
           TextField(
-            enabled: !producto.verificado,
-            onChanged: (value) => producto.descripcion = value,
-            decoration: InputDecoration(border: OutlineInputBorder(), labelText: "Descripción"),
+            enabled: !productoNegocio.verificado,
+            onChanged: (value)  {
+              productoNegocio.descripcion = value;
+              producto.descripcion= value;
+            },
+            decoration: InputDecoration(
+                border: OutlineInputBorder(), labelText: "Descripción"),
             style: textStyle,
-            controller: controllerTextEdit_descripcion,
           ),
           SizedBox(height: 16.0),
           TextField(
             keyboardType: TextInputType.number,
-            onChanged: (value) => producto.precio_venta = double.parse(value),
+            onChanged: (value) => productoNegocio.precio_venta = double.parse(value),
             decoration: InputDecoration(
                 border: OutlineInputBorder(), labelText: "Precio de venta"),
             style: textStyle,
-            controller: controllerTextEdit_precio_venta,
           ),
           SizedBox(height: 16.0),
           TextField(
             keyboardType: TextInputType.number,
-            onChanged: (value) => producto.precio_compra = double.parse(value),
+            onChanged: (value) => productoNegocio.precio_compra = double.parse(value),
             decoration: InputDecoration(
                 border: OutlineInputBorder(), labelText: "Precio de compra"),
             style: textStyle,
-            controller: controllerTextEdit_compra,
           ),
           SizedBox(height: 16.0),
           TextField(
             keyboardType: TextInputType.number,
             onChanged: (value) =>
-                producto.precio_comparacion = double.parse(value),
+                productoNegocio.precio_comparacion = double.parse(value),
             decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: "Precio de comparación"),
             style: textStyle,
-            controller: controllerTextEdit_comparacion,
           ),
         ],
       ),
@@ -281,19 +244,22 @@ class _ProductEditState extends State<ProductEdit> {
           .child("APP")
           .child("ARG")
           .child("PRODUCTOS")
-          .child(producto.id);
+          .child(productoNegocio.id);
       StorageUploadTask uploadTask = ref.putFile(File(_imageFile.path));
       // obtenemos la url de la imagen guardada
       urlIamgen = await (await uploadTask.onComplete).ref.getDownloadURL();
       // TODO: Por el momento los datos del producto se guarda junto a la referencia de la cuenta del negocio
-      producto.urlimagen=urlIamgen;
+      productoNegocio.urlimagen=urlIamgen;
     }
 
     // TODO: Por defecto verificado es TRUE // Cambiar esto cuando se lanze a producción
-    producto.verificado = true;
+    productoNegocio.verificado = true;
+    // valores de creación
+    productoNegocio.timestamp_creation=Timestamp.fromDate(new DateTime.now());
     updateProductoGlobal();
     // Firebase set
-    await Global.getDataProductoNegocio(idNegocio: Global.prefs.getIdNegocio, idProducto: producto.id).upSetProducto(producto.toJson());
+    await Global.getDataProductoNegocio(idNegocio: Global.prefs.getIdNegocio, idProducto: productoNegocio.id)
+        .upSetProducto(productoNegocio.toJson());
 
     Navigator.pop(context);
   }
@@ -302,30 +268,26 @@ class _ProductEditState extends State<ProductEdit> {
     // Valores para registrar el precio
     Precio precio = new Precio(
         id_negocio: Global.oPerfilNegocio.id,
-        precio: producto.precio_venta,
-        moneda: producto.signo_moneda,
+        precio: productoNegocio.precio_venta,
+        moneda: productoNegocio.signo_moneda,
         timestamp: Timestamp.fromDate(new DateTime.now()));
     // Firebase set
     await Global.getPreciosProducto(
             idNegocio: Global.oPerfilNegocio.id,
-            idProducto: producto.id,
+            idProducto: productoNegocio.id,
             isoPAis: "ARG")
         .upSetPrecioProducto(precio.toJson());
 
     Map timestampUpdatePrecio;
     if (urlIamgen == "") {
-      timestampUpdatePrecio = {
-        'timestamp_actualizacion': Timestamp.fromDate(new DateTime.now())
-      };
+      producto.timestamp_actualizacion=Timestamp.fromDate(new DateTime.now());
     } else {
-      timestampUpdatePrecio = {
-        'timestamp_actualizacion': Timestamp.fromDate(new DateTime.now()),
-        'urlimagen': urlIamgen
-      };
+      producto.timestamp_actualizacion=Timestamp.fromDate(new DateTime.now());
+      producto.urlimagen=urlIamgen;
     }
     // Firebase set
-    await Global.getProductosPrecargado(idProducto: producto.id, isoPAis: "ARG")
-        .upSetPrecioProducto(timestampUpdatePrecio);
+    await Global.getProductosPrecargado(idProducto: productoNegocio.id, isoPAis: "ARG")
+        .upSetPrecioProducto(producto.toJson());
   }
 
   void _onImageButtonPressed(ImageSource source, {BuildContext context}) async {
@@ -347,12 +309,13 @@ class _ProductEditState extends State<ProductEdit> {
   }
 
   Widget _previewImage() {
+
     final Text retrieveError = _getRetrieveErrorWidget();
     if (retrieveError != null) {
       return retrieveError;
     }
     if (_imageFile != null) {
-      return Image.file(File(_imageFile.path));
+      return Image.file(File(_imageFile.path),width:screenSize.width,height: screenSize.width,fit:BoxFit.cover,);
     } else if (_pickImageError != null) {
       return Text(
         'Pick image error: $_pickImageError',
