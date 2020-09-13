@@ -24,7 +24,6 @@ class _ProductNewState extends State<ProductNew> {
   Categoria subcategoria;
   bool saveIndicador = false;
   ProductoNegocio productoNegocio = new ProductoNegocio();
-  Producto producto = new Producto();
   String id;
   _ProductNewState({@required this.id});
 
@@ -41,7 +40,6 @@ class _ProductNewState extends State<ProductNew> {
   @override
   void initState() {
     productoNegocio.id = widget.id;
-    producto.id = widget.id;
     super.initState();
   }
 
@@ -163,7 +161,7 @@ class _ProductNewState extends State<ProductNew> {
                     _onImageButtonPressed(ImageSource.gallery,
                         context: context);
                   },
-                  icon: const Icon(Icons.photo_library,color: Colors.white),
+                  icon: const Icon(Icons.photo_library, color: Colors.white),
                   label: Text("Galeria",
                       style: TextStyle(fontSize: 18.0, color: Colors.white))),
             ),
@@ -202,7 +200,9 @@ class _ProductNewState extends State<ProductNew> {
                     child: InkWell(
                       child: TextField(
                         controller: TextEditingController()
-                          ..text = catalogo.getCategoria.nombre,
+                          ..text = catalogo.getCategoria != null
+                              ? catalogo.getCategoria.nombre
+                              : "",
                         enabled: false,
                         enableInteractiveSelection: false,
                         decoration: InputDecoration(
@@ -235,7 +235,9 @@ class _ProductNewState extends State<ProductNew> {
                     child: InkWell(
                       child: TextField(
                         controller: TextEditingController()
-                          ..text = catalogo.getSubcategoria.nombre,
+                          ..text = catalogo.getSubcategoria != null
+                              ? catalogo.getSubcategoria.nombre
+                              : "",
                         enabled: false,
                         enableInteractiveSelection: false,
                         decoration: InputDecoration(
@@ -274,7 +276,6 @@ class _ProductNewState extends State<ProductNew> {
             enabled: !productoNegocio.verificado,
             onChanged: (value) {
               productoNegocio.titulo = value;
-              producto.titulo = value;
             },
             decoration: InputDecoration(
                 border: OutlineInputBorder(
@@ -287,7 +288,6 @@ class _ProductNewState extends State<ProductNew> {
             enabled: !productoNegocio.verificado,
             onChanged: (value) {
               productoNegocio.descripcion = value;
-              producto.descripcion = value;
             },
             decoration: InputDecoration(
                 border: OutlineInputBorder(), labelText: "Descripción"),
@@ -328,41 +328,55 @@ class _ProductNewState extends State<ProductNew> {
 
   void guardar({@required BuildContext buildContext}) async {
     if (this.categoria != null && this.subcategoria != null) {
-      setState(() {
-        saveIndicador = true;
-      });
-      urlIamgen = "";
+      if (productoNegocio.titulo != "") {
+        if (productoNegocio.descripcion != "") {
+          if (productoNegocio.precio_venta != 0.0) {
+            setState(() {
+              saveIndicador = true;
+            });
+            urlIamgen = "";
 
-      // Si la "PickedFile" es distinto nulo procede a guardar la imagen en la base de dato de almacenamiento
-      if (_imageFile != null) {
-        StorageReference ref = FirebaseStorage.instance
-            .ref()
-            .child("APP")
-            .child("ARG")
-            .child("PRODUCTOS")
-            .child(productoNegocio.id);
-        StorageUploadTask uploadTask = ref.putFile(File(_imageFile.path));
-        // obtenemos la url de la imagen guardada
-        urlIamgen = await (await uploadTask.onComplete).ref.getDownloadURL();
-        // TODO: Por el momento los datos del producto se guarda junto a la referencia de la cuenta del negocio
-        productoNegocio.urlimagen = urlIamgen;
+            // Si la "PickedFile" es distinto nulo procede a guardar la imagen en la base de dato de almacenamiento
+            if (_imageFile != null) {
+              StorageReference ref = FirebaseStorage.instance
+                  .ref()
+                  .child("APP")
+                  .child("ARG")
+                  .child("PRODUCTOS")
+                  .child(productoNegocio.id);
+              StorageUploadTask uploadTask = ref.putFile(File(_imageFile.path));
+              // obtenemos la url de la imagen guardada
+              urlIamgen =
+                  await (await uploadTask.onComplete).ref.getDownloadURL();
+              // TODO: Por el momento los datos del producto se guarda junto a la referencia de la cuenta del negocio
+              productoNegocio.urlimagen = urlIamgen;
+            }
+
+            // TODO: Por defecto verificado es TRUE // Cambiar esto cuando se lanze a producción
+            productoNegocio.verificado = true;
+            productoNegocio.categoria = this.categoria.id;
+            productoNegocio.subcategoria = this.subcategoria.id;
+            // valores de creación
+            productoNegocio.timestamp_creation =
+                Timestamp.fromDate(new DateTime.now());
+            updateProductoGlobal();
+            // Firebase set
+            await Global.getDataProductoNegocio(
+                    idNegocio: Global.prefs.getIdNegocio,
+                    idProducto: productoNegocio.id)
+                .upSetProducto(productoNegocio.toJson());
+            Navigator.pop(context);
+          } else {
+            viewSnackBar(
+                context: buildContext, message: 'Asigne un precio de venta');
+          }
+        } else {
+          viewSnackBar(
+              context: buildContext, message: 'Debe elegir una descripción');
+        }
+      } else {
+        viewSnackBar(context: buildContext, message: 'Debe elegir un titulo');
       }
-
-      // TODO: Por defecto verificado es TRUE // Cambiar esto cuando se lanze a producción
-      productoNegocio.verificado = true;
-      producto.categoria = this.categoria.id;
-      producto.subcategoria = this.subcategoria.id;
-      // valores de creación
-      productoNegocio.timestamp_creation =
-          Timestamp.fromDate(new DateTime.now());
-      updateProductoGlobal();
-      // Firebase set
-      await Global.getDataProductoNegocio(
-              idNegocio: Global.prefs.getIdNegocio,
-              idProducto: productoNegocio.id)
-          .upSetProducto(productoNegocio.toJson());
-
-      Navigator.pop(context);
     } else {
       viewSnackBar(context: buildContext, message: 'Debe elegir una categoría');
     }
@@ -393,17 +407,24 @@ class _ProductNewState extends State<ProductNew> {
             isoPAis: "ARG")
         .upSetPrecioProducto(precio.toJson());
 
+    // values
+    // TODO: Por defecto verificado es TRUE // Cambiar esto cuando se lanze a producción
+    productoNegocio.verificado = true;
+    productoNegocio.categoria = this.categoria.id;
+    productoNegocio.subcategoria = this.subcategoria.id;
     Map timestampUpdatePrecio;
     if (urlIamgen == "") {
-      producto.timestamp_actualizacion = Timestamp.fromDate(new DateTime.now());
+      productoNegocio.timestamp_actualizacion =
+          Timestamp.fromDate(new DateTime.now());
     } else {
-      producto.timestamp_actualizacion = Timestamp.fromDate(new DateTime.now());
-      producto.urlimagen = urlIamgen;
+      productoNegocio.timestamp_actualizacion =
+          Timestamp.fromDate(new DateTime.now());
+      productoNegocio.urlimagen = urlIamgen;
     }
     // Firebase set
     await Global.getProductosPrecargado(
             idProducto: productoNegocio.id, isoPAis: "ARG")
-        .upSetPrecioProducto(producto.toJson());
+        .upSetPrecioProducto(productoNegocio.convertProductoDefault().toJson());
   }
 
   void _onImageButtonPressed(ImageSource source, {BuildContext context}) async {

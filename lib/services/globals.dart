@@ -195,14 +195,14 @@ class ProviderCatalogo with ChangeNotifier {
   List<ProductoNegocio> listCatalogoFilter=new List();
   List<ProductoNegocio> listCatalogoCategoria=new List();
   String idMarca="";
-  Categoria categoria=new Categoria(id: "todos",nombre: "Todos");
-  Categoria subcategoria=new Categoria(id: "todos",nombre: "Todos");
+  Categoria categoria;
+  Categoria subcategoria;
   String sNombreFiltro="Todos";
 
   //Creamos el método Get, para poder obtener el valor de mitexto
   String get getIdMarca =>this.idMarca??"";
-  Categoria get getCategoria =>this.categoria??new Categoria(id: "todos",nombre: "Todos");
-  Categoria get getSubcategoria =>this.subcategoria??new Categoria(id: "todos",nombre: "Todos");
+  Categoria get getCategoria =>this.categoria;
+  Categoria get getSubcategoria =>this.subcategoria;
   List<ProductoNegocio> get getCatalogo =>cataloLoadMore;
   List<String> get getMarcas =>listMarcas??[];
 
@@ -214,8 +214,8 @@ class ProviderCatalogo with ChangeNotifier {
       listCatalogoFilter.clear();
       listCatalogoCategoria.clear();
       idMarca="";
-      this.categoria=new Categoria(id: "todos",nombre: "Todos");
-      this.subcategoria=new Categoria(id: "todos",nombre: "Todos"); 
+      this.categoria=null;
+      this.subcategoria=null; 
     }
   }
   set setIdMarca( String id ) {
@@ -233,7 +233,7 @@ class ProviderCatalogo with ChangeNotifier {
     this.sNombreFiltro=nombreFiltro;
   }
   set setCategoria( Categoria categoria ) {
-    this.subcategoria=new Categoria();
+    this.subcategoria=null;
     this.categoria = categoria; 
     getFilterCatalogo(categoria:this.categoria,subcategoria: subcategoria,idMarca: this.idMarca );
     notifyListeners();
@@ -262,7 +262,7 @@ class ProviderCatalogo with ChangeNotifier {
     this.listCatalogoCategoria.clear();
     statusCargaGridListCatalogo = LoadStatus.normal;
 
-    if(categoria.id==""||categoria.id=="todos"){
+    if(categoria==null){
 
       for (var i = 0; i < this.listCatalogo.length; i++) {
           
@@ -277,8 +277,8 @@ class ProviderCatalogo with ChangeNotifier {
     }else{
       for (var i = 0; i < this.listCatalogo.length; i++) {
 
-        if(subcategoria.id=="todos"){
-        if(categoria.id!="todos"&& idMarca=="" ){
+        if(subcategoria==null){
+        if(categoria.id!=""&& idMarca=="" ){
           if(this.listCatalogo[i].categoria==categoria.id){ 
             lista.add(this.listCatalogo[i]); 
             listCatalogoCategoria.add(this.listCatalogo[i]); 
@@ -289,7 +289,7 @@ class ProviderCatalogo with ChangeNotifier {
           if( idMarca==this.listCatalogo[i].id_marca ){lista.add(this.listCatalogo[i]); }
         }
       }else{
-        if(subcategoria.id!="todos"&& idMarca=="" ){
+        if(subcategoria.id!=""&& idMarca=="" ){
           if(this.listCatalogo[i].subcategoria==subcategoria.id){ 
             lista.add(this.listCatalogo[i]); 
             listCatalogoCategoria.add(this.listCatalogo[i]); 
@@ -328,13 +328,13 @@ class ProviderCatalogo with ChangeNotifier {
     this.listMarcas.clear();
     List<String>  marcas =[];
 
-    if( this.categoria.id==""|| this.categoria.id=="todos"){
+    if( this.categoria==null){
       for (var Producto in this.listCatalogo) {
         if( Producto.id_marca!= null && Producto.id_marca != "" ){
           marcas.add(Producto.id_marca);
         }
       }
-    }else if( this.categoria.id!="" ){
+    }else if( this.categoria!=null ){
       for (var Producto in this.listCatalogoCategoria) {
         if( Producto.id_marca!= null && Producto.id_marca != "" ){
           marcas.add(Producto.id_marca);

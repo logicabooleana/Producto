@@ -109,7 +109,7 @@ class _ViewCategoriaState extends State<ViewCategoria> {
                                         .setNombreFiltro = "Mostrar todos";
                                     buildContext
                                         .read<ProviderCatalogo>()
-                                        .setCategoria = new Categoria();
+                                        .setCategoria =null;
                                     buildContext
                                         .read<ProviderCatalogo>()
                                         .setIdMarca = "";

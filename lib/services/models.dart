@@ -149,6 +149,23 @@ class ProductoNegocio  {
         
     };
 
+    Producto convertProductoDefault(){
+    Producto productoDefault=new Producto();
+    productoDefault.id=this.id??"";
+    productoDefault.urlimagen=this.urlimagen??"";
+    productoDefault.verificado=this.verificado??false;
+    productoDefault.id_marca=this.id_marca??"";
+    productoDefault.titulo=this.titulo??"";
+    productoDefault.descripcion=this.descripcion??"";
+    productoDefault.codigo=this.codigo??"";
+    productoDefault.categoria=this.categoria??"";
+    productoDefault.subcategoria=this.subcategoria??"";
+    productoDefault.timestamp_actualizacion=this.timestamp_actualizacion;
+    productoDefault.timestamp_creation=this.timestamp_creation;
+
+    return productoDefault;
+  }
+
 }
 class Producto {
     String id="";

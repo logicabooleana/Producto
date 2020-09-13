@@ -29,6 +29,7 @@ class _ProductEditState extends State<ProductEdit> {
   Categoria categoria;
   Categoria subcategoria;
   bool saveIndicador = false;
+  bool deleteIndicador = false;
   ProductoNegocio producto;
   BuildContext contextPrincipal;
   _ProductEditState(this.producto);
@@ -210,28 +211,35 @@ class _ProductEditState extends State<ProductEdit> {
                 ),
               )
             : _previewImage(),
-            // TODO : Modificar antes de lanzar a produccion
-            true //producto.verificado==false
+        // TODO : Modificar antes de lanzar a produccion
+        true //producto.verificado==false
             ? Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
-                  SizedBox(height:12.0 ,width: 12.0),
+                  SizedBox(height: 12.0, width: 12.0),
                   Expanded(
                     child: RaisedButton.icon(
-                      color: Theme.of(context).accentColor,
-                      padding: const EdgeInsets.all(14.0),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(35.0))),
-                      onPressed: (){_onImageButtonPressed(ImageSource.gallery,context: context);}, 
-                      icon: const Icon(Icons.photo_library), 
-                      label:Text("Galeria", style: TextStyle(fontSize: 18.0, color: Colors.white))
-                      ),
+                        color: Theme.of(context).accentColor,
+                        padding: const EdgeInsets.all(14.0),
+                        shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(35.0))),
+                        onPressed: () {
+                          _onImageButtonPressed(ImageSource.gallery,
+                              context: context);
+                        },
+                        icon: const Icon(Icons.photo_library),
+                        label: Text("Galeria",
+                            style: TextStyle(
+                                fontSize: 18.0, color: Colors.white))),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(12.0),
                     child: FloatingActionButton(
                       onPressed: () {
-                        _onImageButtonPressed(ImageSource.camera,context: context);
+                        _onImageButtonPressed(ImageSource.camera,
+                            context: context);
                       },
                       heroTag: 'image1',
                       tooltip: 'Toma una foto',
@@ -256,6 +264,8 @@ class _ProductEditState extends State<ProductEdit> {
             child: Text("Cargando categorías"),
             builder: (context, catalogo, child) {
               return Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   new Flexible(
                     child: InkWell(
@@ -363,52 +373,117 @@ class _ProductEditState extends State<ProductEdit> {
             style: textStyle,
             controller: controllerTextEdit_comparacion,
           ),
+          SizedBox(height: 25.0),
+          deleteIndicador == false
+          ?SizedBox(
+            width: double.infinity,
+            child: RaisedButton.icon(
+              onPressed: ()async{
+                setState(() {
+                  deleteIndicador=true;
+                });
+                // Firebase ( delete )
+                await Global.getDataProductoNegocio(idNegocio: Global.prefs.getIdNegocio, idProducto: producto.id).deleteDoc(); // Procede a eliminar el documento de la base de datos del catalogo de la cuenta
+                // Emula un retardo de 2 segundos
+                Future.delayed(const Duration(milliseconds: 2000), () {
+                  Navigator.pop(builderContext);
+                });
+              },
+              color: Colors.red[400],
+              icon: Icon(
+                Icons.delete,
+                color: Colors.white,
+              ),
+              padding: EdgeInsets.all(12.0),
+              label: Text("Borrar producto",
+                  style: TextStyle(fontSize: 18.0, color: Colors.white)),
+            ),
+          ):SizedBox(
+            width: double.infinity,
+            child: RaisedButton.icon(
+              onPressed: (){},
+              color: Colors.red[400],
+              icon:Container(width: 16.0,height: 16.0,child: CircularProgressIndicator(backgroundColor: Colors.white)),
+              padding: EdgeInsets.all(12.0),
+              label: Text("Borrando de su catalogo...",
+                  style: TextStyle(fontSize: 18.0, color: Colors.white)),
+            ),
+          ),
+          
+          //CircularProgressIndicator(),
+          SizedBox(height: 10.0),
+          Align(
+            alignment: Alignment
+                .center, // Align however you like (i.e .centerRight, centerLeft)
+            child: Text("Este producto será eliminado de su catálogo",
+                textAlign: TextAlign.center, style: TextStyle(fontSize: 14.0)),
+          ),
+          SizedBox(height: 25.0),
         ],
       ),
     );
   }
 
-  void guardar({@required BuildContext buildContext})async{
+
+  void guardar({@required BuildContext buildContext}) async {
     if (this.categoria != null && this.subcategoria != null) {
-      
-      setState(() {
-      saveIndicador = true;
-    });
-    urlIamgen = "";
+      if (producto.titulo != "") {
+        if (producto.descripcion != "") {
+          if (producto.precio_venta != 0.0) {
+            setState(() {
+              saveIndicador = true;
+            });
+            urlIamgen = "";
 
-    // Si la "PickedFile" es distinto nulo procede a guardar la imagen en la base de dato de almacenamiento
-    if (_imageFile != null) {
-      StorageReference ref = FirebaseStorage.instance
-          .ref()
-          .child("APP")
-          .child("ARG")
-          .child("PRODUCTOS")
-          .child(producto.id);
-      StorageUploadTask uploadTask = ref.putFile(File(_imageFile.path));
-      // obtenemos la url de la imagen guardada
-      urlIamgen = await (await uploadTask.onComplete).ref.getDownloadURL();
-      // TODO: Por el momento los datos del producto se guarda junto a la referencia de la cuenta del negocio
-      producto.urlimagen = urlIamgen;
-    }
+            // Si la "PickedFile" es distinto nulo procede a guardar la imagen en la base de dato de almacenamiento
+            if (_imageFile != null) {
+              StorageReference ref = FirebaseStorage.instance
+                  .ref()
+                  .child("APP")
+                  .child("ARG")
+                  .child("PRODUCTOS")
+                  .child(producto.id);
+              StorageUploadTask uploadTask = ref.putFile(File(_imageFile.path));
+              // obtenemos la url de la imagen guardada
+              urlIamgen =
+                  await (await uploadTask.onComplete).ref.getDownloadURL();
+              // TODO: Por el momento los datos del producto se guarda junto a la referencia de la cuenta del negocio
+              producto.urlimagen = urlIamgen;
+            }
 
-    // TODO: Por defecto verificado es TRUE // Cambiar esto cuando se lanze a producción
-    producto.verificado = true;
-    producto.categoria=this.categoria.id;
-    producto.subcategoria=this.subcategoria.id;
-    updateProductoGlobal();
-    // Firebase set
-    await Global.getDataProductoNegocio(
-            idNegocio: Global.prefs.getIdNegocio, idProducto: producto.id)
-        .upSetProducto(producto.toJson());
+            // TODO: Por defecto verificado es TRUE // Cambiar esto cuando se lanze a producción
+            producto.verificado = true;
+            producto.categoria = this.categoria.id;
+            producto.subcategoria = this.subcategoria.id;
+            updateProductoGlobal();
+            // Firebase set
+            await Global.getDataProductoNegocio(
+                    idNegocio: Global.prefs.getIdNegocio,
+                    idProducto: producto.id)
+                .upSetProducto(producto.toJson());
 
-    Navigator.pop(context); 
+            Navigator.pop(context);
+          } else {
+            viewSnackBar(
+                context: buildContext, message: 'Asigne un precio de venta');
+          }
+        } else {
+          viewSnackBar(
+              context: buildContext, message: 'Debe elegir una descripción');
+        }
+      } else {
+        viewSnackBar(context: buildContext, message: 'Debe elegir un titulo');
+      }
     } else {
-      viewSnackBar(context:buildContext,message: 'Debe elegir una categoría');
+      viewSnackBar(context: buildContext, message: 'Debe elegir una categoría');
     }
   }
 
-  void viewSnackBar({@required BuildContext context,@required String message }) async {
-    final snackBar = SnackBar(content: Text('Debe elegir una categoría'),action: SnackBarAction(label: 'ok',onPressed:(){}));
+  void viewSnackBar(
+      {@required BuildContext context, @required String message}) async {
+    final snackBar = SnackBar(
+        content: Text('Debe elegir una categoría'),
+        action: SnackBarAction(label: 'ok', onPressed: () {}));
 
     // Find the Scaffold in the widget tree and use
     // it to show a SnackBar.
@@ -581,7 +656,7 @@ class _ProductEditState extends State<ProductEdit> {
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
         backgroundColor: Theme.of(buildContext).canvasColor,
         context: buildContext,
-        builder: (ctx) {
+        builder: (_) {
           return Scaffold(
             appBar: AppBar(title: Text("Subcategoria")),
             body: FutureBuilder(
@@ -618,7 +693,7 @@ class _ProductEditState extends State<ProductEdit> {
                               onTap: () {
                                 setState(() {
                                   this.subcategoria = categoriaSelect;
-                                  Navigator.pop(ctx);
+                                  Navigator.pop(buildContext);
                                 });
                               },
                             ),

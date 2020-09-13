@@ -173,7 +173,7 @@ class PagePrincipal extends StatelessWidget {
         ],
       ),
       body: new StreamBuilder(
-        stream: Global.getCatalogoNegocio(idNegocio: perfilNegocio.id)
+        stream: Global.getCatalogoNegocio(idNegocio: perfilNegocio.id??"")
             .streamDataProductoAll(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {

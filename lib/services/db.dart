@@ -94,6 +94,11 @@ class Document<T> {
     return ref.set(Map<String, dynamic>.from(data), SetOptions(merge: true));
   }
 
+  // DELETE
+  Future<void> deleteDoc() {
+    return ref.delete();
+  }
+
 }
 
 class Collection<T> {
