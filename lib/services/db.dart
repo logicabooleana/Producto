@@ -67,6 +67,12 @@ class Document<T> {
       return Global.modelsProductoGlobal[T](v.data()) as T;
     });
   }
+  Future<T> getDataCategoria() {
+    return ref.get().then((v){
+      if(v.exists==false){ return  null; }
+      return Global.modelsCategoria[T](v.data()) as T;
+    });
+  }
   Stream<T> streamDataProducto() {
     return ref.snapshots().map((v) => Global.modelsProducto[T](v.data()) as T);
   }

@@ -195,13 +195,14 @@ class ProviderCatalogo with ChangeNotifier {
   List<ProductoNegocio> listCatalogoFilter=new List();
   List<ProductoNegocio> listCatalogoCategoria=new List();
   String idMarca="";
-  String idCategoria="todos"; 
-  String nombreCategoria="Todos"; 
+  Categoria categoria=new Categoria(id: "todos",nombre: "Todos");
+  Categoria subcategoria=new Categoria(id: "todos",nombre: "Todos");
+  String sNombreFiltro="Todos";
 
   //Creamos el método Get, para poder obtener el valor de mitexto
   String get getIdMarca =>this.idMarca??"";
-  String get getIdCategoria =>this.idCategoria??"";
-  String get getNombreCategoria =>this.nombreCategoria??"Todos";
+  Categoria get getCategoria =>this.categoria??new Categoria(id: "todos",nombre: "Todos");
+  Categoria get getSubcategoria =>this.subcategoria??new Categoria(id: "todos",nombre: "Todos");
   List<ProductoNegocio> get getCatalogo =>cataloLoadMore;
   List<String> get getMarcas =>listMarcas??[];
 
@@ -213,29 +214,34 @@ class ProviderCatalogo with ChangeNotifier {
       listCatalogoFilter.clear();
       listCatalogoCategoria.clear();
       idMarca="";
-      idCategoria="todos"; 
-      nombreCategoria="Todos"; 
+      this.categoria=new Categoria(id: "todos",nombre: "Todos");
+      this.subcategoria=new Categoria(id: "todos",nombre: "Todos"); 
     }
   }
   set setIdMarca( String id ) {
     this.idMarca = id; 
-    getFilterCatalogo(idCategoria:this.idCategoria,idMarca:this.idMarca );
+    getFilterCatalogo(categoria:this.categoria,subcategoria: subcategoria,idMarca:this.idMarca );
     notifyListeners(); //notificamos a los widgets que esten escuchando el stream.
   }
   
   set setCatalogo( List<ProductoNegocio> list ) {
     this.listCatalogo = list; 
-    getFilterCatalogo(idCategoria:this.idCategoria ,idMarca:this.idMarca);
+    getFilterCatalogo(categoria:this.categoria,subcategoria: subcategoria ,idMarca:this.idMarca);
     //notifyListeners(); //notificamos a los widgets que esten escuchando el stream.
   }
-  set setIdCategoria( String idCategoria ) {
-    this.idCategoria = idCategoria; 
-    getFilterCatalogo(idCategoria:this.idCategoria,idMarca: this.idMarca );
+  set setNombreFiltro(String nombreFiltro){
+    this.sNombreFiltro=nombreFiltro;
+  }
+  set setCategoria( Categoria categoria ) {
+    this.subcategoria=new Categoria();
+    this.categoria = categoria; 
+    getFilterCatalogo(categoria:this.categoria,subcategoria: subcategoria,idMarca: this.idMarca );
     notifyListeners();
   }
-  set setNombreFiltro( String nombreCategoria ) {
-    this.nombreCategoria = nombreCategoria; 
-    notifyListeners(); //notificamos a los widgets que esten escuchando el stream.
+  set setSubategoria( Categoria subcategoria ) {
+    this.subcategoria = subcategoria; 
+    getFilterCatalogo(categoria:this.categoria,subcategoria: subcategoria,idMarca: this.idMarca );
+    notifyListeners();
   }
   int getNumeroDeProductosDeMarca({@required String id}){
 
@@ -249,14 +255,14 @@ class ProviderCatalogo with ChangeNotifier {
 
     return cantidad;
   }
-  void getFilterCatalogo({String idCategoria,String idMarca}){
+  void getFilterCatalogo({@required Categoria categoria,@required Categoria subcategoria,String idMarca}){
 
     List<ProductoNegocio> lista =[];
     this.listCatalogoFilter.clear();
     this.listCatalogoCategoria.clear();
     statusCargaGridListCatalogo = LoadStatus.normal;
 
-    if(idCategoria==""||idCategoria=="todos"){
+    if(categoria.id==""||categoria.id=="todos"){
 
       for (var i = 0; i < this.listCatalogo.length; i++) {
           
@@ -270,17 +276,37 @@ class ProviderCatalogo with ChangeNotifier {
       // Carga las marca de los prosductos mostrados de la categoria
     }else{
       for (var i = 0; i < this.listCatalogo.length; i++) {
-          
-        if(idCategoria!=""&& idMarca=="" ){
-          if(this.listCatalogo[i].categoria==idCategoria||this.listCatalogo[i].subcategoria==idCategoria){ 
+
+        if(subcategoria.id=="todos"){
+        if(categoria.id!="todos"&& idMarca=="" ){
+          if(this.listCatalogo[i].categoria==categoria.id){ 
             lista.add(this.listCatalogo[i]); 
-           listCatalogoCategoria.add(this.listCatalogo[i]); 
+            listCatalogoCategoria.add(this.listCatalogo[i]); 
           }
-        }else if(idCategoria!=""&& idMarca!=""){
-          if(this.listCatalogo[i].categoria==idCategoria||this.listCatalogo[i].subcategoria==idCategoria){listCatalogoCategoria.add(this.listCatalogo[i]);if( idMarca==this.listCatalogo[i].id_marca ){lista.add(this.listCatalogo[i]); }}
-        }else if(idCategoria==""&& idMarca!=""){
+        }else if(categoria.id!=""&& idMarca!=""){
+          if(this.listCatalogo[i].categoria==categoria.id){listCatalogoCategoria.add(this.listCatalogo[i]);if( idMarca==this.listCatalogo[i].id_marca ){lista.add(this.listCatalogo[i]); }}
+        }else if(categoria.id==""&& idMarca!=""){
           if( idMarca==this.listCatalogo[i].id_marca ){lista.add(this.listCatalogo[i]); }
         }
+      }else{
+        if(subcategoria.id!="todos"&& idMarca=="" ){
+          if(this.listCatalogo[i].subcategoria==subcategoria.id){ 
+            lista.add(this.listCatalogo[i]); 
+            listCatalogoCategoria.add(this.listCatalogo[i]); 
+          }
+        }else if(subcategoria.id!=""&& idMarca!=""){
+          if(this.listCatalogo[i].subcategoria==subcategoria.id){
+            listCatalogoCategoria.add(this.listCatalogo[i]);
+            if( idMarca==this.listCatalogo[i].id_marca ){
+              lista.add(this.listCatalogo[i]); 
+              }
+            }
+        }else if(subcategoria.id==""&& idMarca!=""){
+          if( idMarca==this.listCatalogo[i].id_marca ){
+            lista.add(this.listCatalogo[i]); 
+            }
+        }
+      }
       }
 
     this.listCatalogoFilter=lista;
@@ -302,13 +328,13 @@ class ProviderCatalogo with ChangeNotifier {
     this.listMarcas.clear();
     List<String>  marcas =[];
 
-    if( this.idCategoria==""|| this.idCategoria=="todos"){
+    if( this.categoria.id==""|| this.categoria.id=="todos"){
       for (var Producto in this.listCatalogo) {
         if( Producto.id_marca!= null && Producto.id_marca != "" ){
           marcas.add(Producto.id_marca);
         }
       }
-    }else if( this.idCategoria!="" ){
+    }else if( this.categoria.id!="" ){
       for (var Producto in this.listCatalogoCategoria) {
         if( Producto.id_marca!= null && Producto.id_marca != "" ){
           marcas.add(Producto.id_marca);

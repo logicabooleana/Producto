@@ -656,7 +656,7 @@ class PagePrincipal extends StatelessWidget {
                 Consumer<ProviderCatalogo>(
                   child: Tab(text: "Todos"),
                   builder: (context, catalogo, child) {
-                    return Tab(text: catalogo.getNombreCategoria);
+                    return Tab(text: catalogo.sNombreFiltro);
                   },
                 ),
               ],

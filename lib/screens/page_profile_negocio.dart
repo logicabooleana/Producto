@@ -512,9 +512,7 @@ class _PageProfileState extends State<PageProfile> {
                                       : Container(),
                                   Divider(endIndent: 12.0, indent: 12.0),
                                   ListTile(
-                                    leading: categoria.url_imagen == "" ||
-                                            categoria.url_imagen == "default"
-                                        ? CircleAvatar(
+                                    leading: CircleAvatar(
                                             backgroundColor: Colors.black26,
                                             radius: 24.0,
                                             child: Text(
@@ -525,19 +523,6 @@ class _PageProfileState extends State<PageProfile> {
                                                     color: Colors.white,
                                                     fontWeight:
                                                         FontWeight.bold)),
-                                          )
-                                        : CachedNetworkImage(
-                                            imageUrl: categoria.url_imagen,
-                                            placeholder: (context, url) =>
-                                                const CircleAvatar(
-                                              backgroundColor: Colors.grey,
-                                              radius: 24.0,
-                                            ),
-                                            imageBuilder: (context, image) =>
-                                                CircleAvatar(
-                                              backgroundImage: image,
-                                              radius: 24.0,
-                                            ),
                                           ),
                                     dense: true,
                                     title: Text(categoria.nombre),
@@ -561,9 +546,7 @@ class _PageProfileState extends State<PageProfile> {
                             : Column(
                                 children: <Widget>[
                                   ListTile(
-                                    leading: categoria.url_imagen == "" ||
-                                            categoria.url_imagen == "default"
-                                        ? CircleAvatar(
+                                    leading:CircleAvatar(
                                             backgroundColor: Colors.black26,
                                             radius: 24.0,
                                             child: Text(
@@ -574,19 +557,6 @@ class _PageProfileState extends State<PageProfile> {
                                                     color: Colors.white,
                                                     fontWeight:
                                                         FontWeight.bold)),
-                                          )
-                                        : CachedNetworkImage(
-                                            imageUrl: categoria.url_imagen,
-                                            placeholder: (context, url) =>
-                                                const CircleAvatar(
-                                              backgroundColor: Colors.grey,
-                                              radius: 24.0,
-                                            ),
-                                            imageBuilder: (context, image) =>
-                                                CircleAvatar(
-                                              backgroundImage: image,
-                                              radius: 24.0,
-                                            ),
                                           ),
                                     dense: true,
                                     title: Text(categoria.nombre),

@@ -107,6 +107,7 @@ class ProductScreen extends StatelessWidget {
                                     child: Text("Se produjo un Error!"))),
                       ));
                     },
+                    color: Theme.of(context).accentColor,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(35.0))),
                     label: Text(productoEnCatalogo?'Editar':"Agregar", style: TextStyle(fontSize: 18.0, color: Colors.white)),
                     icon: Container(), // Icon( Icons.add,color: Colors.white),

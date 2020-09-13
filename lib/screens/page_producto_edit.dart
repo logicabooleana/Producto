@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:catalogo/services/globals.dart';
 import 'package:catalogo/models/models_catalogo.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 class ProductEdit extends StatefulWidget {
   final String sSignoMoneda;
@@ -19,19 +20,22 @@ class ProductEdit extends StatefulWidget {
 
 class _ProductEditState extends State<ProductEdit> {
   TextEditingController controllerTextEdit_titulo;
-
   TextEditingController controllerTextEdit_descripcion;
   TextEditingController controllerTextEdit_precio_venta;
   TextEditingController controllerTextEdit_compra;
   TextEditingController controllerTextEdit_comparacion;
 
+  // Variables
+  Categoria categoria;
+  Categoria subcategoria;
   bool saveIndicador = false;
   ProductoNegocio producto;
+  BuildContext contextPrincipal;
   _ProductEditState(this.producto);
 
   @override
   void initState() {
-    super.initState();
+    getCategoriaProducto();
     controllerTextEdit_titulo = TextEditingController(text: producto.titulo);
     controllerTextEdit_descripcion =
         TextEditingController(text: producto.descripcion);
@@ -41,6 +45,31 @@ class _ProductEditState extends State<ProductEdit> {
         TextEditingController(text: producto.precio_compra.toString());
     controllerTextEdit_comparacion =
         TextEditingController(text: producto.precio_comparacion.toString());
+    super.initState();
+  }
+
+  void getCategoriaProducto() async {
+    Global.getDataCatalogoCategoria(
+            idNegocio: Global.oPerfilNegocio.id,
+            idCategoria: producto.categoria)
+        .getDataCategoria()
+        .then((value) {
+      setState(() {
+        this.categoria = value ?? Categoria();
+      });
+    });
+    if (producto.subcategoria != "") {
+      Global.getDataCatalogoSubcategoria(
+              idNegocio: Global.oPerfilNegocio.id,
+              idCategoria: producto.categoria,
+              idSubcategoria: producto.subcategoria)
+          .getDataCategoria()
+          .then((value) {
+        setState(() {
+          this.subcategoria = value ?? Categoria();
+        });
+      });
+    }
   }
 
   @override
@@ -54,69 +83,77 @@ class _ProductEditState extends State<ProductEdit> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext contextPrincipal) {
+    this.contextPrincipal = contextPrincipal;
+
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0.0,
-        backgroundColor: Theme.of(context).canvasColor,
-        iconTheme: Theme.of(context)
-            .iconTheme
-            .copyWith(color: Theme.of(context).textTheme.bodyText1.color),
-        title: Row(
-          children: <Widget>[
-            producto.verificado == true
-                ? Padding(
-                    padding: EdgeInsets.only(right: 3.0),
-                    child: new Image.asset('assets/icon_verificado.png',
-                        width: 16.0, height: 16.0))
-                : new Container(),
-            Text(widget.producto.id,
-                style: TextStyle(
-                    fontSize: 18.0,
-                    color: Theme.of(context).textTheme.bodyText1.color)),
-          ],
-        ),
-        actions: <Widget>[
-          IconButton(
-              icon: saveIndicador == false
-                  ? Icon(Icons.check)
-                  : Container(
-                      width: 24.0,
-                      height: 24.0,
-                      child: CircularProgressIndicator(
-                        backgroundColor: Colors.white,
-                      ),
-                    ),
-              onPressed: () {
-                guardar();
-              }),
-        ],
-      ),
-      body: FutureBuilder(
-        future: Global.getProductosPrecargado(idProducto: this.producto.id).getDataProductoGlobal(),
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (snapshot.hasData) {
+      body: Builder(builder: (contextBuilder) {
+        return Scaffold(
+          appBar: AppBar(
+            elevation: 0.0,
+            backgroundColor: Theme.of(contextPrincipal).canvasColor,
+            iconTheme: Theme.of(contextPrincipal).iconTheme.copyWith(
+                color: Theme.of(contextPrincipal).textTheme.bodyText1.color),
+            title: Row(
+              children: <Widget>[
+                producto.verificado == true
+                    ? Padding(
+                        padding: EdgeInsets.only(right: 3.0),
+                        child: new Image.asset('assets/icon_verificado.png',
+                            width: 16.0, height: 16.0))
+                    : new Container(),
+                Text(widget.producto.id,
+                    style: TextStyle(
+                        fontSize: 18.0,
+                        color: Theme.of(contextPrincipal)
+                            .textTheme
+                            .bodyText1
+                            .color)),
+              ],
+            ),
+            actions: <Widget>[
+              IconButton(
+                  icon: saveIndicador == false
+                      ? Icon(Icons.check)
+                      : Container(
+                          width: 24.0,
+                          height: 24.0,
+                          child: CircularProgressIndicator(
+                            backgroundColor: Colors.white,
+                          ),
+                        ),
+                  onPressed: () {
+                    guardar(buildContext: contextBuilder);
+                  }),
+            ],
+          ),
+          body: FutureBuilder(
+            future: Global.getProductosPrecargado(idProducto: this.producto.id)
+                .getDataProductoGlobal(),
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              if (snapshot.hasData) {
+                Producto productoGlobal = snapshot.data;
+                this.producto.urlimagen = productoGlobal.urlimagen;
+                this.producto.titulo = productoGlobal.titulo;
+                this.producto.descripcion = productoGlobal.descripcion;
+                this.producto.verificado = productoGlobal.verificado;
 
-            Producto productoGlobal = snapshot.data;
-            this.producto.urlimagen=productoGlobal.urlimagen;
-            this.producto.titulo=productoGlobal.titulo;
-            this.producto.descripcion=productoGlobal.descripcion;
-            this.producto.verificado=productoGlobal.verificado;
-
-            return SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  widgetsImagen(),
-                  widgetFormEditText(),
-                ],
-              ),
-            );
-          } else {
-            return Center(child: CircularProgressIndicator());
-          }
-        },
-      ),
+                return SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      widgetsImagen(),
+                      widgetFormEditText(builderContext: context),
+                    ],
+                  ),
+                );
+              } else {
+                return Center(child: CircularProgressIndicator());
+              }
+            },
+          ),
+        );
+      }),
     );
   }
 
@@ -173,29 +210,28 @@ class _ProductEditState extends State<ProductEdit> {
                 ),
               )
             : _previewImage(),
-        true //producto.verificado==false
+            // TODO : Modificar antes de lanzar a produccion
+            true //producto.verificado==false
             ? Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: FloatingActionButton(
-                      onPressed: () {
-                        _onImageButtonPressed(ImageSource.gallery,
-                            context: context);
-                      },
-                      heroTag: 'image0',
-                      tooltip: 'Elegir imagen de la galería',
-                      child: const Icon(Icons.photo_library),
-                    ),
+                  SizedBox(height:12.0 ,width: 12.0),
+                  Expanded(
+                    child: RaisedButton.icon(
+                      color: Theme.of(context).accentColor,
+                      padding: const EdgeInsets.all(14.0),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(35.0))),
+                      onPressed: (){_onImageButtonPressed(ImageSource.gallery,context: context);}, 
+                      icon: const Icon(Icons.photo_library), 
+                      label:Text("Galeria", style: TextStyle(fontSize: 18.0, color: Colors.white))
+                      ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(12.0),
                     child: FloatingActionButton(
                       onPressed: () {
-                        _onImageButtonPressed(ImageSource.camera,
-                            context: context);
+                        _onImageButtonPressed(ImageSource.camera,context: context);
                       },
                       heroTag: 'image1',
                       tooltip: 'Toma una foto',
@@ -209,13 +245,76 @@ class _ProductEditState extends State<ProductEdit> {
     );
   }
 
-  Widget widgetFormEditText() {
+  Widget widgetFormEditText({@required BuildContext builderContext}) {
     TextStyle textStyle = new TextStyle(fontSize: 24.0);
     return Container(
       padding: EdgeInsets.all(12.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
+          Consumer<ProviderCatalogo>(
+            child: Text("Cargando categorías"),
+            builder: (context, catalogo, child) {
+              return Row(
+                children: [
+                  new Flexible(
+                    child: InkWell(
+                      child: TextField(
+                        controller: TextEditingController()
+                          ..text = this.categoria != null
+                              ? this.categoria.nombre
+                              : "",
+                        enabled: false,
+                        enableInteractiveSelection: false,
+                        decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Colors.green, width: 2)),
+                            labelText: "Categoría"),
+                        style: textStyle,
+                      ),
+                      onTap: () {
+                        getCategoria(buildContext: builderContext);
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    height: 12.0,
+                    width: 12.0,
+                  ),
+                  new Flexible(
+                    child: InkWell(
+                      child: TextField(
+                        controller: TextEditingController()
+                          ..text = this.subcategoria != null
+                              ? this.subcategoria.nombre
+                              : "",
+                        enabled: false,
+                        enableInteractiveSelection: false,
+                        decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Colors.green, width: 2)),
+                            labelText: "Subcategoría"),
+                        style: textStyle,
+                      ),
+                      onTap: () {
+                        if (this.categoria != null) {
+                          getSubCategoria(
+                              buildContext: builderContext,
+                              idCategoria: this.categoria.id);
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+          SizedBox(
+            height: 12.0,
+            width: 12.0,
+          ),
           TextField(
             enabled: !producto.verificado,
             onChanged: (value) => producto.titulo = value,
@@ -230,7 +329,8 @@ class _ProductEditState extends State<ProductEdit> {
           TextField(
             enabled: !producto.verificado,
             onChanged: (value) => producto.descripcion = value,
-            decoration: InputDecoration(border: OutlineInputBorder(), labelText: "Descripción"),
+            decoration: InputDecoration(
+                border: OutlineInputBorder(), labelText: "Descripción"),
             style: textStyle,
             controller: controllerTextEdit_descripcion,
           ),
@@ -268,8 +368,10 @@ class _ProductEditState extends State<ProductEdit> {
     );
   }
 
-  void guardar() async {
-    setState(() {
+  void guardar({@required BuildContext buildContext})async{
+    if (this.categoria != null && this.subcategoria != null) {
+      
+      setState(() {
       saveIndicador = true;
     });
     urlIamgen = "";
@@ -286,16 +388,31 @@ class _ProductEditState extends State<ProductEdit> {
       // obtenemos la url de la imagen guardada
       urlIamgen = await (await uploadTask.onComplete).ref.getDownloadURL();
       // TODO: Por el momento los datos del producto se guarda junto a la referencia de la cuenta del negocio
-      producto.urlimagen=urlIamgen;
+      producto.urlimagen = urlIamgen;
     }
 
     // TODO: Por defecto verificado es TRUE // Cambiar esto cuando se lanze a producción
     producto.verificado = true;
+    producto.categoria=this.categoria.id;
+    producto.subcategoria=this.subcategoria.id;
     updateProductoGlobal();
     // Firebase set
-    await Global.getDataProductoNegocio(idNegocio: Global.prefs.getIdNegocio, idProducto: producto.id).upSetProducto(producto.toJson());
+    await Global.getDataProductoNegocio(
+            idNegocio: Global.prefs.getIdNegocio, idProducto: producto.id)
+        .upSetProducto(producto.toJson());
 
-    Navigator.pop(context);
+    Navigator.pop(context); 
+    } else {
+      viewSnackBar(context:buildContext,message: 'Debe elegir una categoría');
+    }
+  }
+
+  void viewSnackBar({@required BuildContext context,@required String message }) async {
+    final snackBar = SnackBar(content: Text('Debe elegir una categoría'),action: SnackBarAction(label: 'ok',onPressed:(){}));
+
+    // Find the Scaffold in the widget tree and use
+    // it to show a SnackBar.
+    Scaffold.of(context).showSnackBar(snackBar);
   }
 
   void updateProductoGlobal() async {
@@ -387,5 +504,138 @@ class _ProductEditState extends State<ProductEdit> {
     } else {
       _retrieveDataError = response.exception.code;
     }
+  }
+
+  // VIEWS
+  getCategoria({@required BuildContext buildContext}) {
+    showModalBottomSheet(
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+        backgroundColor: Theme.of(buildContext).canvasColor,
+        context: buildContext,
+        builder: (ctx) {
+          return Scaffold(
+            appBar: AppBar(title: Text("Categoría")),
+            body: FutureBuilder(
+              future: Global.getCatalogoCategorias(
+                      idNegocio: Global.oPerfilNegocio.id)
+                  .getDataCategoriaAll(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  Global.listCategoriasCatalogo = snapshot.data;
+                  if (Global.listCategoriasCatalogo.length != 0) {
+                    return ListView.builder(
+                      padding: EdgeInsets.symmetric(vertical: 15.0),
+                      shrinkWrap: true,
+                      itemCount: Global.listCategoriasCatalogo.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        Categoria categoriaSelect =
+                            Global.listCategoriasCatalogo[index];
+                        return Column(
+                          children: <Widget>[
+                            ListTile(
+                              leading: CircleAvatar(
+                                backgroundColor: Colors.black26,
+                                radius: 24.0,
+                                child: Text(
+                                    categoriaSelect.nombre.substring(0, 1),
+                                    style: TextStyle(
+                                        fontSize: 18.0,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold)),
+                              ),
+                              dense: true,
+                              title: Text(categoriaSelect.nombre),
+                              onTap: () {
+                                setState(() {
+                                  this.categoria = categoriaSelect;
+                                  this.subcategoria = null;
+                                  Navigator.pop(ctx);
+                                  getSubCategoria(
+                                      buildContext: buildContext,
+                                      idCategoria: this.categoria.id);
+                                });
+                              },
+                            ),
+                            Divider(endIndent: 12.0, indent: 12.0),
+                          ],
+                        );
+                      },
+                    );
+                  } else {
+                    return Center(child: Text("Cargando..."));
+                  }
+                } else {
+                  return Center(child: Text("Cargando..."));
+                }
+              },
+            ),
+          );
+        });
+  }
+
+  getSubCategoria(
+      {@required BuildContext buildContext, @required String idCategoria}) {
+    showModalBottomSheet(
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+        backgroundColor: Theme.of(buildContext).canvasColor,
+        context: buildContext,
+        builder: (ctx) {
+          return Scaffold(
+            appBar: AppBar(title: Text("Subcategoria")),
+            body: FutureBuilder(
+              future: Global.getCatalogoSubcategorias(
+                      idNegocio: Global.oPerfilNegocio.id,
+                      idCategoria: idCategoria)
+                  .getDataCategoriaAll(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  Global.listCategoriasCatalogo = snapshot.data;
+                  if (Global.listCategoriasCatalogo.length != 0) {
+                    return ListView.builder(
+                      padding: EdgeInsets.symmetric(vertical: 15.0),
+                      shrinkWrap: true,
+                      itemCount: Global.listCategoriasCatalogo.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        Categoria categoriaSelect =
+                            Global.listCategoriasCatalogo[index];
+                        return Column(
+                          children: <Widget>[
+                            ListTile(
+                              leading: CircleAvatar(
+                                backgroundColor: Colors.black26,
+                                radius: 24.0,
+                                child: Text(
+                                    categoriaSelect.nombre.substring(0, 1),
+                                    style: TextStyle(
+                                        fontSize: 18.0,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold)),
+                              ),
+                              dense: true,
+                              title: Text(categoriaSelect.nombre),
+                              onTap: () {
+                                setState(() {
+                                  this.subcategoria = categoriaSelect;
+                                  Navigator.pop(ctx);
+                                });
+                              },
+                            ),
+                            Divider(endIndent: 12.0, indent: 12.0),
+                          ],
+                        );
+                      },
+                    );
+                  } else {
+                    return Center(child: Text("Cargando..."));
+                  }
+                } else {
+                  return Center(child: Text("Cargando..."));
+                }
+              },
+            ),
+          );
+        });
   }
 }

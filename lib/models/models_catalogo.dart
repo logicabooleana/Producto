@@ -32,24 +32,20 @@ class Precio{
 class Categoria {
     String id="";
     String nombre="";
-    String url_imagen="default";  // URL imagen
 
   Categoria({ 
-    this.id="", 
-    this.nombre="",
-    this.url_imagen="", 
+    this.id="todos", 
+    this.nombre="Todos",
     });
   Map<String, dynamic> toJson() => {
         "id": id,
         "nombre": nombre,
-        "url_imagen": url_imagen,
     };
 
   factory Categoria.fromMap(Map data) {
     return Categoria(
       id: data['id'] ?? '',
       nombre: data['nombre'] ?? '',
-      url_imagen: data['url_imagen'] ?? 'default',
     );
   }
 

@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:catalogo/screens/widgets/widgets_categoria.dart';
 import 'package:catalogo/services/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -7,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:catalogo/services/globals.dart';
 import 'package:catalogo/models/models_catalogo.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 class ProductNew extends StatefulWidget {
   final String id;
@@ -17,10 +19,12 @@ class ProductNew extends StatefulWidget {
 }
 
 class _ProductNewState extends State<ProductNew> {
-
+  // Variables
+  Categoria categoria;
+  Categoria subcategoria;
   bool saveIndicador = false;
-  ProductoNegocio productoNegocio=new ProductoNegocio();
-  Producto producto=new Producto();
+  ProductoNegocio productoNegocio = new ProductoNegocio();
+  Producto producto = new Producto();
   String id;
   _ProductNewState({@required this.id});
 
@@ -28,6 +32,7 @@ class _ProductNewState extends State<ProductNew> {
   PickedFile _imageFile;
   dynamic _pickImageError;
   String _retrieveDataError;
+  BuildContext contextPrincipal;
   final ImagePicker _picker = ImagePicker();
 
   // Toma los pixeles del ancho y alto de la pantalla
@@ -35,8 +40,8 @@ class _ProductNewState extends State<ProductNew> {
 
   @override
   void initState() {
-    productoNegocio.id=widget.id;
-    producto.id=widget.id;
+    productoNegocio.id = widget.id;
+    producto.id = widget.id;
     super.initState();
   }
 
@@ -46,52 +51,61 @@ class _ProductNewState extends State<ProductNew> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    screenSize= MediaQuery.of(context).size;
+  Widget build(BuildContext contextPrincipal) {
+    contextPrincipal = contextPrincipal;
+    screenSize = MediaQuery.of(contextPrincipal).size;
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0.0,
-        backgroundColor: Theme.of(context).canvasColor,
-        iconTheme: Theme.of(context).iconTheme.copyWith(color: Theme.of(context).textTheme.bodyText1.color),
-        title: Row(
-          children: <Widget>[
-            productoNegocio.verificado == true
-                ? Padding(
-                    padding: EdgeInsets.only(right: 3.0),
-                    child: new Image.asset('assets/icon_verificado.png',
-                        width: 16.0, height: 16.0))
-                : new Container(),
-            Text(widget.id,
-                style: TextStyle(
-                    fontSize: 18.0,
-                    color: Theme.of(context).textTheme.bodyText1.color)),
-          ],
-        ),
-        actions: <Widget>[
-          IconButton(
-              icon: saveIndicador == false
-                  ? Icon(Icons.check)
-                  : Container(
-                      width: 24.0,
-                      height: 24.0,
-                      child: CircularProgressIndicator(
-                        backgroundColor: Colors.white,
-                      ),
-                    ),
-              onPressed: () {
-                //guardar();
-              }),
-        ],
-      ),
-      body:SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  widgetsImagen(),
-                  widgetFormEditText(),
-                ],
-              ),
+      body: Builder(builder: (contextBuilder) {
+        return Scaffold(
+          appBar: AppBar(
+            elevation: 0.0,
+            backgroundColor: Theme.of(contextPrincipal).canvasColor,
+            iconTheme: Theme.of(contextPrincipal).iconTheme.copyWith(
+                color: Theme.of(contextPrincipal).textTheme.bodyText1.color),
+            title: Row(
+              children: <Widget>[
+                productoNegocio.verificado == true
+                    ? Padding(
+                        padding: EdgeInsets.only(right: 3.0),
+                        child: new Image.asset('assets/icon_verificado.png',
+                            width: 16.0, height: 16.0))
+                    : new Container(),
+                Text(widget.id,
+                    style: TextStyle(
+                        fontSize: 18.0,
+                        color: Theme.of(contextPrincipal)
+                            .textTheme
+                            .bodyText1
+                            .color)),
+              ],
             ),
+            actions: <Widget>[
+              IconButton(
+                  icon: saveIndicador == false
+                      ? Icon(Icons.check)
+                      : Container(
+                          width: 24.0,
+                          height: 24.0,
+                          child: CircularProgressIndicator(
+                            backgroundColor: Colors.white,
+                          ),
+                        ),
+                  onPressed: () {
+                    guardar(buildContext: contextBuilder);
+                  }),
+            ],
+          ),
+          body: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                widgetsImagen(),
+                widgetFormEditText(builderContext: contextBuilder),
+              ],
+            ),
+          ),
+        );
+      }),
     );
   }
 
@@ -118,7 +132,7 @@ class _ProductNewState extends State<ProductNew> {
                     height: MediaQuery.of(context).size.width,
                     fadeInDuration: Duration(milliseconds: 200),
                     fit: BoxFit.cover,
-                    imageUrl:this.productoNegocio.urlimagen??"default",
+                    imageUrl: this.productoNegocio.urlimagen ?? "default",
                     placeholder: (context, url) => FadeInImage(
                         image: AssetImage("assets/loading.gif"),
                         placeholder: AssetImage("assets/loading.gif")),
@@ -134,49 +148,128 @@ class _ProductNewState extends State<ProductNew> {
                 ),
               )
             : _previewImage(),
-          true //producto.verificado==false
-            ? Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: FloatingActionButton(
-                      onPressed: () {
-                        _onImageButtonPressed(ImageSource.gallery,
-                            context: context);
-                      },
-                      heroTag: 'image0',
-                      tooltip: 'Elegir imagen de la galería',
-                      child: const Icon(Icons.photo_library),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: FloatingActionButton(
-                      onPressed: () {
-                        _onImageButtonPressed(ImageSource.camera,
-                            context: context);
-                      },
-                      heroTag: 'image1',
-                      tooltip: 'Toma una foto',
-                      child: const Icon(Icons.camera_alt),
-                    ),
-                  ),
-                ],
-              )
-            : Container(),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            SizedBox(height: 12.0, width: 12.0),
+            Expanded(
+              child: RaisedButton.icon(
+                  color: Theme.of(context).accentColor,
+                  padding: const EdgeInsets.all(14.0),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(35.0))),
+                  onPressed: () {
+                    _onImageButtonPressed(ImageSource.gallery,
+                        context: context);
+                  },
+                  icon: const Icon(Icons.photo_library,color: Colors.white),
+                  label: Text("Galeria",
+                      style: TextStyle(fontSize: 18.0, color: Colors.white))),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: FloatingActionButton(
+                onPressed: () {
+                  _onImageButtonPressed(ImageSource.camera, context: context);
+                },
+                heroTag: 'image1',
+                tooltip: 'Toma una foto',
+                child: const Icon(Icons.camera_alt),
+              ),
+            ),
+          ],
+        )
       ],
     );
   }
 
-  Widget widgetFormEditText() {
+  Widget widgetFormEditText({@required BuildContext builderContext}) {
     TextStyle textStyle = new TextStyle(fontSize: 24.0);
     return Container(
       padding: EdgeInsets.all(12.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
+          Consumer<ProviderCatalogo>(
+            child: Text("Cargando categorías"),
+            builder: (context, catalogo, child) {
+              this.categoria = catalogo.getCategoria;
+              this.subcategoria = catalogo.getSubcategoria;
+              return Row(
+                children: [
+                  new Flexible(
+                    child: InkWell(
+                      child: TextField(
+                        controller: TextEditingController()
+                          ..text = catalogo.getCategoria.nombre,
+                        enabled: false,
+                        enableInteractiveSelection: false,
+                        decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Colors.green, width: 2)),
+                            labelText: "Categoría"),
+                        style: textStyle,
+                      ),
+                      onTap: () {
+                        showModalBottomSheet(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20.0)),
+                            backgroundColor:
+                                Theme.of(builderContext).canvasColor,
+                            context: builderContext,
+                            builder: (ctx) {
+                              return ClipRRect(
+                                child: ViewCategoria(buildContext: ctx),
+                              );
+                            });
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    height: 12.0,
+                    width: 12.0,
+                  ),
+                  new Flexible(
+                    child: InkWell(
+                      child: TextField(
+                        controller: TextEditingController()
+                          ..text = catalogo.getSubcategoria.nombre,
+                        enabled: false,
+                        enableInteractiveSelection: false,
+                        decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Colors.green, width: 2)),
+                            labelText: "Subcategoría"),
+                        style: textStyle,
+                      ),
+                      onTap: () {
+                        showModalBottomSheet(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20.0)),
+                            backgroundColor:
+                                Theme.of(builderContext).canvasColor,
+                            context: builderContext,
+                            builder: (ctx) {
+                              return ClipRRect(
+                                child: ViewSubCategoria(
+                                    buildContextCategoria: ctx,
+                                    categoria: catalogo.getCategoria),
+                              );
+                            });
+                      },
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+          SizedBox(
+            height: 12.0,
+            width: 12.0,
+          ),
           TextField(
             enabled: !productoNegocio.verificado,
             onChanged: (value) {
@@ -192,9 +285,9 @@ class _ProductNewState extends State<ProductNew> {
           SizedBox(height: 16.0),
           TextField(
             enabled: !productoNegocio.verificado,
-            onChanged: (value)  {
+            onChanged: (value) {
               productoNegocio.descripcion = value;
-              producto.descripcion= value;
+              producto.descripcion = value;
             },
             decoration: InputDecoration(
                 border: OutlineInputBorder(), labelText: "Descripción"),
@@ -203,7 +296,8 @@ class _ProductNewState extends State<ProductNew> {
           SizedBox(height: 16.0),
           TextField(
             keyboardType: TextInputType.number,
-            onChanged: (value) => productoNegocio.precio_venta = double.parse(value),
+            onChanged: (value) =>
+                productoNegocio.precio_venta = double.parse(value),
             decoration: InputDecoration(
                 border: OutlineInputBorder(), labelText: "Precio de venta"),
             style: textStyle,
@@ -211,7 +305,8 @@ class _ProductNewState extends State<ProductNew> {
           SizedBox(height: 16.0),
           TextField(
             keyboardType: TextInputType.number,
-            onChanged: (value) => productoNegocio.precio_compra = double.parse(value),
+            onChanged: (value) =>
+                productoNegocio.precio_compra = double.parse(value),
             decoration: InputDecoration(
                 border: OutlineInputBorder(), labelText: "Precio de compra"),
             style: textStyle,
@@ -231,37 +326,57 @@ class _ProductNewState extends State<ProductNew> {
     );
   }
 
-  void guardar() async {
-    setState(() {
-      saveIndicador = true;
-    });
-    urlIamgen = "";
+  void guardar({@required BuildContext buildContext}) async {
+    if (this.categoria != null && this.subcategoria != null) {
+      setState(() {
+        saveIndicador = true;
+      });
+      urlIamgen = "";
 
-    // Si la "PickedFile" es distinto nulo procede a guardar la imagen en la base de dato de almacenamiento
-    if (_imageFile != null) {
-      StorageReference ref = FirebaseStorage.instance
-          .ref()
-          .child("APP")
-          .child("ARG")
-          .child("PRODUCTOS")
-          .child(productoNegocio.id);
-      StorageUploadTask uploadTask = ref.putFile(File(_imageFile.path));
-      // obtenemos la url de la imagen guardada
-      urlIamgen = await (await uploadTask.onComplete).ref.getDownloadURL();
-      // TODO: Por el momento los datos del producto se guarda junto a la referencia de la cuenta del negocio
-      productoNegocio.urlimagen=urlIamgen;
+      // Si la "PickedFile" es distinto nulo procede a guardar la imagen en la base de dato de almacenamiento
+      if (_imageFile != null) {
+        StorageReference ref = FirebaseStorage.instance
+            .ref()
+            .child("APP")
+            .child("ARG")
+            .child("PRODUCTOS")
+            .child(productoNegocio.id);
+        StorageUploadTask uploadTask = ref.putFile(File(_imageFile.path));
+        // obtenemos la url de la imagen guardada
+        urlIamgen = await (await uploadTask.onComplete).ref.getDownloadURL();
+        // TODO: Por el momento los datos del producto se guarda junto a la referencia de la cuenta del negocio
+        productoNegocio.urlimagen = urlIamgen;
+      }
+
+      // TODO: Por defecto verificado es TRUE // Cambiar esto cuando se lanze a producción
+      productoNegocio.verificado = true;
+      producto.categoria = this.categoria.id;
+      producto.subcategoria = this.subcategoria.id;
+      // valores de creación
+      productoNegocio.timestamp_creation =
+          Timestamp.fromDate(new DateTime.now());
+      updateProductoGlobal();
+      // Firebase set
+      await Global.getDataProductoNegocio(
+              idNegocio: Global.prefs.getIdNegocio,
+              idProducto: productoNegocio.id)
+          .upSetProducto(productoNegocio.toJson());
+
+      Navigator.pop(context);
+    } else {
+      viewSnackBar(context: buildContext, message: 'Debe elegir una categoría');
     }
+  }
 
-    // TODO: Por defecto verificado es TRUE // Cambiar esto cuando se lanze a producción
-    productoNegocio.verificado = true;
-    // valores de creación
-    productoNegocio.timestamp_creation=Timestamp.fromDate(new DateTime.now());
-    updateProductoGlobal();
-    // Firebase set
-    await Global.getDataProductoNegocio(idNegocio: Global.prefs.getIdNegocio, idProducto: productoNegocio.id)
-        .upSetProducto(productoNegocio.toJson());
+  void viewSnackBar(
+      {@required BuildContext context, @required String message}) async {
+    final snackBar = SnackBar(
+        content: Text('Debe elegir una categoría'),
+        action: SnackBarAction(label: 'ok', onPressed: () {}));
 
-    Navigator.pop(context);
+    // Find the Scaffold in the widget tree and use
+    // it to show a SnackBar.
+    Scaffold.of(context).showSnackBar(snackBar);
   }
 
   void updateProductoGlobal() async {
@@ -280,13 +395,14 @@ class _ProductNewState extends State<ProductNew> {
 
     Map timestampUpdatePrecio;
     if (urlIamgen == "") {
-      producto.timestamp_actualizacion=Timestamp.fromDate(new DateTime.now());
+      producto.timestamp_actualizacion = Timestamp.fromDate(new DateTime.now());
     } else {
-      producto.timestamp_actualizacion=Timestamp.fromDate(new DateTime.now());
-      producto.urlimagen=urlIamgen;
+      producto.timestamp_actualizacion = Timestamp.fromDate(new DateTime.now());
+      producto.urlimagen = urlIamgen;
     }
     // Firebase set
-    await Global.getProductosPrecargado(idProducto: productoNegocio.id, isoPAis: "ARG")
+    await Global.getProductosPrecargado(
+            idProducto: productoNegocio.id, isoPAis: "ARG")
         .upSetPrecioProducto(producto.toJson());
   }
 
@@ -309,13 +425,17 @@ class _ProductNewState extends State<ProductNew> {
   }
 
   Widget _previewImage() {
-
     final Text retrieveError = _getRetrieveErrorWidget();
     if (retrieveError != null) {
       return retrieveError;
     }
     if (_imageFile != null) {
-      return Image.file(File(_imageFile.path),width:screenSize.width,height: screenSize.width,fit:BoxFit.cover,);
+      return Image.file(
+        File(_imageFile.path),
+        width: screenSize.width,
+        height: screenSize.width,
+        fit: BoxFit.cover,
+      );
     } else if (_pickImageError != null) {
       return Text(
         'Pick image error: $_pickImageError',
