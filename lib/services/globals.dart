@@ -95,6 +95,10 @@ class Global {
   }
 
   // Consultas DB ( Colecction )
+  static Collection<Marca> getMarcasAll( {String isoPais="ARG"} ){
+    // Firestore References for Writes
+    return  Collection<Marca>(path: '/APP/ARG/MARCAS');
+  }
   static Collection<Precio> getListPreciosProducto( { String idProducto,String isoPAis="ARG"} ){
     // Firestore References for Writes
     return  Collection<Precio>(path: '/APP/$isoPAis/PRODUCTOS/$idProducto/REGISTRO_PRECIOS_$isoPAis'); // '/APP/ARG/PRODUCTOS'

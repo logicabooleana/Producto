@@ -4,14 +4,14 @@ import 'package:catalogo/screens/page_producto_view.dart';
 import 'package:catalogo/screens/page_producto_new.dart';
 import 'package:flutter/services.dart';
 
-class WidgetSeachCode extends StatefulWidget {
-  WidgetSeachCode({Key key}) : super(key: key);
+class WidgetSeachProduct extends StatefulWidget {
+  WidgetSeachProduct({Key key}) : super(key: key);
 
   @override
-  _WidgetSeachCodeState createState() => _WidgetSeachCodeState();
+  _WidgetSeachProductState createState() => _WidgetSeachProductState();
 }
 
-class _WidgetSeachCodeState extends State<WidgetSeachCode> {
+class _WidgetSeachProductState extends State<WidgetSeachProduct> {
 
   String codigoBar = "";
   TextStyle textStyle = new TextStyle(fontSize: 30.0);

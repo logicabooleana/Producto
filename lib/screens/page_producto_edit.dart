@@ -8,11 +8,11 @@ import 'package:catalogo/services/globals.dart';
 import 'package:catalogo/models/models_catalogo.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:catalogo/screens/widgets/widgetSeachMarcaProducto.dart';
 
 class ProductEdit extends StatefulWidget {
-  final String sSignoMoneda;
   final ProductoNegocio producto;
-  ProductEdit({this.producto, this.sSignoMoneda});
+  ProductEdit({@required this.producto});
 
   @override
   _ProductEditState createState() => _ProductEditState(producto);
@@ -26,6 +26,10 @@ class _ProductEditState extends State<ProductEdit> {
   TextEditingController controllerTextEdit_comparacion;
 
   // Variables
+  TextStyle textStyle = new TextStyle(fontSize: 24.0);
+  bool enCatalogo =
+      false; // verifica si el producto se encuentra en el catalogo o no
+  Marca marca;
   Categoria categoria;
   Categoria subcategoria;
   bool saveIndicador = false;
@@ -36,6 +40,8 @@ class _ProductEditState extends State<ProductEdit> {
 
   @override
   void initState() {
+    checkCatalogo();
+    getMarca();
     getCategoriaProducto();
     controllerTextEdit_titulo = TextEditingController(text: producto.titulo);
     controllerTextEdit_descripcion =
@@ -49,15 +55,39 @@ class _ProductEditState extends State<ProductEdit> {
     super.initState();
   }
 
+  void checkCatalogo() async {
+    Global.listProudctosNegocio.forEach((element) {
+      if (element.id == this.producto.id) {
+        enCatalogo = true;
+      }
+    });
+  }
+
+  void getMarca() async {
+    // Defaul values
+    this.marca = null;
+    if (producto != null) {
+      if (producto.id_marca != "") {
+        Global.getMarca(idMarca: producto.id_marca)
+            .getDataMarca()
+            .then((value) {
+          if (value != null) {
+            setState(() {
+              this.marca = value;
+            });
+          }
+        });
+      }
+    }
+  }
+
   void getCategoriaProducto() async {
     Global.getDataCatalogoCategoria(
             idNegocio: Global.oPerfilNegocio.id,
             idCategoria: producto.categoria)
         .getDataCategoria()
         .then((value) {
-      setState(() {
-        this.categoria = value ?? Categoria();
-      });
+      this.categoria = value ?? Categoria();
     });
     if (producto.subcategoria != "") {
       Global.getDataCatalogoSubcategoria(
@@ -70,6 +100,8 @@ class _ProductEditState extends State<ProductEdit> {
           this.subcategoria = value ?? Categoria();
         });
       });
+    } else {
+      setState(() {});
     }
   }
 
@@ -254,7 +286,6 @@ class _ProductEditState extends State<ProductEdit> {
   }
 
   Widget widgetFormEditText({@required BuildContext builderContext}) {
-    TextStyle textStyle = new TextStyle(fontSize: 24.0);
     return Container(
       padding: EdgeInsets.all(12.0),
       child: Column(
@@ -288,7 +319,7 @@ class _ProductEditState extends State<ProductEdit> {
                       },
                     ),
                   ),
-                  SizedBox(
+                  new SizedBox(
                     height: 12.0,
                     width: 12.0,
                   ),
@@ -325,16 +356,26 @@ class _ProductEditState extends State<ProductEdit> {
             height: 12.0,
             width: 12.0,
           ),
-          TextField(
-            enabled: !producto.verificado,
-            onChanged: (value) => producto.titulo = value,
-            decoration: InputDecoration(
-                border: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.green, width: 2)),
-                labelText: "Titulo"),
-            style: textStyle,
-            controller: controllerTextEdit_titulo,
-          ),
+          widgetTextFieldMarca(),
+          this.marca == null
+              ? SizedBox(
+                  height: 12.0,
+                  width: 12.0,
+                )
+              : Container(),
+          this.marca == null
+              ? TextField(
+                  enabled: !producto.verificado,
+                  onChanged: (value) => producto.titulo = value,
+                  decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                          borderSide:
+                              BorderSide(color: Colors.green, width: 2)),
+                      labelText: "Titulo"),
+                  style: textStyle,
+                  controller: controllerTextEdit_titulo,
+                )
+              : Container(),
           SizedBox(height: 16.0),
           TextField(
             enabled: !producto.verificado,
@@ -374,105 +415,174 @@ class _ProductEditState extends State<ProductEdit> {
             controller: controllerTextEdit_comparacion,
           ),
           SizedBox(height: 25.0),
-          deleteIndicador == false
-          ?SizedBox(
-            width: double.infinity,
-            child: RaisedButton.icon(
-              onPressed: ()async{
-                setState(() {
-                  deleteIndicador=true;
-                });
-                // Firebase ( delete )
-                await Global.getDataProductoNegocio(idNegocio: Global.prefs.getIdNegocio, idProducto: producto.id).deleteDoc(); // Procede a eliminar el documento de la base de datos del catalogo de la cuenta
-                // Emula un retardo de 2 segundos
-                Future.delayed(const Duration(milliseconds: 2000), () {
-                  Navigator.pop(builderContext);
-                });
-              },
-              color: Colors.red[400],
-              icon: Icon(
-                Icons.delete,
-                color: Colors.white,
-              ),
-              padding: EdgeInsets.all(12.0),
-              label: Text("Borrar producto",
-                  style: TextStyle(fontSize: 18.0, color: Colors.white)),
-            ),
-          ):SizedBox(
-            width: double.infinity,
-            child: RaisedButton.icon(
-              onPressed: (){},
-              color: Colors.red[400],
-              icon:Container(width: 16.0,height: 16.0,child: CircularProgressIndicator(backgroundColor: Colors.white)),
-              padding: EdgeInsets.all(12.0),
-              label: Text("Borrando de su catalogo...",
-                  style: TextStyle(fontSize: 18.0, color: Colors.white)),
-            ),
-          ),
-          
-          //CircularProgressIndicator(),
-          SizedBox(height: 10.0),
-          Align(
-            alignment: Alignment
-                .center, // Align however you like (i.e .centerRight, centerLeft)
-            child: Text("Este producto será eliminado de su catálogo",
-                textAlign: TextAlign.center, style: TextStyle(fontSize: 14.0)),
-          ),
-          SizedBox(height: 25.0),
+          enCatalogo
+              ? widgetDeleteProducto(context: builderContext)
+              : Container(),
         ],
       ),
     );
   }
 
+  Widget widgetTextFieldMarca() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        new Flexible(
+          child: InkWell(
+            child: TextField(
+              controller: TextEditingController()
+                ..text = this.marca != null ? this.marca.titulo : "",
+              enabled: false,
+              enableInteractiveSelection: false,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.green, width: 2)),
+                labelText: "Marca",
+              ),
+              style: textStyle,
+            ),
+            onTap: () {
+              showModalSelectMarca(buildContext: contextPrincipal);
+            },
+          ),
+        ),
+        this.marca!=null?Padding(
+          padding: EdgeInsets.only(left: 12.0),
+          child: IconButton(
+            icon: Icon(Icons.close),
+            onPressed: (){
+              setState(() {
+                this.marca=null;
+              });
+            },
+          ),
+        ):Container(),
+      ],
+    );
+  }
+
+  Widget widgetDeleteProducto({@required BuildContext context}) {
+    return Column(
+      children: [
+        deleteIndicador == false
+            ? SizedBox(
+                width: double.infinity,
+                child: RaisedButton.icon(
+                  onPressed: () {
+                    showDialogDelete(buildContext: context);
+                  },
+                  color: Colors.red[400],
+                  icon: Icon(Icons.delete, color: Colors.white),
+                  padding: EdgeInsets.all(12.0),
+                  label: Text("Borrar producto",
+                      style: TextStyle(fontSize: 18.0, color: Colors.white)),
+                ),
+              )
+            : SizedBox(
+                width: double.infinity,
+                child: RaisedButton.icon(
+                  onPressed: () {},
+                  color: Colors.red[400],
+                  icon: Container(
+                      width: 16.0,
+                      height: 16.0,
+                      child: CircularProgressIndicator(
+                          backgroundColor: Colors.white)),
+                  padding: EdgeInsets.all(12.0),
+                  label: Text("Borrando de su catalogo...",
+                      style: TextStyle(fontSize: 18.0, color: Colors.white)),
+                ),
+              ),
+
+        //CircularProgressIndicator(),
+        SizedBox(height: 10.0),
+        Align(
+          alignment: Alignment
+              .center, // Align however you like (i.e .centerRight, centerLeft)
+          child: Text("Este producto será eliminado de su catálogo",
+              textAlign: TextAlign.center, style: TextStyle(fontSize: 14.0)),
+        ),
+        SizedBox(height: 25.0),
+      ],
+    );
+  }
+
+  void deleteProduct({@required BuildContext context}) async {
+    setState(() {
+      deleteIndicador = true;
+    });
+    // Firebase ( delete )
+    await Global.getDataProductoNegocio(
+            idNegocio: Global.prefs.getIdNegocio, idProducto: producto.id)
+        .deleteDoc(); // Procede a eliminar el documento de la base de datos del catalogo de la cuenta
+    // Emula un retardo de 2 segundos
+    Future.delayed(const Duration(milliseconds: 3000), () {
+      Navigator.pop(context);
+    });
+  }
 
   void guardar({@required BuildContext buildContext}) async {
-    if (this.categoria != null && this.subcategoria != null) {
-      if (producto.titulo != "") {
-        if (producto.descripcion != "") {
-          if (producto.precio_venta != 0.0) {
-            setState(() {
-              saveIndicador = true;
-            });
-            urlIamgen = "";
+    if (this.categoria != null && this.categoria.id != "") {
+      if (this.subcategoria != null && this.subcategoria.id != "") {
+        if (producto.titulo != "") {
+          if (producto.descripcion != "") {
+            if (this.marca != null) {
+              if (producto.precio_venta != 0.0) {
+                setState(() {
+                  saveIndicador = true;
+                });
+                urlIamgen = "";
 
-            // Si la "PickedFile" es distinto nulo procede a guardar la imagen en la base de dato de almacenamiento
-            if (_imageFile != null) {
-              StorageReference ref = FirebaseStorage.instance
-                  .ref()
-                  .child("APP")
-                  .child("ARG")
-                  .child("PRODUCTOS")
-                  .child(producto.id);
-              StorageUploadTask uploadTask = ref.putFile(File(_imageFile.path));
-              // obtenemos la url de la imagen guardada
-              urlIamgen =
-                  await (await uploadTask.onComplete).ref.getDownloadURL();
-              // TODO: Por el momento los datos del producto se guarda junto a la referencia de la cuenta del negocio
-              producto.urlimagen = urlIamgen;
+                // Si la "PickedFile" es distinto nulo procede a guardar la imagen en la base de dato de almacenamiento
+                if (_imageFile != null) {
+                  StorageReference ref = FirebaseStorage.instance
+                      .ref()
+                      .child("APP")
+                      .child("ARG")
+                      .child("PRODUCTOS")
+                      .child(producto.id);
+                  StorageUploadTask uploadTask =
+                      ref.putFile(File(_imageFile.path));
+                  // obtenemos la url de la imagen guardada
+                  urlIamgen =
+                      await (await uploadTask.onComplete).ref.getDownloadURL();
+                  // TODO: Por el momento los datos del producto se guarda junto a la referencia de la cuenta del negocio
+                  producto.urlimagen = urlIamgen;
+                }
+
+                // TODO: Por defecto verificado es TRUE // Cambiar esto cuando se lanze a producción
+                producto.verificado = true;
+                producto.categoria = this.categoria.id;
+                producto.subcategoria = this.subcategoria.id;
+                producto.id_marca = this.marca.id;
+                updateProductoGlobal();
+                // Firebase set
+                await Global.getDataProductoNegocio(
+                        idNegocio: Global.prefs.getIdNegocio,
+                        idProducto: producto.id)
+                    .upSetProducto(producto.toJson());
+
+                Navigator.pop(context);
+              } else {
+                viewSnackBar(
+                    context: buildContext,
+                    message: 'Asigne un precio de venta');
+              }
+            } else {
+              viewSnackBar(
+                  context: buildContext, message: 'Debe seleccionar una marca');
             }
-
-            // TODO: Por defecto verificado es TRUE // Cambiar esto cuando se lanze a producción
-            producto.verificado = true;
-            producto.categoria = this.categoria.id;
-            producto.subcategoria = this.subcategoria.id;
-            updateProductoGlobal();
-            // Firebase set
-            await Global.getDataProductoNegocio(
-                    idNegocio: Global.prefs.getIdNegocio,
-                    idProducto: producto.id)
-                .upSetProducto(producto.toJson());
-
-            Navigator.pop(context);
           } else {
             viewSnackBar(
-                context: buildContext, message: 'Asigne un precio de venta');
+                context: buildContext, message: 'Debe elegir una descripción');
           }
         } else {
-          viewSnackBar(
-              context: buildContext, message: 'Debe elegir una descripción');
+          viewSnackBar(context: buildContext, message: 'Debe elegir un titulo');
         }
       } else {
-        viewSnackBar(context: buildContext, message: 'Debe elegir un titulo');
+        viewSnackBar(
+            context: buildContext, message: 'Debe elegir una subcategoría');
       }
     } else {
       viewSnackBar(context: buildContext, message: 'Debe elegir una categoría');
@@ -712,5 +822,120 @@ class _ProductEditState extends State<ProductEdit> {
             ),
           );
         });
+  }
+
+  showModalSelectMarca({@required BuildContext buildContext}) {
+    showModalBottomSheet(
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+        backgroundColor: Theme.of(buildContext).canvasColor,
+        context: buildContext,
+        builder: (_) {
+          // Variables
+          List<Marca> listMarcasAll = new List<Marca>();
+          return Scaffold(
+            appBar: AppBar(
+              title: Text("Marcas"),
+              actions: [
+                IconButton(
+                  icon: Icon(Icons.search),
+                  onPressed: () async {
+                    if (listMarcasAll.length != 0) {
+                      // Muestra un "showSearch" y espera ah revolver un resultado
+                      showSearch(
+                              context: buildContext,
+                              delegate: DataSearchMarcaProduct(
+                                  listMarcas: listMarcasAll))
+                          .then((value) {
+                        if (value != null) {
+                          setState(() {
+                            this.marca = value;
+                          });
+                        }
+                      });
+                    }
+                  },
+                ),
+              ],
+            ),
+            body: FutureBuilder(
+              future: Global.getMarcasAll().getDataMarca(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  listMarcasAll = snapshot.data;
+                  if (listMarcasAll.length != 0) {
+                    return ListView.builder(
+                      padding: EdgeInsets.symmetric(vertical: 15.0),
+                      shrinkWrap: true,
+                      itemCount: listMarcasAll.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        Marca marcaSelect = listMarcasAll[index];
+                        return Column(
+                          children: <Widget>[
+                            ListTile(
+                              leading: CircleAvatar(
+                                backgroundColor: Colors.black26,
+                                radius: 24.0,
+                                child: Text(marcaSelect.titulo.substring(0, 1),
+                                    style: TextStyle(
+                                        fontSize: 18.0,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold)),
+                              ),
+                              dense: true,
+                              title: Text(marcaSelect.titulo),
+                              onTap: () {
+                                setState(() {
+                                  this.marca = marcaSelect;
+                                  Navigator.pop(buildContext);
+                                });
+                              },
+                            ),
+                            Divider(endIndent: 12.0, indent: 12.0),
+                          ],
+                        );
+                      },
+                    );
+                  } else {
+                    return Center(child: Text("Cargando..."));
+                  }
+                } else {
+                  return Center(child: Text("Cargando..."));
+                }
+              },
+            ),
+          );
+        });
+  }
+
+  void showDialogDelete({@required BuildContext buildContext}) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text(
+              "¿Seguro que quieres eliminar este producto de tu catálogo?"),
+          content: new Text(
+              "El producto será eliminado de tu catálogo y toda la información acumulada"),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Cancelar"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            new FlatButton(
+              child: new Text("Borrar"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                deleteProduct(context: buildContext);
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }

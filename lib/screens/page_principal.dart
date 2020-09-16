@@ -12,10 +12,11 @@ import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
 
 /* Dependencias */
+import 'package:catalogo/shared/widgets_image_circle.dart';
 import 'package:catalogo/screens/profile.dart';
-import 'package:catalogo/screens/widgets/widget_circle_border.dart';
+import 'package:catalogo/shared/widgets_image_circle.dart'as image;
 import 'package:catalogo/services/preferencias_usuario.dart';
-import 'package:catalogo/screens/widgets/widgetSeachCode.dart';
+import 'package:catalogo/screens/widgets/widgetSeachProductCatalogo.dart';
 import 'package:catalogo/screens/page_producto_view.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:catalogo/screens/widgets/widget_profile.dart';
@@ -206,7 +207,7 @@ class PagePrincipal extends StatelessWidget {
                 tooltip: 'Escribe el codigo del producto',
                 onPressed: () {
                   Navigator.of(buildContext).push(MaterialPageRoute(
-                    builder: (BuildContext context) => WidgetSeachCode(),
+                    builder: (BuildContext context) => WidgetSeachProduct(),
                   ));
                 })
           ],
@@ -277,9 +278,7 @@ class PagePrincipal extends StatelessWidget {
             ),
           ),
           onTap: () {
-            showSearch(
-                context: buildContext,
-                delegate: DataSearch(listOBJ: Global.listProudctosNegocio));
+            showSearch(context: buildContext,delegate: DataSearch(listOBJ: Global.listProudctosNegocio));
           },
         ),
         shape: RoundedRectangleBorder(
@@ -754,8 +753,7 @@ class PagePrincipal extends StatelessWidget {
                                       gradientColor: colorGradientInstagram,
                                       child: Padding(
                                         padding: EdgeInsets.all(5.0),
-                                        child: viewCircleImage(
-                                            url: marca.url_imagen, radius: 30),
+                                        child: image.viewCircleImage(url:marca.url_imagen,texto:marca.titulo, size:30),
                                       ),
                                     ),
                                     SizedBox(

@@ -63,13 +63,13 @@ class Document<T> {
   }
   Future<T> getDataProductoGlobal() {
     return ref.get().then((v){
-      if(v.exists==false){ return  null; }
+      if(!v.exists){ return  null; }
       return Global.modelsProductoGlobal[T](v.data()) as T;
     });
   }
   Future<T> getDataCategoria() {
     return ref.get().then((v){
-      if(v.exists==false){ return  null; }
+      if(!v.exists){ return  null; }
       return Global.modelsCategoria[T](v.data()) as T;
     });
   }
@@ -82,7 +82,10 @@ class Document<T> {
 
   // Models Marca DEL PRODUCTO
   Future<T> getDataMarca() {
-    return ref.get().then((v) => Global.modelsMarca[T](v.data()) as T);
+    return ref.get().then((v){
+      if(!v.exists){return null;}
+      return Global.modelsMarca[T](v.data()) as T;
+    });
   }
   Stream<T> streamDataMarca() {
     return ref.snapshots().map((v) => Global.modelsMarca[T](v.data()) as T);
@@ -143,6 +146,13 @@ class Collection<T> {
   Stream<List<T>> streamDataProductoAll() {
     return ref.snapshots().map( (list) => list.docs.map((doc) => Global.modelsProducto[T](doc.data()) as T).toList() );
   }
+
+  // Model MARCA
+  Future<List<T>> getDataMarca() async {
+    var snapshots = await ref.get();
+    return snapshots.docs.map((doc) => Global.modelsMarca[T](doc.data()) as T ).toList();
+  }
+  
 
   // Model Categoria
   Future<List<T>> getDataCategoriaAll() async {

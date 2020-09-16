@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:catalogo/screens/page_buscadorProductos.dart';
 import 'package:catalogo/services/globals.dart';
+import 'package:catalogo/shared/widgets_image_circle.dart'as image;
 
 class WidgetProfile extends StatelessWidget {
   const WidgetProfile({Key key}) : super(key: key);
@@ -51,8 +52,7 @@ Widget profileUser({@required BuildContext context}) {
                 Padding(
                   padding: EdgeInsets.only(bottom: 20.0),
                   child: GestureDetector(
-                    child: viewCircleImage(
-                        url: Global.oPerfilNegocio.imagen_perfil, radius: 60.0),
+                    child: image.viewCircleImage(url:Global.oPerfilNegocio.imagen_perfil, texto: Global.oPerfilNegocio.nombre_negocio, size: 60.0),
                     onTap: () => Navigator.pushNamed(context, '/profilCuenta'),
                   ),
                 ),
@@ -140,31 +140,7 @@ Widget widgetBuscadorView({@required BuildContext buildContext}) {
   );
 }
 
-Widget viewCircleImage({@required String url, double radius = 85.0}) {
-  return Global.oPerfilNegocio.imagen_perfil == "" ||
-          Global.oPerfilNegocio.imagen_perfil == "default"
-      ? CircleAvatar(
-          backgroundColor: Colors.black26,
-          radius: radius,
-          child: Text(Global.oPerfilNegocio.nombre_negocio.substring(0, 1),
-              style: TextStyle(
-                  fontSize: radius,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold)),
-        )
-      : CachedNetworkImage(
-          imageUrl: url,
-          placeholder: (context, url) => CircleAvatar(
-            backgroundColor: Colors.grey,
-            radius: radius,
-          ),
-          imageBuilder: (context, image) => CircleAvatar(
-            backgroundImage: image,
-            radius: radius,
-          ),
-          errorWidget: (context, url, error) => Icon(Icons.error),
-        );
-}
+
 
 
 /* Crea una vista de la descripción del perfil */

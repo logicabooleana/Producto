@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 const int _DefaultDashes = 20;
 const List<Color> _DefaultGradient = [Color.fromRGBO(129, 52, 175, 1.0)];
@@ -73,4 +74,38 @@ class DashedCirclePainter extends CustomPainter {
   bool shouldRepaint(DashedCirclePainter oldDelegate) {
     return dashes != oldDelegate.dashes ;
   }
+}
+
+Widget viewCircleImage({@required String url,@required String texto ,@required double  size= 85.0}) {
+  return Container(
+    width: size,
+    height: size,
+    child: url== "" ||url == "default"
+      ? CircleAvatar(
+          backgroundColor: Colors.black26,
+          radius: size,
+          child: Text(texto.substring(0, 1),
+              style: TextStyle(
+                  fontSize: size/2,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold)),
+        )
+      : CachedNetworkImage(
+          imageUrl: url,
+          placeholder: (context, url) => CircleAvatar(
+          backgroundColor: Colors.black26,
+          radius: size,
+          child: Text(texto.substring(0, 1),
+              style: TextStyle(
+                  fontSize: size/2,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold)),
+        ),
+          imageBuilder: (context, image) => CircleAvatar(
+            backgroundImage: image,
+            radius: size,
+          ),
+          errorWidget: (context, url, error) => Icon(Icons.error),
+        ),
+  );
 }

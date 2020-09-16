@@ -34,8 +34,8 @@ class Categoria {
     String nombre="";
 
   Categoria({ 
-    this.id="todos", 
-    this.nombre="Todos",
+    this.id="", 
+    this.nombre="",
     });
   Map<String, dynamic> toJson() => {
         "id": id,
