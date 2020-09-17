@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/services.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:catalogo/services/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,6 +10,7 @@ import 'package:catalogo/models/models_catalogo.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:catalogo/screens/widgets/widgetSeachMarcaProducto.dart';
+import 'package:flutter_masked_text/flutter_masked_text.dart';
 
 class ProductEdit extends StatefulWidget {
   final ProductoNegocio producto;
@@ -21,9 +23,9 @@ class ProductEdit extends StatefulWidget {
 class _ProductEditState extends State<ProductEdit> {
   TextEditingController controllerTextEdit_titulo;
   TextEditingController controllerTextEdit_descripcion;
-  TextEditingController controllerTextEdit_precio_venta;
-  TextEditingController controllerTextEdit_compra;
-  TextEditingController controllerTextEdit_comparacion;
+  MoneyMaskedTextController controllerTextEdit_precio_venta;
+  MoneyMaskedTextController controllerTextEdit_compra;
+  MoneyMaskedTextController controllerTextEdit_comparacion;
 
   // Variables
   TextStyle textStyle = new TextStyle(fontSize: 24.0);
@@ -47,11 +49,11 @@ class _ProductEditState extends State<ProductEdit> {
     controllerTextEdit_descripcion =
         TextEditingController(text: producto.descripcion);
     controllerTextEdit_precio_venta =
-        TextEditingController(text: producto.precio_venta.toString());
+        MoneyMaskedTextController(initialValue: producto.precio_venta,decimalSeparator: ',', thousandSeparator: '.',precision: 2);
     controllerTextEdit_compra =
-        TextEditingController(text: producto.precio_compra.toString());
+        MoneyMaskedTextController(initialValue: producto.precio_compra ,decimalSeparator: ',', thousandSeparator: '.',precision: 2);
     controllerTextEdit_comparacion =
-        TextEditingController(text: producto.precio_comparacion.toString());
+        MoneyMaskedTextController(initialValue: producto.precio_comparacion,decimalSeparator: ',', thousandSeparator: '.' ,precision:2);
     super.initState();
   }
 
@@ -256,26 +258,28 @@ class _ProductEditState extends State<ProductEdit> {
                         padding: const EdgeInsets.all(14.0),
                         shape: RoundedRectangleBorder(
                             borderRadius:
-                                BorderRadius.all(Radius.circular(35.0))),
+                                BorderRadius.all(Radius.circular(5.0))),
                         onPressed: () {
                           _onImageButtonPressed(ImageSource.gallery,
                               context: context);
                         },
-                        icon: const Icon(Icons.photo_library),
+                        icon: const Icon(Icons.photo_library,
+                            color: Colors.white),
                         label: Text("Galeria",
                             style: TextStyle(
                                 fontSize: 18.0, color: Colors.white))),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(12.0),
-                    child: FloatingActionButton(
-                      onPressed: () {
-                        _onImageButtonPressed(ImageSource.camera,
-                            context: context);
-                      },
-                      heroTag: 'image1',
-                      tooltip: 'Toma una foto',
-                      child: const Icon(Icons.camera_alt),
+                    child: MaterialButton(
+                      elevation: 1.0,
+                      color: Theme.of(context).accentColor,
+                      onPressed: () => _onImageButtonPressed(ImageSource.camera,
+                          context: context),
+                      child: Icon(Icons.camera_alt, color: Colors.white),
+                      padding: EdgeInsets.all(14.0),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(5.0))),
                     ),
                   ),
                 ],
@@ -387,8 +391,9 @@ class _ProductEditState extends State<ProductEdit> {
           ),
           SizedBox(height: 16.0),
           TextField(
-            keyboardType: TextInputType.number,
-            onChanged: (value) => producto.precio_venta = double.parse(value),
+            //inputFormatters: [DecimalTextInputFormatter(decimalRange: 2)],
+            keyboardType: TextInputType.numberWithOptions(decimal: true),
+            onChanged: (value) => producto.precio_venta = controllerTextEdit_precio_venta.numberValue,
             decoration: InputDecoration(
                 border: OutlineInputBorder(), labelText: "Precio de venta"),
             style: textStyle,
@@ -396,8 +401,9 @@ class _ProductEditState extends State<ProductEdit> {
           ),
           SizedBox(height: 16.0),
           TextField(
-            keyboardType: TextInputType.number,
-            onChanged: (value) => producto.precio_compra = double.parse(value),
+            //inputFormatters: [DecimalTextInputFormatter(decimalRange: 2)],
+            keyboardType: TextInputType.numberWithOptions(decimal: true),
+            onChanged: (value) => producto.precio_compra = controllerTextEdit_precio_venta.numberValue,
             decoration: InputDecoration(
                 border: OutlineInputBorder(), labelText: "Precio de compra"),
             style: textStyle,
@@ -405,9 +411,10 @@ class _ProductEditState extends State<ProductEdit> {
           ),
           SizedBox(height: 16.0),
           TextField(
-            keyboardType: TextInputType.number,
+            //inputFormatters: [DecimalTextInputFormatter(decimalRange: 2)],
+            keyboardType: TextInputType.numberWithOptions(decimal: true),
             onChanged: (value) =>
-                producto.precio_comparacion = double.parse(value),
+                producto.precio_comparacion = controllerTextEdit_precio_venta.numberValue,
             decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: "Precio de comparación"),
@@ -418,6 +425,7 @@ class _ProductEditState extends State<ProductEdit> {
           enCatalogo
               ? widgetDeleteProducto(context: builderContext)
               : Container(),
+        widgetDeleteProductoOPTDeveloper(context: builderContext),
         ],
       ),
     );
@@ -447,17 +455,19 @@ class _ProductEditState extends State<ProductEdit> {
             },
           ),
         ),
-        this.marca!=null?Padding(
-          padding: EdgeInsets.only(left: 12.0),
-          child: IconButton(
-            icon: Icon(Icons.close),
-            onPressed: (){
-              setState(() {
-                this.marca=null;
-              });
-            },
-          ),
-        ):Container(),
+        this.marca != null
+            ? Padding(
+                padding: EdgeInsets.only(left: 12.0),
+                child: IconButton(
+                  icon: Icon(Icons.close),
+                  onPressed: () {
+                    setState(() {
+                      this.marca = null;
+                    });
+                  },
+                ),
+              )
+            : Container(),
       ],
     );
   }
@@ -494,15 +504,6 @@ class _ProductEditState extends State<ProductEdit> {
                       style: TextStyle(fontSize: 18.0, color: Colors.white)),
                 ),
               ),
-
-        //CircularProgressIndicator(),
-        SizedBox(height: 10.0),
-        Align(
-          alignment: Alignment
-              .center, // Align however you like (i.e .centerRight, centerLeft)
-          child: Text("Este producto será eliminado de su catálogo",
-              textAlign: TextAlign.center, style: TextStyle(fontSize: 14.0)),
-        ),
         SizedBox(height: 25.0),
       ],
     );
@@ -523,8 +524,8 @@ class _ProductEditState extends State<ProductEdit> {
   }
 
   void guardar({@required BuildContext buildContext}) async {
-    if (this.categoria != null && this.categoria.id != "") {
-      if (this.subcategoria != null && this.subcategoria.id != "") {
+    if (this.categoria != null) {
+      if (this.subcategoria != null) {
         if (producto.titulo != "") {
           if (producto.descripcion != "") {
             if (this.marca != null) {
@@ -590,9 +591,9 @@ class _ProductEditState extends State<ProductEdit> {
   }
 
   void viewSnackBar(
-      {@required BuildContext context, @required String message}) async {
-    final snackBar = SnackBar(
-        content: Text('Debe elegir una categoría'),
+      {@required BuildContext context, @required String message}) {
+    SnackBar snackBar = new SnackBar(
+        content: Text(message),
         action: SnackBarAction(label: 'ok', onPressed: () {}));
 
     // Find the Scaffold in the widget tree and use
@@ -759,8 +760,7 @@ class _ProductEditState extends State<ProductEdit> {
         });
   }
 
-  getSubCategoria(
-      {@required BuildContext buildContext, @required String idCategoria}) {
+  getSubCategoria({@required BuildContext buildContext, @required String idCategoria}) {
     showModalBottomSheet(
         shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
@@ -938,4 +938,91 @@ class _ProductEditState extends State<ProductEdit> {
       },
     );
   }
+
+
+
+
+
+
+
+
+
+  // TODO: OPCIONES PARA EL DESARROLLADOR ( Eliminar para producción )
+  Widget widgetDeleteProductoOPTDeveloper({@required BuildContext context}) {
+    return Column(
+      children: [
+        deleteIndicador == false
+            ? SizedBox(
+                width: double.infinity,
+                child: RaisedButton.icon(
+                  onPressed: () {
+                    showDialogDeleteOPTDeveloper(buildContext: context);
+                  },
+                  color: Colors.red[400],
+                  icon: Icon(Icons.security, color: Colors.white),
+                  padding: EdgeInsets.all(12.0),
+                  label: Text("Borrar producto (Desarrollador)",
+                      style: TextStyle(fontSize: 18.0, color: Colors.white)),
+                ),
+              )
+            :Container(),
+        SizedBox(height: 25.0),
+      ],
+    );
+  }
+   void showDialogDeleteOPTDeveloper({@required BuildContext buildContext}) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          
+          title: new Text(
+              "¿Seguro que quieres eliminar este producto definitivamente? (Desarrollador)"),
+          content: new Text(
+              "El producto será eliminado de tu catálogo ,de la base de dato global y toda la información acumulada menos el historial de precios registrado"),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Cancelar"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            new FlatButton(
+              child: new Text("Borrar"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                deleteProductOPTDeveloper(context: buildContext);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+  void deleteProductOPTDeveloper({@required BuildContext context}) async {
+    setState(() {
+      deleteIndicador = true;
+    });
+    // Storage ( delete )
+    if( producto.urlimagen!=""){
+      StorageReference ref = FirebaseStorage.instance.ref().child("APP").child("ARG").child("PRODUCTOS").child(producto.id);
+      await ref.delete(); // Procede a eliminar el archivo de la base de datos
+    }
+    // Firebase ( delete )
+    await Global.getDataProductoNegocio(idNegocio: Global.prefs.getIdNegocio, idProducto: producto.id)
+        .deleteDoc(); // Procede a eliminar el documento de la base de datos del catalogo de la cuenta
+    await Global.getProductosPrecargado(idProducto: producto.id)
+        .deleteDoc(); // Procede a eliminar el documento de la base de datos del catalogo de la cuenta
+    // Emula un retardo de 2 segundos
+    Future.delayed(const Duration(milliseconds: 5000), () {
+      Navigator.pop(context);
+    });
+  }
+
+
+
+
 }
+

@@ -753,7 +753,7 @@ class PagePrincipal extends StatelessWidget {
                                       gradientColor: colorGradientInstagram,
                                       child: Padding(
                                         padding: EdgeInsets.all(5.0),
-                                        child: image.viewCircleImage(url:marca.url_imagen,texto:marca.titulo, size:30),
+                                        child: image.viewCircleImage(url:marca.url_imagen,texto:marca.titulo, size:50),
                                       ),
                                     ),
                                     SizedBox(

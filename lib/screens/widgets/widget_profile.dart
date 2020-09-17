@@ -52,7 +52,7 @@ Widget profileUser({@required BuildContext context}) {
                 Padding(
                   padding: EdgeInsets.only(bottom: 20.0),
                   child: GestureDetector(
-                    child: image.viewCircleImage(url:Global.oPerfilNegocio.imagen_perfil, texto: Global.oPerfilNegocio.nombre_negocio, size: 60.0),
+                    child: image.viewCircleImage(url:Global.oPerfilNegocio.imagen_perfil, texto: Global.oPerfilNegocio.nombre_negocio, size: 120.0),
                     onTap: () => Navigator.pushNamed(context, '/profilCuenta'),
                   ),
                 ),

@@ -187,8 +187,7 @@ class WidgetContentInfo extends StatelessWidget {
                           : Container(),
                       producto.precio_venta != 0.0
                           ? Text(
-                              Publicaciones.getFormatoPrecio(
-                                  monto: producto.precio_venta),
+                              Publicaciones.getFormatoPrecio(monto: producto.precio_venta),
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16.0,

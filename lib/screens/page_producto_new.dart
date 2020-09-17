@@ -111,73 +111,49 @@ class _ProductNewState extends State<ProductNew> {
     return Column(
       children: [
         _imageFile == null
-            ? Container(
+            ?Container(
                 height: MediaQuery.of(context).size.width,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(0.0),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black26,
-                      offset: Offset(0.0, 0.0),
-                      blurRadius: 6.0,
-                    ),
-                  ],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(0.0),
-                  child: CachedNetworkImage(
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.width,
-                    fadeInDuration: Duration(milliseconds: 200),
-                    fit: BoxFit.cover,
-                    imageUrl: this.productoNegocio.urlimagen ?? "default",
-                    placeholder: (context, url) => FadeInImage(
-                        image: AssetImage("assets/loading.gif"),
-                        placeholder: AssetImage("assets/loading.gif")),
-                    errorWidget: (context, url, error) => Container(
-                      color: Colors.grey,
-                      width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.width,
-                      child: Center(
-                        child: Icon(Icons.image),
-                      ),
-                    ),
-                  ),
-                ),
+                color: Colors.grey,
+                child: Center(child: Icon(Icons.image,color: Colors.white)),
               )
             : _previewImage(),
         Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: <Widget>[
-            SizedBox(height: 12.0, width: 12.0),
-            Expanded(
-              child: RaisedButton.icon(
-                  color: Theme.of(context).accentColor,
-                  padding: const EdgeInsets.all(14.0),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(35.0))),
-                  onPressed: () {
-                    _onImageButtonPressed(ImageSource.gallery,
-                        context: context);
-                  },
-                  icon: const Icon(Icons.photo_library, color: Colors.white),
-                  label: Text("Galeria",
-                      style: TextStyle(fontSize: 18.0, color: Colors.white))),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: FloatingActionButton(
-                onPressed: () {
-                  _onImageButtonPressed(ImageSource.camera, context: context);
-                },
-                heroTag: 'image1',
-                tooltip: 'Toma una foto',
-                child: const Icon(Icons.camera_alt),
-              ),
-            ),
-          ],
-        )
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  SizedBox(height: 12.0, width: 12.0),
+                  Expanded(
+                    child: RaisedButton.icon(
+                        color: Theme.of(context).accentColor,
+                        padding: const EdgeInsets.all(14.0),
+                        shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(5.0))),
+                        onPressed: () {
+                          _onImageButtonPressed(ImageSource.gallery,
+                              context: context);
+                        },
+                        icon: const Icon(Icons.photo_library,
+                            color: Colors.white),
+                        label: Text("Galeria",
+                            style: TextStyle(
+                                fontSize: 18.0, color: Colors.white))),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: MaterialButton(
+                      elevation: 1.0,
+                      color: Theme.of(context).accentColor,
+                      onPressed: () => _onImageButtonPressed(ImageSource.camera,
+                          context: context),
+                      child: Icon(Icons.camera_alt, color: Colors.white),
+                      padding: EdgeInsets.all(14.0),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(5.0))),
+                    ),
+                  ),
+                ],
+              )
       ],
     );
   }
@@ -451,12 +427,7 @@ class _ProductNewState extends State<ProductNew> {
       return retrieveError;
     }
     if (_imageFile != null) {
-      return Image.file(
-        File(_imageFile.path),
-        width: screenSize.width,
-        height: screenSize.width,
-        fit: BoxFit.cover,
-      );
+      return Image.file(File(_imageFile.path));
     } else if (_pickImageError != null) {
       return Text(
         'Pick image error: $_pickImageError',

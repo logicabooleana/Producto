@@ -44,7 +44,7 @@ class Publicaciones {
     static String getFormatoPrecio({String moneda="\$",double monto} ) {
 
       // Formatter 
-      var saf = NumberFormat.currency(name: moneda, customPattern: '\u00a4###,###,#00.00',decimalDigits: 2);
+      var saf = NumberFormat.currency(locale: 'es_AR',name: moneda, customPattern: '\u00a4###,###,#00.00',decimalDigits: 2);
 
       return  saf.format(monto);
     }
