@@ -295,10 +295,7 @@ class _ProductEditState extends State<ProductEdit> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Consumer<ProviderCatalogo>(
-            child: Text("Cargando categorías"),
-            builder: (context, catalogo, child) {
-              return Row(
+          Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -353,9 +350,7 @@ class _ProductEditState extends State<ProductEdit> {
                     ),
                   ),
                 ],
-              );
-            },
-          ),
+              ),
           SizedBox(
             height: 12.0,
             width: 12.0,
@@ -850,6 +845,7 @@ class _ProductEditState extends State<ProductEdit> {
                         if (value != null) {
                           setState(() {
                             this.marca = value;
+                            this.producto.titulo=this.marca.titulo;
                           });
                         }
                       });
@@ -887,6 +883,7 @@ class _ProductEditState extends State<ProductEdit> {
                               onTap: () {
                                 setState(() {
                                   this.marca = marcaSelect;
+                                  this.producto.titulo=this.marca.titulo;
                                   Navigator.pop(buildContext);
                                 });
                               },

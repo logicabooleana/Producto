@@ -1,6 +1,6 @@
 import 'dart:io';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:catalogo/screens/widgets/widgets_categoria.dart';
+import 'package:flutter/services.dart';
 import 'package:catalogo/services/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -9,49 +9,89 @@ import 'package:catalogo/services/globals.dart';
 import 'package:catalogo/models/models_catalogo.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:catalogo/screens/widgets/widgetSeachMarcaProducto.dart';
+import 'package:flutter_masked_text/flutter_masked_text.dart';
 
 class ProductNew extends StatefulWidget {
   final String id;
   ProductNew({@required this.id});
 
   @override
-  _ProductNewState createState() => _ProductNewState(id: id);
+  _ProductNewState createState() =>
+      _ProductNewState(new ProductoNegocio(id: this.id));
 }
 
 class _ProductNewState extends State<ProductNew> {
+  TextEditingController controllerTextEdit_titulo;
+  TextEditingController controllerTextEdit_descripcion;
+  MoneyMaskedTextController controllerTextEdit_precio_venta;
+  MoneyMaskedTextController controllerTextEdit_compra;
+  MoneyMaskedTextController controllerTextEdit_comparacion;
+
+  _ProductNewState(this.producto);
   // Variables
+  TextStyle textStyle = new TextStyle(fontSize: 24.0);
+  bool enCatalogo =
+      false; // verifica si el producto se encuentra en el catalogo o no
+  Marca marca;
   Categoria categoria;
   Categoria subcategoria;
   bool saveIndicador = false;
-  ProductoNegocio productoNegocio = new ProductoNegocio();
-  String id;
-  _ProductNewState({@required this.id});
-
+  ProductoNegocio producto;
+  BuildContext contextPrincipal;
+  // Variables de imagen
   String urlIamgen = "";
   PickedFile _imageFile;
   dynamic _pickImageError;
   String _retrieveDataError;
-  BuildContext contextPrincipal;
   final ImagePicker _picker = ImagePicker();
-
-  // Toma los pixeles del ancho y alto de la pantalla
-  Size screenSize;
 
   @override
   void initState() {
-    productoNegocio.id = widget.id;
+    checkCatalogo();
+    controllerTextEdit_titulo = TextEditingController(text: producto.titulo);
+    controllerTextEdit_descripcion =
+        TextEditingController(text: producto.descripcion);
+    controllerTextEdit_precio_venta = MoneyMaskedTextController(
+        initialValue: producto.precio_venta,
+        decimalSeparator: ',',
+        thousandSeparator: '.',
+        precision: 2);
+    controllerTextEdit_compra = MoneyMaskedTextController(
+        initialValue: producto.precio_compra,
+        decimalSeparator: ',',
+        thousandSeparator: '.',
+        precision: 2);
+    controllerTextEdit_comparacion = MoneyMaskedTextController(
+        initialValue: producto.precio_comparacion,
+        decimalSeparator: ',',
+        thousandSeparator: '.',
+        precision: 2);
     super.initState();
+  }
+
+  void checkCatalogo() async {
+    Global.listProudctosNegocio.forEach((element) {
+      if (element.id == this.producto.id) {
+        enCatalogo = true;
+      }
+    });
   }
 
   @override
   void dispose() {
+    controllerTextEdit_titulo.dispose();
+    controllerTextEdit_descripcion.dispose();
+    controllerTextEdit_precio_venta.dispose();
+    controllerTextEdit_compra.dispose();
+    controllerTextEdit_comparacion.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext contextPrincipal) {
-    contextPrincipal = contextPrincipal;
-    screenSize = MediaQuery.of(contextPrincipal).size;
+    this.contextPrincipal = contextPrincipal;
+
     return Scaffold(
       body: Builder(builder: (contextBuilder) {
         return Scaffold(
@@ -60,23 +100,11 @@ class _ProductNewState extends State<ProductNew> {
             backgroundColor: Theme.of(contextPrincipal).canvasColor,
             iconTheme: Theme.of(contextPrincipal).iconTheme.copyWith(
                 color: Theme.of(contextPrincipal).textTheme.bodyText1.color),
-            title: Row(
-              children: <Widget>[
-                productoNegocio.verificado == true
-                    ? Padding(
-                        padding: EdgeInsets.only(right: 3.0),
-                        child: new Image.asset('assets/icon_verificado.png',
-                            width: 16.0, height: 16.0))
-                    : new Container(),
-                Text(widget.id,
-                    style: TextStyle(
-                        fontSize: 18.0,
-                        color: Theme.of(contextPrincipal)
-                            .textTheme
-                            .bodyText1
-                            .color)),
-              ],
-            ),
+            title: Text(this.producto.id,
+                style: TextStyle(
+                    fontSize: 18.0,
+                    color:
+                        Theme.of(contextPrincipal).textTheme.bodyText1.color)),
             actions: <Widget>[
               IconButton(
                   icon: saveIndicador == false
@@ -98,7 +126,7 @@ class _ProductNewState extends State<ProductNew> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 widgetsImagen(),
-                widgetFormEditText(builderContext: contextBuilder),
+                widgetFormEditText(builderContext: context),
               ],
             ),
           ),
@@ -111,55 +139,59 @@ class _ProductNewState extends State<ProductNew> {
     return Column(
       children: [
         _imageFile == null
-            ?Container(
+            ? Container(
                 height: MediaQuery.of(context).size.width,
-                color: Colors.grey,
-                child: Center(child: Icon(Icons.image,color: Colors.white)),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(0.0),
+                  color: Colors.grey,
+                ),
+                child: Center(
+                  child: Icon(
+                    Icons.image,
+                    color: Colors.white,
+                  ),
+                ),
               )
             : _previewImage(),
         Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  SizedBox(height: 12.0, width: 12.0),
-                  Expanded(
-                    child: RaisedButton.icon(
-                        color: Theme.of(context).accentColor,
-                        padding: const EdgeInsets.all(14.0),
-                        shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(5.0))),
-                        onPressed: () {
-                          _onImageButtonPressed(ImageSource.gallery,
-                              context: context);
-                        },
-                        icon: const Icon(Icons.photo_library,
-                            color: Colors.white),
-                        label: Text("Galeria",
-                            style: TextStyle(
-                                fontSize: 18.0, color: Colors.white))),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: MaterialButton(
-                      elevation: 1.0,
-                      color: Theme.of(context).accentColor,
-                      onPressed: () => _onImageButtonPressed(ImageSource.camera,
-                          context: context),
-                      child: Icon(Icons.camera_alt, color: Colors.white),
-                      padding: EdgeInsets.all(14.0),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(5.0))),
-                    ),
-                  ),
-                ],
-              )
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            SizedBox(height: 12.0, width: 12.0),
+            Expanded(
+              child: RaisedButton.icon(
+                  color: Theme.of(context).accentColor,
+                  padding: const EdgeInsets.all(14.0),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(5.0))),
+                  onPressed: () {
+                    _onImageButtonPressed(ImageSource.gallery,
+                        context: context);
+                  },
+                  icon: const Icon(Icons.photo_library, color: Colors.white),
+                  label: Text("Galeria",
+                      style: TextStyle(fontSize: 18.0, color: Colors.white))),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: MaterialButton(
+                elevation: 1.0,
+                color: Theme.of(context).accentColor,
+                onPressed: () =>
+                    _onImageButtonPressed(ImageSource.camera, context: context),
+                child: Icon(Icons.camera_alt, color: Colors.white),
+                padding: EdgeInsets.all(14.0),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5.0))),
+              ),
+            ),
+          ],
+        )
       ],
     );
   }
 
   Widget widgetFormEditText({@required BuildContext builderContext}) {
-    TextStyle textStyle = new TextStyle(fontSize: 24.0);
     return Container(
       padding: EdgeInsets.all(12.0),
       child: Column(
@@ -168,16 +200,21 @@ class _ProductNewState extends State<ProductNew> {
           Consumer<ProviderCatalogo>(
             child: Text("Cargando categorías"),
             builder: (context, catalogo, child) {
-              this.categoria = catalogo.getCategoria;
-              this.subcategoria = catalogo.getSubcategoria;
+
+              // set ( values )
+              this.categoria=catalogo.categoria;
+              this.subcategoria=catalogo.subcategoria;
+
               return Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   new Flexible(
                     child: InkWell(
                       child: TextField(
                         controller: TextEditingController()
-                          ..text = catalogo.getCategoria != null
-                              ? catalogo.getCategoria.nombre
+                          ..text = catalogo.categoria != null
+                              ? catalogo.categoria.nombre
                               : "",
                         enabled: false,
                         enableInteractiveSelection: false,
@@ -203,7 +240,7 @@ class _ProductNewState extends State<ProductNew> {
                       },
                     ),
                   ),
-                  SizedBox(
+                  new SizedBox(
                     height: 12.0,
                     width: 12.0,
                   ),
@@ -211,8 +248,8 @@ class _ProductNewState extends State<ProductNew> {
                     child: InkWell(
                       child: TextField(
                         controller: TextEditingController()
-                          ..text = catalogo.getSubcategoria != null
-                              ? catalogo.getSubcategoria.nombre
+                          ..text = catalogo.subcategoria != null
+                              ? catalogo.subcategoria.nombre
                               : "",
                         enabled: false,
                         enableInteractiveSelection: false,
@@ -224,7 +261,8 @@ class _ProductNewState extends State<ProductNew> {
                         style: textStyle,
                       ),
                       onTap: () {
-                        showModalBottomSheet(
+                        if (catalogo.categoria != null) {
+                          showModalBottomSheet(
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20.0)),
                             backgroundColor:
@@ -232,11 +270,10 @@ class _ProductNewState extends State<ProductNew> {
                             context: builderContext,
                             builder: (ctx) {
                               return ClipRRect(
-                                child: ViewSubCategoria(
-                                    buildContextCategoria: ctx,
-                                    categoria: catalogo.getCategoria),
+                                child: ViewSubCategoria(buildContextCategoria: ctx,categoria:this.categoria),
                               );
                             });
+                        }
                       },
                     ),
                   ),
@@ -248,159 +285,215 @@ class _ProductNewState extends State<ProductNew> {
             height: 12.0,
             width: 12.0,
           ),
-          TextField(
-            enabled: !productoNegocio.verificado,
-            onChanged: (value) {
-              productoNegocio.titulo = value;
-            },
-            decoration: InputDecoration(
-                border: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.green, width: 2)),
-                labelText: "Titulo"),
-            style: textStyle,
-          ),
+          widgetTextFieldMarca(),
+          this.marca == null
+              ? SizedBox(
+                  height: 12.0,
+                  width: 12.0,
+                )
+              : Container(),
+          this.marca == null
+              ? TextField(
+                  enabled: !producto.verificado,
+                  onChanged: (value) => producto.titulo = value,
+                  decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                          borderSide:
+                              BorderSide(color: Colors.green, width: 2)),
+                      labelText: "Titulo"),
+                  style: textStyle,
+                  controller: controllerTextEdit_titulo,
+                )
+              : Container(),
           SizedBox(height: 16.0),
           TextField(
-            enabled: !productoNegocio.verificado,
-            onChanged: (value) {
-              productoNegocio.descripcion = value;
-            },
+            enabled: !producto.verificado,
+            onChanged: (value) => producto.descripcion = value,
             decoration: InputDecoration(
                 border: OutlineInputBorder(), labelText: "Descripción"),
             style: textStyle,
+            controller: controllerTextEdit_descripcion,
           ),
           SizedBox(height: 16.0),
           TextField(
-            keyboardType: TextInputType.number,
-            onChanged: (value) =>
-                productoNegocio.precio_venta = double.parse(value),
+            //inputFormatters: [DecimalTextInputFormatter(decimalRange: 2)],
+            keyboardType: TextInputType.numberWithOptions(decimal: true),
+            onChanged: (value) => producto.precio_venta =
+                controllerTextEdit_precio_venta.numberValue,
             decoration: InputDecoration(
                 border: OutlineInputBorder(), labelText: "Precio de venta"),
             style: textStyle,
+            controller: controllerTextEdit_precio_venta,
           ),
           SizedBox(height: 16.0),
           TextField(
-            keyboardType: TextInputType.number,
-            onChanged: (value) =>
-                productoNegocio.precio_compra = double.parse(value),
+            //inputFormatters: [DecimalTextInputFormatter(decimalRange: 2)],
+            keyboardType: TextInputType.numberWithOptions(decimal: true),
+            onChanged: (value) => producto.precio_compra =
+                controllerTextEdit_precio_venta.numberValue,
             decoration: InputDecoration(
                 border: OutlineInputBorder(), labelText: "Precio de compra"),
             style: textStyle,
+            controller: controllerTextEdit_compra,
           ),
           SizedBox(height: 16.0),
           TextField(
-            keyboardType: TextInputType.number,
-            onChanged: (value) =>
-                productoNegocio.precio_comparacion = double.parse(value),
+            //inputFormatters: [DecimalTextInputFormatter(decimalRange: 2)],
+            keyboardType: TextInputType.numberWithOptions(decimal: true),
+            onChanged: (value) => producto.precio_comparacion =
+                controllerTextEdit_precio_venta.numberValue,
             decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: "Precio de comparación"),
             style: textStyle,
+            controller: controllerTextEdit_comparacion,
           ),
+          SizedBox(height: 25.0),
         ],
       ),
     );
   }
 
+  Widget widgetTextFieldMarca() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        new Flexible(
+          child: InkWell(
+            child: TextField(
+              controller: TextEditingController()
+                ..text = this.marca != null ? this.marca.titulo : "",
+              enabled: false,
+              enableInteractiveSelection: false,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.green, width: 2)),
+                labelText: "Marca",
+              ),
+              style: textStyle,
+            ),
+            onTap: () {
+              showModalSelectMarca(buildContext: contextPrincipal);
+            },
+          ),
+        ),
+        this.marca != null
+            ? Padding(
+                padding: EdgeInsets.only(left: 12.0),
+                child: IconButton(
+                  icon: Icon(Icons.close),
+                  onPressed: () {
+                    setState(() {
+                      this.marca = null;
+                    });
+                  },
+                ),
+              )
+            : Container(),
+      ],
+    );
+  }
   void guardar({@required BuildContext buildContext}) async {
-    if (this.categoria != null && this.subcategoria != null) {
-      if (productoNegocio.titulo != "") {
-        if (productoNegocio.descripcion != "") {
-          if (productoNegocio.precio_venta != 0.0) {
-            setState(() {
-              saveIndicador = true;
-            });
-            urlIamgen = "";
+    if (this.categoria != null) {
+      if (this.subcategoria != null) {
+        if (producto.titulo != "") {
+          if (producto.descripcion != "") {
+            if (this.marca != null) {
+              if (producto.precio_venta != 0.0) {
+                setState(() {
+                  saveIndicador = true;
+                });
+                urlIamgen = "";
 
-            // Si la "PickedFile" es distinto nulo procede a guardar la imagen en la base de dato de almacenamiento
-            if (_imageFile != null) {
-              StorageReference ref = FirebaseStorage.instance
-                  .ref()
-                  .child("APP")
-                  .child("ARG")
-                  .child("PRODUCTOS")
-                  .child(productoNegocio.id);
-              StorageUploadTask uploadTask = ref.putFile(File(_imageFile.path));
-              // obtenemos la url de la imagen guardada
-              urlIamgen =
-                  await (await uploadTask.onComplete).ref.getDownloadURL();
-              // TODO: Por el momento los datos del producto se guarda junto a la referencia de la cuenta del negocio
-              productoNegocio.urlimagen = urlIamgen;
+                // Si la "PickedFile" es distinto nulo procede a guardar la imagen en la base de dato de almacenamiento
+                if (_imageFile != null) {
+                  StorageReference ref = FirebaseStorage.instance
+                      .ref()
+                      .child("APP")
+                      .child("ARG")
+                      .child("PRODUCTOS")
+                      .child(producto.id);
+                  StorageUploadTask uploadTask =
+                      ref.putFile(File(_imageFile.path));
+                  // obtenemos la url de la imagen guardada
+                  urlIamgen =
+                      await (await uploadTask.onComplete).ref.getDownloadURL();
+                  // TODO: Por el momento los datos del producto se guarda junto a la referencia de la cuenta del negocio
+                  producto.urlimagen = urlIamgen;
+                }
+
+                // TODO: Por defecto verificado es TRUE // Cambiar esto cuando se lanze a producción
+                producto.verificado = true;
+                producto.categoria = this.categoria.id;
+                producto.subcategoria = this.subcategoria.id;
+                producto.id_marca = this.marca.id;
+                savevProductoGlobal();
+                // Firebase set
+                await Global.getDataProductoNegocio(
+                        idNegocio: Global.prefs.getIdNegocio,
+                        idProducto: producto.id)
+                    .upSetProducto(producto.toJson());
+
+                Navigator.pop(context);
+              } else {
+                viewSnackBar(
+                    context: buildContext,
+                    message: 'Asigne un precio de venta');
+              }
+            } else {
+              viewSnackBar(
+                  context: buildContext, message: 'Debe seleccionar una marca');
             }
-
-            // TODO: Por defecto verificado es TRUE // Cambiar esto cuando se lanze a producción
-            productoNegocio.verificado = true;
-            productoNegocio.categoria = this.categoria.id;
-            productoNegocio.subcategoria = this.subcategoria.id;
-            // valores de creación
-            productoNegocio.timestamp_creation =
-                Timestamp.fromDate(new DateTime.now());
-            updateProductoGlobal();
-            // Firebase set
-            await Global.getDataProductoNegocio(
-                    idNegocio: Global.prefs.getIdNegocio,
-                    idProducto: productoNegocio.id)
-                .upSetProducto(productoNegocio.toJson());
-            Navigator.pop(context);
           } else {
             viewSnackBar(
-                context: buildContext, message: 'Asigne un precio de venta');
+                context: buildContext, message: 'Debe elegir una descripción');
           }
         } else {
-          viewSnackBar(
-              context: buildContext, message: 'Debe elegir una descripción');
+          viewSnackBar(context: buildContext, message: 'Debe elegir un titulo');
         }
       } else {
-        viewSnackBar(context: buildContext, message: 'Debe elegir un titulo');
+        viewSnackBar(
+            context: buildContext, message: 'Debe elegir una subcategoría');
       }
     } else {
       viewSnackBar(context: buildContext, message: 'Debe elegir una categoría');
     }
   }
 
+  void savevProductoGlobal() async {
+    // Valores para registrar el precio
+    Precio precio = new Precio(
+        id_negocio: Global.oPerfilNegocio.id,
+        precio: producto.precio_venta,
+        moneda: producto.signo_moneda,
+        timestamp: Timestamp.fromDate(new DateTime.now()));
+    // Firebase set
+    await Global.getPreciosProducto(
+            idNegocio: Global.oPerfilNegocio.id,
+            idProducto: producto.id,
+            isoPAis: "ARG")
+        .upSetPrecioProducto(precio.toJson());
+    if (urlIamgen == "") {
+      producto.timestamp_actualizacion=Timestamp.fromDate(new DateTime.now());
+      producto.urlimagen="default";
+    } else {
+      producto.timestamp_actualizacion=Timestamp.fromDate(new DateTime.now());
+      producto.urlimagen=urlIamgen;
+    }
+    // Firebase set
+    await Global.getProductosPrecargado(idProducto: producto.id, isoPAis: "ARG")
+        .upSetPrecioProducto(producto.convertProductoDefault().toJson());
+  }
   void viewSnackBar(
-      {@required BuildContext context, @required String message}) async {
-    final snackBar = SnackBar(
-        content: Text('Debe elegir una categoría'),
+      {@required BuildContext context, @required String message}) {
+    SnackBar snackBar = new SnackBar(
+        content: Text(message),
         action: SnackBarAction(label: 'ok', onPressed: () {}));
 
     // Find the Scaffold in the widget tree and use
     // it to show a SnackBar.
     Scaffold.of(context).showSnackBar(snackBar);
-  }
-
-  void updateProductoGlobal() async {
-    // Valores para registrar el precio
-    Precio precio = new Precio(
-        id_negocio: Global.oPerfilNegocio.id,
-        precio: productoNegocio.precio_venta,
-        moneda: productoNegocio.signo_moneda,
-        timestamp: Timestamp.fromDate(new DateTime.now()));
-    // Firebase set
-    await Global.getPreciosProducto(
-            idNegocio: Global.oPerfilNegocio.id,
-            idProducto: productoNegocio.id,
-            isoPAis: "ARG")
-        .upSetPrecioProducto(precio.toJson());
-
-    // values
-    // TODO: Por defecto verificado es TRUE // Cambiar esto cuando se lanze a producción
-    productoNegocio.verificado = true;
-    productoNegocio.categoria = this.categoria.id;
-    productoNegocio.subcategoria = this.subcategoria.id;
-    Map timestampUpdatePrecio;
-    if (urlIamgen == "") {
-      productoNegocio.timestamp_actualizacion =
-          Timestamp.fromDate(new DateTime.now());
-    } else {
-      productoNegocio.timestamp_actualizacion =
-          Timestamp.fromDate(new DateTime.now());
-      productoNegocio.urlimagen = urlIamgen;
-    }
-    // Firebase set
-    await Global.getProductosPrecargado(
-            idProducto: productoNegocio.id, isoPAis: "ARG")
-        .upSetPrecioProducto(productoNegocio.convertProductoDefault().toJson());
   }
 
   void _onImageButtonPressed(ImageSource source, {BuildContext context}) async {
@@ -463,4 +556,93 @@ class _ProductNewState extends State<ProductNew> {
       _retrieveDataError = response.exception.code;
     }
   }
+
+  
+
+  showModalSelectMarca({@required BuildContext buildContext}) {
+    showModalBottomSheet(
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+        backgroundColor: Theme.of(buildContext).canvasColor,
+        context: buildContext,
+        builder: (_) {
+          // Variables
+          List<Marca> listMarcasAll = new List<Marca>();
+          return Scaffold(
+            appBar: AppBar(
+              title: Text("Marcas"),
+              actions: [
+                IconButton(
+                  icon: Icon(Icons.search),
+                  onPressed: () async {
+                    if (listMarcasAll.length != 0) {
+                      // Muestra un "showSearch" y espera ah revolver un resultado
+                      showSearch(
+                              context: buildContext,
+                              delegate: DataSearchMarcaProduct(
+                                  listMarcas: listMarcasAll))
+                          .then((value) {
+                        if (value != null) {
+                          setState(() {
+                            this.marca = value;
+                            this.producto.titulo=this.marca.titulo;
+                          });
+                        }
+                      });
+                    }
+                  },
+                ),
+              ],
+            ),
+            body: FutureBuilder(
+              future: Global.getMarcasAll().getDataMarca(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  listMarcasAll = snapshot.data;
+                  if (listMarcasAll.length != 0) {
+                    return ListView.builder(
+                      padding: EdgeInsets.symmetric(vertical: 15.0),
+                      shrinkWrap: true,
+                      itemCount: listMarcasAll.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        Marca marcaSelect = listMarcasAll[index];
+                        return Column(
+                          children: <Widget>[
+                            ListTile(
+                              leading: CircleAvatar(
+                                backgroundColor: Colors.black26,
+                                radius: 24.0,
+                                child: Text(marcaSelect.titulo.substring(0, 1),
+                                    style: TextStyle(
+                                        fontSize: 18.0,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold)),
+                              ),
+                              dense: true,
+                              title: Text(marcaSelect.titulo),
+                              onTap: () {
+                                setState(() {
+                                  this.marca = marcaSelect;
+                                  this.producto.titulo=this.marca.titulo;
+                                  Navigator.pop(buildContext);
+                                });
+                              },
+                            ),
+                            Divider(endIndent: 12.0, indent: 12.0),
+                          ],
+                        );
+                      },
+                    );
+                  } else {
+                    return Center(child: Text("Cargando..."));
+                  }
+                } else {
+                  return Center(child: Text("Cargando..."));
+                }
+              },
+            ),
+          );
+        });
+  }
+
 }

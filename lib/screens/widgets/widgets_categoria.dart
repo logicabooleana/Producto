@@ -8,8 +8,7 @@ class ViewCategoria extends StatefulWidget {
   ViewCategoria({@required this.buildContext});
 
   @override
-  _ViewCategoriaState createState() =>
-      _ViewCategoriaState(buildContextPrincipal: buildContext);
+  _ViewCategoriaState createState() =>_ViewCategoriaState(buildContextPrincipal: buildContext);
 }
 
 class _ViewCategoriaState extends State<ViewCategoria> {
