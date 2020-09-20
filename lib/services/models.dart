@@ -171,6 +171,7 @@ class Producto {
     String id="";
     bool verificado = false; // estado de verificación  al un moderador
     String id_marca=""; // ID de la marca por defecto esta vacia
+    String id_negocio=""; // ID del negocios que actualizo el producto
     String urlimagen="https://default";  // URL imagen
     String titulo="";  // Titulo
     String descripcion=""; // Informacion
@@ -185,6 +186,7 @@ class Producto {
     this.id="", 
     this.verificado=false,
     this.id_marca="", 
+    this.id_negocio="", 
     this.urlimagen="", 
     this.titulo="", 
     this.descripcion="", 
@@ -199,6 +201,7 @@ class Producto {
         "id": id??"",
         "verificado": verificado??"",
         "id_marca": id_marca??"",
+        "id_negocio": id_negocio??"",
         "urlimagen": urlimagen??"https://default",
         "titulo": titulo??"",
         "descripcion": descripcion??"",
@@ -212,6 +215,7 @@ class Producto {
       id: data['id'] ?? '',
       verificado: data['verificado'] ?? false,
       id_marca: data['id_marca'] ?? '',
+      id_negocio: data['id_negocio'] ?? '',
       urlimagen: data['urlimagen'] ?? 'https://default',
       titulo: data['titulo'] ?? '',
       descripcion: data['descripcion'] ?? '',
@@ -226,6 +230,7 @@ class Producto {
     ProductoNegocio productoNegocio=new ProductoNegocio();
     productoNegocio.id=this.id??"";
     productoNegocio.urlimagen=this.urlimagen??"";
+     productoNegocio.id_negocio=this.id_negocio??"";
     productoNegocio.verificado=this.verificado??false;
     productoNegocio.id_marca=this.id_marca??"";
     productoNegocio.titulo=this.titulo??"";

@@ -1,4 +1,3 @@
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:catalogo/models/models_catalogo.dart';
 import 'package:catalogo/models/models_profile.dart';
@@ -11,20 +10,18 @@ import 'package:catalogo/services/globals.dart';
 import 'package:geolocator/geolocator.dart';
 
 class ProductScreen extends StatelessWidget {
-
   String sSignoMoneda;
   ProductoNegocio producto;
-  bool productoEnCatalogo=false;
+  bool productoEnCatalogo = false;
 
   ProductScreen({this.producto, this.sSignoMoneda});
 
   @override
   Widget build(BuildContext context) {
-
     for (ProductoNegocio item in Global.listProudctosNegocio) {
-      if(item.id==producto.id){
-        producto=item;
-        productoEnCatalogo=true;
+      if (item.id == producto.id) {
+        producto = item;
+        productoEnCatalogo = true;
         break;
       }
     }
@@ -38,20 +35,57 @@ class ProductScreen extends StatelessWidget {
         title: Row(
           children: <Widget>[
             producto.verificado == true
-                ? Padding(padding:EdgeInsets.only(right:3.0),child: new Image.asset('assets/icon_verificado.png',width: 16.0,height: 16.0))
+                ? Padding(
+                    padding: EdgeInsets.only(right: 3.0),
+                    child: new Image.asset('assets/icon_verificado.png',
+                        width: 16.0, height: 16.0))
                 : new Container(),
-            Text(this.producto.id,style: TextStyle(fontSize: 18.0,color: Theme.of(context).textTheme.bodyText1.color)),
+            Text(this.producto.id,
+                style: TextStyle(
+                    fontSize: 18.0,
+                    color: Theme.of(context).textTheme.bodyText1.color)),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: Theme.of(context).accentColor,
+        foregroundColor: Colors.black,
+        onPressed: () {
+          Navigator.of(context).pushReplacement(MaterialPageRoute(
+            builder: (BuildContext context) => producto != null
+                ? ProductEdit(producto: producto)
+                : Scaffold(body: Center(child: Text("Se produjo un Error!"))),
+          ));
+        },
+        icon: Icon(
+          productoEnCatalogo ? Icons.edit : Icons.add_box,
+          color: Colors.white,
+        ),
+        label: Text(productoEnCatalogo ? 'Editar' : "Agregar",
+            style: TextStyle(fontSize: 18.0, color: Colors.white)),
       ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             WidgetImagen(producto: producto),
-            WidgetDescripcion(context),
-            WidgetUltimosPrecios(producto: producto),
-            productoEnCatalogo?WidgetOtrosProductos(producto: producto):Container(),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  WidgetDescripcion(context),
+                  WidgetUltimosPrecios(producto: producto),
+                  productoEnCatalogo
+                      ? WidgetOtrosProductos(producto: producto)
+                      : Container(),
+                ],
+              ),
+            ),
+            const SizedBox(
+              height: 60.0,
+              width: 60.0,
+            ),
           ],
         ),
       ),
@@ -59,64 +93,36 @@ class ProductScreen extends StatelessWidget {
   }
 
   Padding WidgetDescripcion(BuildContext context) {
-
-
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           producto.titulo != ""
               ? Container(
                   child: Text(producto.titulo,
-                      style: TextStyle(
-                          height: 2,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold),
+                      style: TextStyle(height: 2, fontSize: 30, fontWeight: FontWeight.bold),
                       overflow: TextOverflow.fade,
                       softWrap: false),
                 )
               : Container(),
+          SizedBox(
+            height: 8.0,
+            width: 8.0,
+          ),
           producto.descripcion != ""
               ? Text(producto.descripcion,
                   style: TextStyle(
                       height: 1, fontSize: 16, fontWeight: FontWeight.normal))
               : Container(),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              producto.precio_venta != null&&producto.precio_venta != 0.0
-                  ? Text(
-                      Publicaciones.getFormatoPrecio(monto: producto.precio_venta),
-                      style: TextStyle(height: 2, fontSize: 24, fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.end,
-                    )
-                  : Container(),
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 0.0),
-                child: SizedBox(
-                  height: 50,
-                  child: RaisedButton.icon(
-                    onPressed: () {
-                      Navigator.of(context).pushReplacement(MaterialPageRoute(
-                        builder: (BuildContext context) => producto != null
-                            ? ProductEdit(producto: producto)
-                            : Scaffold(
-                                body: Center(
-                                    child: Text("Se produjo un Error!"))),
-                      ));
-                    },
-                    color: Theme.of(context).accentColor,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(35.0))),
-                    label: Text(productoEnCatalogo?'Editar':"Agregar", style: TextStyle(fontSize: 18.0, color: Colors.white)),
-                    icon: Container(), // Icon( Icons.add,color: Colors.white),
-                    textColor: Colors.white,
-                  ),
-                ),
-              ),
-            ],
-          ),
+          producto.precio_venta != null && producto.precio_venta != 0.0
+              ? Text(
+                  Publicaciones.getFormatoPrecio(monto: producto.precio_venta),
+                  style: TextStyle(
+                      height: 2, fontSize: 30, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.end,
+                )
+              : Container(),
         ],
       ),
     );
@@ -152,10 +158,11 @@ class WidgetImagen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-    return Container(
-      height: MediaQuery.of(context).size.width,
-      decoration: BoxDecoration(
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+      //height: MediaQuery.of(context).size.width,
+      /*  decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(0.0),
         boxShadow: [
           BoxShadow(
@@ -164,7 +171,7 @@ class WidgetImagen extends StatelessWidget {
             blurRadius: 6.0,
           ),
         ],
-      ),
+      ), */
       child: Hero(
         tag: producto.id,
         child: ClipRRect(
@@ -174,7 +181,7 @@ class WidgetImagen extends StatelessWidget {
             height: MediaQuery.of(context).size.width,
             fadeInDuration: Duration(milliseconds: 200),
             fit: BoxFit.cover,
-            imageUrl: producto.urlimagen??"default",
+            imageUrl: producto.urlimagen ?? "default",
             placeholder: (context, url) => FadeInImage(
                 image: AssetImage("assets/loading.gif"),
                 placeholder: AssetImage("assets/loading.gif")),
@@ -212,8 +219,9 @@ class WidgetOtrosProductos extends StatelessWidget {
       children: <Widget>[
         Divider(endIndent: 12.0, indent: 12.0),
         Padding(
-            child: Text("Otros productos", style: TextStyle(fontSize: 16.0)),
-            padding: EdgeInsets.all(12.0)),
+          child: Text("Otros productos", style: TextStyle(fontSize: 16.0)),
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+        ),
         SizedBox(
           height: 150,
           width: double.infinity,
@@ -254,8 +262,8 @@ class WidgetUltimosPrecios extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future:
-          Global.getListPreciosProducto(idProducto: producto.id, isoPAis: "ARG").getDataPreciosProductosAll(),
+      future: Global.getListPreciosProducto(idProducto: producto.id)
+          .getDataPreciosProductosAll(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           List<Precio> listaPrecios = snapshot.data;
@@ -263,11 +271,16 @@ class WidgetUltimosPrecios extends StatelessWidget {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              listaPrecios.length!=0?Divider(endIndent: 12.0, indent: 12.0):Container(),
-              listaPrecios.length!=0?Padding(
-                padding: EdgeInsets.all(12.0),
-                child: Text("Ultimos precios registrados",style: TextStyle(fontSize: 16.0)),
-              ):Container(),
+              listaPrecios.length != 0
+                  ? Divider(endIndent: 12.0, indent: 12.0)
+                  : Container(),
+              listaPrecios.length != 0
+                  ? Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: Text("Ultimos precios registrados",
+                          style: TextStyle(fontSize: 16.0)),
+                    )
+                  : Container(),
               ListView.builder(
                 //physics: const AlwaysScrollableScrollPhysics(),
                 physics: const NeverScrollableScrollPhysics(),
@@ -276,11 +289,12 @@ class WidgetUltimosPrecios extends StatelessWidget {
                 itemCount: listaPrecios.length,
                 itemBuilder: (context, index) {
                   return FutureBuilder(
-                      future: Global.getNegocio(idNegocio: listaPrecios[index].id_negocio).getDataPerfilNegocio(),
+                      future: Global.getNegocio(
+                              idNegocio: listaPrecios[index].id_negocio)
+                          .getDataPerfilNegocio(),
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
                           PerfilNegocio perfilNegocio = snapshot.data;
-
                           return Column(
                             children: <Widget>[
                               ListTile(
@@ -324,7 +338,8 @@ class WidgetUltimosPrecios extends StatelessWidget {
                                     Text(
                                       Publicaciones.getFechaPublicacion(
                                               listaPrecios[index]
-                                                  .timestamp.toDate(),
+                                                  .timestamp
+                                                  .toDate(),
                                               new DateTime.now())
                                           .toLowerCase(),
                                       textAlign: TextAlign.end,
@@ -446,7 +461,8 @@ class ProductoItemHorizontal extends StatelessWidget {
                         children: [
                           Expanded(
                             child: Padding(
-                              padding: EdgeInsets.all(10.0),
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 8.0),
                               child: Column(
                                 children: <Widget>[
                                   producto.titulo != "" &&
@@ -508,4 +524,3 @@ class ProviderProductoView with ChangeNotifier {
     notifyListeners(); //notificamos a los widgets que esten escuchando el stream.
   }
 }
-

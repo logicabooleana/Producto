@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:catalogo/screens/page_marca_create.dart';
 import 'package:flutter/services.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:catalogo/services/models.dart';
@@ -8,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:catalogo/services/globals.dart';
 import 'package:catalogo/models/models_catalogo.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:provider/provider.dart';
 import 'package:catalogo/screens/widgets/widgetSeachMarcaProducto.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
 
@@ -29,8 +29,8 @@ class _ProductEditState extends State<ProductEdit> {
 
   // Variables
   TextStyle textStyle = new TextStyle(fontSize: 24.0);
-  bool enCatalogo =
-      false; // verifica si el producto se encuentra en el catalogo o no
+  bool enCatalogo=false; // verifica si el producto se encuentra en el catalogo o no
+  bool editable=false; // TODO : Eliminar para produccion
   Marca marca;
   Categoria categoria;
   Categoria subcategoria;
@@ -48,12 +48,21 @@ class _ProductEditState extends State<ProductEdit> {
     controllerTextEdit_titulo = TextEditingController(text: producto.titulo);
     controllerTextEdit_descripcion =
         TextEditingController(text: producto.descripcion);
-    controllerTextEdit_precio_venta =
-        MoneyMaskedTextController(initialValue: producto.precio_venta,decimalSeparator: ',', thousandSeparator: '.',precision: 2);
-    controllerTextEdit_compra =
-        MoneyMaskedTextController(initialValue: producto.precio_compra ,decimalSeparator: ',', thousandSeparator: '.',precision: 2);
-    controllerTextEdit_comparacion =
-        MoneyMaskedTextController(initialValue: producto.precio_comparacion,decimalSeparator: ',', thousandSeparator: '.' ,precision:2);
+    controllerTextEdit_precio_venta = MoneyMaskedTextController(
+        initialValue: producto.precio_venta,
+        decimalSeparator: ',',
+        thousandSeparator: '.',
+        precision: 2);
+    controllerTextEdit_compra = MoneyMaskedTextController(
+        initialValue: producto.precio_compra,
+        decimalSeparator: ',',
+        thousandSeparator: '.',
+        precision: 2);
+    controllerTextEdit_comparacion = MoneyMaskedTextController(
+        initialValue: producto.precio_comparacion,
+        decimalSeparator: ',',
+        thousandSeparator: '.',
+        precision: 2);
     super.initState();
   }
 
@@ -91,7 +100,7 @@ class _ProductEditState extends State<ProductEdit> {
         .then((value) {
       this.categoria = value ?? Categoria();
     });
-    if (producto.subcategoria != "") {
+    if (producto.categoria != "") {
       Global.getDataCatalogoSubcategoria(
               idNegocio: Global.oPerfilNegocio.id,
               idCategoria: producto.categoria,
@@ -171,7 +180,10 @@ class _ProductEditState extends State<ProductEdit> {
                 this.producto.urlimagen = productoGlobal.urlimagen;
                 this.producto.titulo = productoGlobal.titulo;
                 this.producto.descripcion = productoGlobal.descripcion;
-                this.producto.verificado = productoGlobal.verificado;
+                // TODO: Eliminar condicion para producción
+                if( editable!=true ){
+                  this.producto.verificado = productoGlobal.verificado;
+                }
 
                 return SingleChildScrollView(
                   child: Column(
@@ -245,9 +257,7 @@ class _ProductEditState extends State<ProductEdit> {
                 ),
               )
             : _previewImage(),
-        // TODO : Modificar antes de lanzar a produccion
-        true //producto.verificado==false
-            ? Row(
+        producto.verificado==false?Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
@@ -296,61 +306,60 @@ class _ProductEditState extends State<ProductEdit> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  new Flexible(
-                    child: InkWell(
-                      child: TextField(
-                        controller: TextEditingController()
-                          ..text = this.categoria != null
-                              ? this.categoria.nombre
-                              : "",
-                        enabled: false,
-                        enableInteractiveSelection: false,
-                        decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.green, width: 2)),
-                            labelText: "Categoría"),
-                        style: textStyle,
-                      ),
-                      onTap: () {
-                        getCategoria(buildContext: builderContext);
-                      },
-                    ),
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              new Flexible(
+                child: InkWell(
+                  child: TextField(
+                    controller: TextEditingController()..text =this.categoria != null ? this.categoria.nombre : "",
+                    enabled:false,
+                    enableInteractiveSelection:false,
+                    decoration: InputDecoration(
+                        border: OutlineInputBorder(borderSide:BorderSide(color: Colors.green, width: 2)),
+                        labelText: "Categoría"),
+                    style: textStyle,
                   ),
-                  new SizedBox(
-                    height: 12.0,
-                    width: 12.0,
-                  ),
-                  new Flexible(
-                    child: InkWell(
-                      child: TextField(
-                        controller: TextEditingController()
-                          ..text = this.subcategoria != null
-                              ? this.subcategoria.nombre
-                              : "",
-                        enabled: false,
-                        enableInteractiveSelection: false,
-                        decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.green, width: 2)),
-                            labelText: "Subcategoría"),
-                        style: textStyle,
-                      ),
-                      onTap: () {
-                        if (this.categoria != null) {
-                          getSubCategoria(
-                              buildContext: builderContext,
-                              idCategoria: this.categoria.id);
-                        }
-                      },
-                    ),
-                  ),
-                ],
+                  onTap: () {
+                    if( producto.verificado==false){
+                      getCategoria(buildContext: builderContext);
+                    }
+                  },
+                ),
               ),
+              new SizedBox(
+                height: 12.0,
+                width: 12.0,
+              ),
+              new Flexible(
+                child: InkWell(
+                  child: TextField(
+                    controller: TextEditingController()
+                      ..text = this.subcategoria != null
+                          ? this.subcategoria.nombre
+                          : "",
+                    enabled:false,
+                    enableInteractiveSelection:false,
+                    decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.green, width: 2)),
+                        labelText: "Subcategoría"),
+                    style: textStyle,
+                  ),
+                  onTap: () {
+                    if( producto.verificado==false){
+                      if (this.categoria != null) {
+                        getSubCategoria(
+                          buildContext: builderContext,
+                          idCategoria: this.categoria.id);
+                    }
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
           SizedBox(
             height: 12.0,
             width: 12.0,
@@ -364,7 +373,7 @@ class _ProductEditState extends State<ProductEdit> {
               : Container(),
           this.marca == null
               ? TextField(
-                  enabled: !producto.verificado,
+                  enabled: producto.verificado==true?false:true,
                   onChanged: (value) => producto.titulo = value,
                   decoration: InputDecoration(
                       border: OutlineInputBorder(
@@ -388,7 +397,8 @@ class _ProductEditState extends State<ProductEdit> {
           TextField(
             //inputFormatters: [DecimalTextInputFormatter(decimalRange: 2)],
             keyboardType: TextInputType.numberWithOptions(decimal: true),
-            onChanged: (value) => producto.precio_venta = controllerTextEdit_precio_venta.numberValue,
+            onChanged: (value) => producto.precio_venta =
+                controllerTextEdit_precio_venta.numberValue,
             decoration: InputDecoration(
                 border: OutlineInputBorder(), labelText: "Precio de venta"),
             style: textStyle,
@@ -398,7 +408,8 @@ class _ProductEditState extends State<ProductEdit> {
           TextField(
             //inputFormatters: [DecimalTextInputFormatter(decimalRange: 2)],
             keyboardType: TextInputType.numberWithOptions(decimal: true),
-            onChanged: (value) => producto.precio_compra = controllerTextEdit_precio_venta.numberValue,
+            onChanged: (value) => producto.precio_compra =
+                controllerTextEdit_precio_venta.numberValue,
             decoration: InputDecoration(
                 border: OutlineInputBorder(), labelText: "Precio de compra"),
             style: textStyle,
@@ -408,8 +419,8 @@ class _ProductEditState extends State<ProductEdit> {
           TextField(
             //inputFormatters: [DecimalTextInputFormatter(decimalRange: 2)],
             keyboardType: TextInputType.numberWithOptions(decimal: true),
-            onChanged: (value) =>
-                producto.precio_comparacion = controllerTextEdit_precio_venta.numberValue,
+            onChanged: (value) => producto.precio_comparacion =
+                controllerTextEdit_precio_venta.numberValue,
             decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: "Precio de comparación"),
@@ -418,9 +429,10 @@ class _ProductEditState extends State<ProductEdit> {
           ),
           SizedBox(height: 25.0),
           enCatalogo
-              ? widgetDeleteProducto(context: builderContext)
+              ? saveIndicador==false?widgetDeleteProducto(context: builderContext):Container()
               : Container(),
-        widgetDeleteProductoOPTDeveloper(context: builderContext),
+          saveIndicador==false?widgetSaveProductoOPTDeveloper(context: builderContext):Container(),
+          saveIndicador==false?widgetDeleteProductoOPTDeveloper(context: builderContext):Container(),
         ],
       ),
     );
@@ -446,11 +458,13 @@ class _ProductEditState extends State<ProductEdit> {
               style: textStyle,
             ),
             onTap: () {
-              showModalSelectMarca(buildContext: contextPrincipal);
+              if(producto.verificado==false){
+                showModalSelectMarca(buildContext: contextPrincipal);
+              }
             },
           ),
         ),
-        this.marca != null
+        this.marca != null && producto.verificado==false
             ? Padding(
                 padding: EdgeInsets.only(left: 12.0),
                 child: IconButton(
@@ -480,7 +494,7 @@ class _ProductEditState extends State<ProductEdit> {
                   color: Colors.red[400],
                   icon: Icon(Icons.delete, color: Colors.white),
                   padding: EdgeInsets.all(12.0),
-                  label: Text("Borrar producto",
+                  label: Text("Quitar producto de mi catalogo",
                       style: TextStyle(fontSize: 18.0, color: Colors.white)),
                 ),
               )
@@ -622,8 +636,7 @@ class _ProductEditState extends State<ProductEdit> {
       };
     }
     // Firebase set
-    await Global.getProductosPrecargado(idProducto: producto.id, isoPAis: "ARG")
-        .upSetPrecioProducto(timestampUpdatePrecio);
+    await Global.getProductosPrecargado(idProducto: producto.id).upSetPrecioProducto(timestampUpdatePrecio);
   }
 
   void _onImageButtonPressed(ImageSource source, {BuildContext context}) async {
@@ -833,6 +846,22 @@ class _ProductEditState extends State<ProductEdit> {
               title: Text("Marcas"),
               actions: [
                 IconButton(
+                  icon: Icon(Icons.add),
+                  onPressed: () {
+                    Navigator.of(buildContext)
+                        .push(MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                PageCreateMarca()))
+                        .then((value) {
+                      setState(() {
+                        Navigator.of(buildContext).pop();
+                        this.marca = value;
+                        this.producto.titulo = this.marca.titulo;
+                      });
+                    });
+                  },
+                ),
+                IconButton(
                   icon: Icon(Icons.search),
                   onPressed: () async {
                     if (listMarcasAll.length != 0) {
@@ -844,8 +873,9 @@ class _ProductEditState extends State<ProductEdit> {
                           .then((value) {
                         if (value != null) {
                           setState(() {
+                            Navigator.of(buildContext).pop();
                             this.marca = value;
-                            this.producto.titulo=this.marca.titulo;
+                            this.producto.titulo = this.marca.titulo;
                           });
                         }
                       });
@@ -883,7 +913,7 @@ class _ProductEditState extends State<ProductEdit> {
                               onTap: () {
                                 setState(() {
                                   this.marca = marcaSelect;
-                                  this.producto.titulo=this.marca.titulo;
+                                  this.producto.titulo = this.marca.titulo;
                                   Navigator.pop(buildContext);
                                 });
                               },
@@ -936,15 +966,35 @@ class _ProductEditState extends State<ProductEdit> {
     );
   }
 
-
-
-
-
-
-
-
-
   // TODO: OPCIONES PARA EL DESARROLLADOR ( Eliminar para producción )
+  Widget widgetSaveProductoOPTDeveloper({@required BuildContext context}) {
+    return Column(
+      children: [
+        deleteIndicador == false
+            ? SizedBox(
+                width: double.infinity,
+                child: RaisedButton.icon(
+                  onPressed: () {
+                    if( editable ){
+                      guardarDeveloper(buildContext: context);
+                    }else{
+                      setState(() {
+                        editable=true;
+                        producto.verificado=false;
+                      });
+                    }
+                  },
+                  color: editable?Colors.green[400]:Colors.orange[400],
+                  icon: Icon(Icons.security, color: Colors.white),
+                  padding: EdgeInsets.all(12.0),
+                  label: Text(editable?"Actualizar producto Global":"Editar",style: TextStyle(fontSize: 18.0, color: Colors.white)),
+                ),
+              )
+            : Container(),
+        SizedBox(height: 25.0),
+      ],
+    );
+  }
   Widget widgetDeleteProductoOPTDeveloper({@required BuildContext context}) {
     return Column(
       children: [
@@ -958,22 +1008,22 @@ class _ProductEditState extends State<ProductEdit> {
                   color: Colors.red[400],
                   icon: Icon(Icons.security, color: Colors.white),
                   padding: EdgeInsets.all(12.0),
-                  label: Text("Borrar producto (Desarrollador)",
+                  label: Text("Borrar producto",
                       style: TextStyle(fontSize: 18.0, color: Colors.white)),
                 ),
               )
-            :Container(),
+            : Container(),
         SizedBox(height: 25.0),
       ],
     );
   }
-   void showDialogDeleteOPTDeveloper({@required BuildContext buildContext}) {
+
+  void showDialogDeleteOPTDeveloper({@required BuildContext buildContext}) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         // return object of type Dialog
         return AlertDialog(
-          
           title: new Text(
               "¿Seguro que quieres eliminar este producto definitivamente? (Desarrollador)"),
           content: new Text(
@@ -998,17 +1048,24 @@ class _ProductEditState extends State<ProductEdit> {
       },
     );
   }
+
   void deleteProductOPTDeveloper({@required BuildContext context}) async {
     setState(() {
       deleteIndicador = true;
     });
     // Storage ( delete )
-    if( producto.urlimagen!=""){
-      StorageReference ref = FirebaseStorage.instance.ref().child("APP").child("ARG").child("PRODUCTOS").child(producto.id);
+    if (producto.urlimagen != "") {
+      StorageReference ref = FirebaseStorage.instance
+          .ref()
+          .child("APP")
+          .child("ARG")
+          .child("PRODUCTOS")
+          .child(producto.id);
       await ref.delete(); // Procede a eliminar el archivo de la base de datos
     }
     // Firebase ( delete )
-    await Global.getDataProductoNegocio(idNegocio: Global.prefs.getIdNegocio, idProducto: producto.id)
+    await Global.getDataProductoNegocio(
+            idNegocio: Global.prefs.getIdNegocio, idProducto: producto.id)
         .deleteDoc(); // Procede a eliminar el documento de la base de datos del catalogo de la cuenta
     await Global.getProductosPrecargado(idProducto: producto.id)
         .deleteDoc(); // Procede a eliminar el documento de la base de datos del catalogo de la cuenta
@@ -1018,8 +1075,97 @@ class _ProductEditState extends State<ProductEdit> {
     });
   }
 
+  void guardarDeveloper({@required BuildContext buildContext}) async {
+    if (this.categoria != null) {
+      if (this.subcategoria != null) {
+        if (producto.titulo != "") {
+          if (producto.descripcion != "") {
+            if (this.marca != null) {
+              if (producto.precio_venta != 0.0) {
+                setState(() {
+                  saveIndicador = true;
+                });
+                urlIamgen = "";
 
+                // Si la "PickedFile" es distinto nulo procede a guardar la imagen en la base de dato de almacenamiento
+                if (_imageFile != null) {
+                  StorageReference ref = FirebaseStorage.instance
+                      .ref()
+                      .child("APP")
+                      .child("ARG")
+                      .child("PRODUCTOS")
+                      .child(producto.id);
+                  StorageUploadTask uploadTask =
+                      ref.putFile(File(_imageFile.path));
+                  // obtenemos la url de la imagen guardada
+                  urlIamgen =await (await uploadTask.onComplete).ref.getDownloadURL();
+                  // TODO: Por el momento los datos del producto se guarda junto a la referencia de la cuenta del negocio
+                  producto.urlimagen = urlIamgen;
+                }
 
+                // TODO: Por defecto verificado es TRUE // Cambiar esto cuando se lanze a producción
+                producto.verificado = true;
+                producto.categoria = this.categoria.id;
+                producto.subcategoria = this.subcategoria.id;
+                producto.id_marca = this.marca.id;
+                updateProductoGlobalDeveloper();
+                // Firebase set
+                await Global.getDataProductoNegocio(
+                        idNegocio: Global.prefs.getIdNegocio,
+                        idProducto: producto.id)
+                    .upSetProducto(producto.toJson());
 
+                Navigator.pop(context);
+              } else {
+                viewSnackBar(
+                    context: buildContext,
+                    message: 'Asigne un precio de venta');
+              }
+            } else {
+              viewSnackBar(
+                  context: buildContext, message: 'Debe seleccionar una marca');
+            }
+          } else {
+            viewSnackBar(
+                context: buildContext, message: 'Debe elegir una descripción');
+          }
+        } else {
+          viewSnackBar(context: buildContext, message: 'Debe elegir un titulo');
+        }
+      } else {
+        viewSnackBar(
+            context: buildContext, message: 'Debe elegir una subcategoría');
+      }
+    } else {
+      viewSnackBar(context: buildContext, message: 'Debe elegir una categoría');
+    }
+  }
+
+  void updateProductoGlobalDeveloper() async {
+    // Valores para registrar el precio
+    Precio precio = new Precio(
+        id_negocio: Global.oPerfilNegocio.id,
+        precio: producto.precio_venta,
+        moneda: producto.signo_moneda,
+        timestamp: Timestamp.fromDate(new DateTime.now()));
+    // Firebase set
+    await Global.getPreciosProducto(
+            idNegocio: Global.oPerfilNegocio.id,
+            idProducto: producto.id,
+            isoPAis: "ARG")
+        .upSetPrecioProducto(precio.toJson());
+    if (urlIamgen == "") {
+      producto.timestamp_actualizacion=Timestamp.fromDate(new DateTime.now());
+      producto.urlimagen="default";
+    } else {
+      producto.timestamp_actualizacion=Timestamp.fromDate(new DateTime.now());
+      producto.urlimagen=urlIamgen;
+    }
+    // set ( id del usuario que actualizo el producto )
+    producto.id_negocio=Global.oPerfilNegocio.id;
+    //producto.id_usuario=Global.us;
+    // Firebase set
+    await Global.getProductosPrecargado(idProducto: producto.id)
+        .upSetPrecioProducto(producto.convertProductoDefault().toJson());
+  }
 }
-

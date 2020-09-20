@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:catalogo/screens/page_buscadorProductos.dart';
 import 'package:catalogo/services/globals.dart';
 import 'package:catalogo/shared/widgets_image_circle.dart'as image;

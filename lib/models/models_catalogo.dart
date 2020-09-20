@@ -65,7 +65,14 @@ class Marca {
     Timestamp timestamp_creacion; // Marca de tiempo de la creacion del documento
     String id_usuario_actualizado =""; // ID el usuaruio que actualizo el productos
     Timestamp timestamp_actualizado; // Marca de tiempo de la ultima actualizacion
-
+  Marca({
+    this.id="",
+    this.titulo="",
+    this.descripcion="",
+    this.url_imagen="",
+    this.codigo_empresa="",
+    this.timestamp_seleccion,
+  });
   Marca.fromMap(Map data) {
     id= data['id'] ?? '';
       titulo= data['titulo'] ?? '';
@@ -78,5 +85,14 @@ class Marca {
       id_usuario_actualizado= data['id_usuario_actualizado'] ?? '';
       timestamp_actualizado= data['timestamp_actualizado'];
   }
+ Map<String, dynamic> toJson() => {
+        "id": id??"",
+        "titulo": titulo??"",
+        "descripcion": descripcion??"",
+        "url_imagen": url_imagen??"",
+        "codigo_empresa": codigo_empresa??"",
+        "timestamp_seleccion": timestamp_seleccion,
+        
+    };
 
 }

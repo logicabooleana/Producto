@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:catalogo/screens/page_marca_create.dart';
 import 'package:catalogo/screens/widgets/widgets_categoria.dart';
 import 'package:flutter/services.dart';
 import 'package:catalogo/services/models.dart';
@@ -11,6 +12,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:catalogo/screens/widgets/widgetSeachMarcaProducto.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
+import 'package:catalogo/screens/widgets/widgets_notify.dart';
 
 class ProductNew extends StatefulWidget {
   final String id;
@@ -31,14 +33,14 @@ class _ProductNewState extends State<ProductNew> {
   _ProductNewState(this.producto);
   // Variables
   TextStyle textStyle = new TextStyle(fontSize: 24.0);
-  bool enCatalogo =
-      false; // verifica si el producto se encuentra en el catalogo o no
+  bool enCatalogo =false; // verifica si el producto se encuentra en el catalogo o no
   Marca marca;
   Categoria categoria;
   Categoria subcategoria;
   bool saveIndicador = false;
   ProductoNegocio producto;
   BuildContext contextPrincipal;
+
   // Variables de imagen
   String urlIamgen = "";
   PickedFile _imageFile;
@@ -162,11 +164,9 @@ class _ProductNewState extends State<ProductNew> {
               child: RaisedButton.icon(
                   color: Theme.of(context).accentColor,
                   padding: const EdgeInsets.all(14.0),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(5.0))),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
                   onPressed: () {
-                    _onImageButtonPressed(ImageSource.gallery,
-                        context: context);
+                    _onImageButtonPressed(ImageSource.gallery,context: context);
                   },
                   icon: const Icon(Icons.photo_library, color: Colors.white),
                   label: Text("Galeria",
@@ -437,27 +437,25 @@ class _ProductNewState extends State<ProductNew> {
 
                 Navigator.pop(context);
               } else {
-                viewSnackBar(
+                showSnackBar(
                     context: buildContext,
                     message: 'Asigne un precio de venta');
               }
             } else {
-              viewSnackBar(
-                  context: buildContext, message: 'Debe seleccionar una marca');
+              showSnackBar(context: buildContext, message: 'Debe seleccionar una marca');
             }
           } else {
-            viewSnackBar(
-                context: buildContext, message: 'Debe elegir una descripción');
+            showSnackBar(context: buildContext, message: 'Debe elegir una descripción');
           }
         } else {
-          viewSnackBar(context: buildContext, message: 'Debe elegir un titulo');
+          showSnackBar(context: buildContext, message: 'Debe elegir un titulo');
         }
       } else {
-        viewSnackBar(
+        showSnackBar(
             context: buildContext, message: 'Debe elegir una subcategoría');
       }
     } else {
-      viewSnackBar(context: buildContext, message: 'Debe elegir una categoría');
+      showSnackBar(context: buildContext, message: 'Debe elegir una categoría');
     }
   }
 
@@ -484,16 +482,6 @@ class _ProductNewState extends State<ProductNew> {
     // Firebase set
     await Global.getProductosPrecargado(idProducto: producto.id, isoPAis: "ARG")
         .upSetPrecioProducto(producto.convertProductoDefault().toJson());
-  }
-  void viewSnackBar(
-      {@required BuildContext context, @required String message}) {
-    SnackBar snackBar = new SnackBar(
-        content: Text(message),
-        action: SnackBarAction(label: 'ok', onPressed: () {}));
-
-    // Find the Scaffold in the widget tree and use
-    // it to show a SnackBar.
-    Scaffold.of(context).showSnackBar(snackBar);
   }
 
   void _onImageButtonPressed(ImageSource source, {BuildContext context}) async {
@@ -572,6 +560,19 @@ class _ProductNewState extends State<ProductNew> {
             appBar: AppBar(
               title: Text("Marcas"),
               actions: [
+                IconButton(
+                  icon: Icon(Icons.add),
+                  onPressed:() {
+                    Navigator.of(buildContext).push(MaterialPageRoute(
+                    builder: (BuildContext context) => PageCreateMarca())).then((value){
+                      setState(() {
+                        Navigator.of(buildContext).pop();
+                            this.marca = value;
+                            this.producto.titulo=this.marca.titulo;
+                          });
+                    });
+                  },
+                ),
                 IconButton(
                   icon: Icon(Icons.search),
                   onPressed: () async {
