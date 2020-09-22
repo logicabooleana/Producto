@@ -8,8 +8,11 @@ import 'package:flutter/material.dart';
 import 'package:catalogo/utils/utils.dart';
 import 'package:catalogo/services/globals.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:flutter/services.dart';
 
 class ProductScreen extends StatelessWidget {
+  // Variables
+  BuildContext contextScaffold;
   String sSignoMoneda;
   ProductoNegocio producto;
   bool productoEnCatalogo = false;
@@ -25,6 +28,7 @@ class ProductScreen extends StatelessWidget {
         break;
       }
     }
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0.0,
@@ -32,62 +36,76 @@ class ProductScreen extends StatelessWidget {
         iconTheme: Theme.of(context)
             .iconTheme
             .copyWith(color: Theme.of(context).textTheme.bodyText1.color),
-        title: Row(
-          children: <Widget>[
-            producto.verificado == true
-                ? Padding(
-                    padding: EdgeInsets.only(right: 3.0),
-                    child: new Image.asset('assets/icon_verificado.png',
-                        width: 16.0, height: 16.0))
-                : new Container(),
-            Text(this.producto.id,
-                style: TextStyle(
-                    fontSize: 18.0,
-                    color: Theme.of(context).textTheme.bodyText1.color)),
-          ],
+        title: InkWell(
+          onTap: () {
+            if( contextScaffold!=null){
+              Clipboard.setData(new ClipboardData(text: producto.codigo))
+                .then((_) {
+              Scaffold.of(contextScaffold).showSnackBar(
+                  SnackBar(content: Text("Código copiado en portapapeles")));
+            });
+            }
+            
+          },
+          child: Row(
+            children: <Widget>[
+              producto.verificado == true
+                  ? Padding(
+                      padding: EdgeInsets.only(right: 3.0),
+                      child: new Image.asset('assets/icon_verificado.png',
+                          width: 16.0, height: 16.0))
+                  : new Container(),
+              Text(this.producto.id,
+                  style: TextStyle(
+                      fontSize: 18.0,
+                      color: Theme.of(context).textTheme.bodyText1.color)),
+            ],
+          ),
         ),
+        actions: [
+          IconButton(
+            padding: EdgeInsets.all(12.0),
+            icon: Icon(productoEnCatalogo ? Icons.edit : Icons.add_box,
+                color: Colors.white),
+            onPressed: () {
+              Navigator.of(context).pushReplacement(MaterialPageRoute(
+                builder: (BuildContext context) => producto != null
+                    ? ProductEdit(producto: producto)
+                    : Scaffold(
+                        body: Center(child: Text("Se produjo un Error!"))),
+              ));
+            },
+          ),
+        ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: Theme.of(context).accentColor,
-        foregroundColor: Colors.black,
-        onPressed: () {
-          Navigator.of(context).pushReplacement(MaterialPageRoute(
-            builder: (BuildContext context) => producto != null
-                ? ProductEdit(producto: producto)
-                : Scaffold(body: Center(child: Text("Se produjo un Error!"))),
-          ));
-        },
-        icon: Icon(
-          productoEnCatalogo ? Icons.edit : Icons.add_box,
-          color: Colors.white,
-        ),
-        label: Text(productoEnCatalogo ? 'Editar' : "Agregar",
-            style: TextStyle(fontSize: 18.0, color: Colors.white)),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            WidgetImagen(producto: producto),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  WidgetDescripcion(context),
-                  WidgetUltimosPrecios(producto: producto),
-                  productoEnCatalogo
-                      ? WidgetOtrosProductos(producto: producto)
-                      : Container(),
-                ],
-              ),
+      body:Builder(builder: (contextBuilder) {
+        contextScaffold=contextBuilder;
+          return SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                WidgetImagen(producto: producto),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      WidgetDescripcion(context),
+                      WidgetUltimosPrecios(producto: producto),
+                      productoEnCatalogo
+                          ? WidgetOtrosProductos(producto: producto)
+                          : Container(),
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  height: 60.0,
+                  width: 60.0,
+                ),
+              ],
             ),
-            const SizedBox(
-              height: 60.0,
-              width: 60.0,
-            ),
-          ],
-        ),
+          );
+        }
       ),
     );
   }
@@ -101,7 +119,8 @@ class ProductScreen extends StatelessWidget {
           producto.titulo != ""
               ? Container(
                   child: Text(producto.titulo,
-                      style: TextStyle(height: 2, fontSize: 30, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          height: 2, fontSize: 30, fontWeight: FontWeight.bold),
                       overflow: TextOverflow.fade,
                       softWrap: false),
                 )
@@ -115,14 +134,35 @@ class ProductScreen extends StatelessWidget {
                   style: TextStyle(
                       height: 1, fontSize: 16, fontWeight: FontWeight.normal))
               : Container(),
-          producto.precio_venta != null && producto.precio_venta != 0.0
-              ? Text(
-                  Publicaciones.getFormatoPrecio(monto: producto.precio_venta),
-                  style: TextStyle(
-                      height: 2, fontSize: 30, fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.end,
-                )
-              : Container(),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              producto.precio_venta != null && producto.precio_venta != 0.0
+                  ? Text(
+                      Publicaciones.getFormatoPrecio(
+                          monto: producto.precio_venta),
+                      style: TextStyle(
+                          height: 2, fontSize: 30, fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.end,
+                    )
+                  : Container(),
+              producto.precio_venta != null && producto.precio_venta != 0.0
+                  ? Text(
+                      Publicaciones.getFechaPublicacion(
+                              producto.timestamp_actualizacion.toDate(),
+                              new DateTime.now())
+                          .toLowerCase(),
+                      textAlign: TextAlign.end,
+                      style: TextStyle(
+                          fontStyle: FontStyle.normal,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white70
+                              : Colors.black54),
+                    )
+                  : Container(),
+            ],
+          ),
         ],
       ),
     );
@@ -161,17 +201,6 @@ class WidgetImagen extends StatelessWidget {
     return Card(
       clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
-      //height: MediaQuery.of(context).size.width,
-      /*  decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(0.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black26,
-            offset: Offset(0.0, 0.0),
-            blurRadius: 6.0,
-          ),
-        ],
-      ), */
       child: Hero(
         tag: producto.id,
         child: ClipRRect(

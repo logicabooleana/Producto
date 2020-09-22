@@ -133,7 +133,6 @@ class ProductoNegocio  {
         "codigo": codigo??"",
         "categoria": categoria??"",
         "subcategoria": subcategoria??"",
-        "timestamp_creation": timestamp_creation,
         "producto_precargado": producto_precargado,
         "habilitado": habilitado,
         "precio_venta": precio_venta??0.0,
@@ -144,6 +143,8 @@ class ProductoNegocio  {
         "iva_aplicado": iva_aplicado,
         "iva": iva,
         "timestamp_compra": timestamp_compra,
+        "timestamp_creation": timestamp_creation,
+        "timestamp_actualizacion": timestamp_actualizacion,
         "signo_moneda": signo_moneda,
         "cantidad": cantidad,
         

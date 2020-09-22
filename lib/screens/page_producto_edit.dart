@@ -181,7 +181,7 @@ class _ProductEditState extends State<ProductEdit> {
                 this.producto.titulo = productoGlobal.titulo;
                 this.producto.descripcion = productoGlobal.descripcion;
                 // TODO: Eliminar condicion para producción
-                if( editable!=true ){
+                if( editable==false ){
                   this.producto.verificado = productoGlobal.verificado;
                 }
 
@@ -543,7 +543,6 @@ class _ProductEditState extends State<ProductEdit> {
                   saveIndicador = true;
                 });
                 urlIamgen = "";
-
                 // Si la "PickedFile" es distinto nulo procede a guardar la imagen en la base de dato de almacenamiento
                 if (_imageFile != null) {
                   StorageReference ref = FirebaseStorage.instance
@@ -560,9 +559,10 @@ class _ProductEditState extends State<ProductEdit> {
                   // TODO: Por el momento los datos del producto se guarda junto a la referencia de la cuenta del negocio
                   producto.urlimagen = urlIamgen;
                 }
-
+                // Set ( values )
                 // TODO: Por defecto verificado es TRUE // Cambiar esto cuando se lanze a producción
                 producto.verificado = true;
+                producto.timestamp_actualizacion=Timestamp.fromDate(new DateTime.now());
                 producto.categoria = this.categoria.id;
                 producto.subcategoria = this.subcategoria.id;
                 producto.id_marca = this.marca.id;

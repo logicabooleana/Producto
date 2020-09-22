@@ -24,18 +24,13 @@ class _WidgetCatalogoGridListState extends State<WidgetCatalogoGridList> {
         child: Text("Cargando..."),
       ),
       builder: (comsumerContext, catalogo, child) {
-        return _gridListProductos(
-            buildContext: context, providerCatalogo: catalogo);
+        return _gridListProductos(buildContext: context, providerCatalogo: catalogo);
       },
     );
   }
 
 /* Generamos una GridList de los productos */
-  Widget _gridListProductos(
-      {BuildContext buildContext, ProviderCatalogo providerCatalogo}) {
-    //Provider ( set )
-    //buildContext.read<ProviderPerfilNegocio>().setCantidadProductos =Global.listProudctosNegocio.length;
-    //buildContext.read<ProviderMarcasProductos>().listMarcas.clear();
+  Widget _gridListProductos({BuildContext buildContext, ProviderCatalogo providerCatalogo}) {
 
     return providerCatalogo.getCatalogo.length != 0
         ? LoadAny(
@@ -56,8 +51,7 @@ class _WidgetCatalogoGridListState extends State<WidgetCatalogoGridList> {
                   ),
                   delegate: SliverChildBuilderDelegate(
                     (BuildContext context, int index) {
-                      return ProductoItem(
-                          producto: providerCatalogo.getCatalogo[index]);
+                      return ProductoItem(producto: providerCatalogo.getCatalogo[index]);
                     },
                     childCount: providerCatalogo.getCatalogo.length,
                   ),

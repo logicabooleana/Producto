@@ -70,7 +70,11 @@ class Document<T> {
   Future<T> getDataCategoria() {
     return ref.get().then((v){
       if(!v.exists){ return  null; }
-      return Global.modelsCategoria[T](v.data()) as T;
+      var map = new Map();
+      map=v.data();
+      // valor de id del documento  por si es nulo
+      map["id"]=v.id;
+      return Global.modelsCategoria[T](map) as T;
     });
   }
   Stream<T> streamDataProducto() {

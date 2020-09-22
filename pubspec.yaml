@@ -56,6 +56,9 @@ dependencies:
   image_picker: ^0.6.7+7
   modal_bottom_sheet: ^0.2.0+1 # Crea impresionantes y poderosas hojas inferiores modales.
   flutter_masked_text: ^0.8.0 # Entrada de texto enmascarado para aleteo.
+  clipboard: ^0.1.2+8
+  screenshot: ^0.2.0 # Un complemento simple para capturar widgets como imágenes.
+
 
 flutter_icons:
   android: true

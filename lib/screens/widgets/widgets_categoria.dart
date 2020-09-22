@@ -38,17 +38,14 @@ class _ViewCategoriaState extends State<ViewCategoria> {
         title: Text("Categoria"),
       ),
       body: FutureBuilder(
-        future:
-            Global.getCatalogoCategorias(idNegocio: Global.oPerfilNegocio.id)
-                .getDataCategoriaAll(),
+        future:Global.getCatalogoCategorias(idNegocio: Global.oPerfilNegocio.id).getDataCategoriaAll(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             Global.listCategoriasCatalogo = snapshot.data;
             if (Global.listCategoriasCatalogo.length == 0) {
               return crearCategoria == false
                   ? ListTile(
-                      contentPadding: EdgeInsets.symmetric(
-                          vertical: 15.0, horizontal: 15.0),
+                      contentPadding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 15.0),
                       leading: CircleAvatar(
                         radius: 24.0,
                         child: Icon(Icons.add),

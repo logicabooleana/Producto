@@ -4,6 +4,8 @@ import 'package:catalogo/utils/utils.dart';
 import 'package:catalogo/models/models_catalogo.dart';
 import 'package:catalogo/shared/widgets_image_circle.dart';
 
+
+
 class DataSearchMarcaProduct extends SearchDelegate {
   List<Marca> listMarcas;
   DataSearchMarcaProduct({@required this.listMarcas}) {

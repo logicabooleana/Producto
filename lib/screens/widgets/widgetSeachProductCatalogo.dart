@@ -3,6 +3,7 @@ import 'package:catalogo/services/globals.dart';
 import 'package:catalogo/screens/page_producto_view.dart';
 import 'package:catalogo/screens/page_producto_new.dart';
 import 'package:flutter/services.dart';
+import 'package:clipboard/clipboard.dart';
 
 class WidgetSeachProduct extends StatefulWidget {
   WidgetSeachProduct({Key key}) : super(key: key);
@@ -12,13 +13,14 @@ class WidgetSeachProduct extends StatefulWidget {
 }
 
 class _WidgetSeachProductState extends State<WidgetSeachProduct> {
+  TextEditingController textEditingController = new TextEditingController();
 
   String codigoBar = "";
   TextStyle textStyle = new TextStyle(fontSize: 30.0);
   bool buscando = false;
   String textoTextResult = "";
   String texto = "";
-  bool buttonAddProduct=false;
+  bool buttonAddProduct = false;
 
   @override
   void dispose() {
@@ -28,14 +30,14 @@ class _WidgetSeachProductState extends State<WidgetSeachProduct> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Buscar")),
+      appBar: AppBar(
+        title: Text("Buscar"),
+        ),
       body: _body(),
     );
   }
 
   Widget _body() {
-
-    
     final screenSize = MediaQuery.of(context).size;
 
     return Center(
@@ -45,44 +47,82 @@ class _WidgetSeachProductState extends State<WidgetSeachProduct> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            TextField(
-              //keyboardType: TextInputType.number,
-              keyboardType: TextInputType.numberWithOptions(decimal: false),
-              inputFormatters: [FilteringTextInputFormatter.allow(new RegExp('[1234567890]'))],
-              onChanged: (value){
-                setState(() {
-                  codigoBar = value;
-                  buttonAddProduct=false;
-                });
-              },
-              decoration: InputDecoration(
-                  border: OutlineInputBorder(), labelText: "Código"),
-              style: textStyle,
-            ),
-            !buscando? RaisedButton(
-                    onPressed: () {
+            Row(
+              children: [
+                Flexible(
+                  child: TextField(
+                    controller: textEditingController,
+                    //keyboardType: TextInputType.number,
+                    keyboardType: TextInputType.numberWithOptions(decimal: false),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(new RegExp('[1234567890]'))
+                    ],
+                    onChanged: (value) {
                       setState(() {
+                        codigoBar = value;
+                        buttonAddProduct = false;
+                      });
+                    },
+                    decoration: InputDecoration(
+                        border: OutlineInputBorder(), labelText: "Código"),
+                    style: textStyle,
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.content_copy), 
+                onPressed:() {
+                  FlutterClipboard.paste().then((value) {
+                        // Do what ever you want with the value.
+                        setState(() {
+                          textEditingController.text = value ?? "";
+                          buttonAddProduct= false;
+                          codigoBar = value;
+                        });
+                      });
+                },),
+              ],
+            ),
+            !buscando
+                ? RaisedButton.icon(
+                  icon: Icon(Icons.search),
+                    onPressed: () {
+                      if( textEditingController.text!=""){
+                        setState(() {
                         buscando = true;
+                        buttonAddProduct= false;
                         texto = "";
                         getIdProducto(id: codigoBar ?? "");
                       });
+                      }
+                      
                     },
-                    child: Text("Buscar"),
+                    label: Text("Buscar"),
                   )
-                :SizedBox( child: CircularProgressIndicator(),height:screenSize.width/2, width:screenSize.width/2,),
+                : SizedBox(
+                    child: CircularProgressIndicator(),
+                    height: screenSize.width / 2,
+                    width: screenSize.width / 2,
+                  ),
             Text(texto),
-            buttonAddProduct?RaisedButton.icon(
+            buttonAddProduct
+                ? RaisedButton.icon(
                     onPressed: () {
                       Navigator.of(context).pushReplacement(MaterialPageRoute(
-                        builder: (BuildContext context) =>ProductNew(id: this.codigoBar,),
+                        builder: (BuildContext context) => ProductNew(
+                          id: this.codigoBar,
+                        ),
                       ));
                     },
-                    padding:EdgeInsets.all(12.0),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(35.0))),
-                    label: Text("Agregar nuevo producto", style: TextStyle(fontSize: 18.0, color: Colors.white)),
+                    color: Theme.of(context).primaryColor,
+                    padding: EdgeInsets.all(12.0),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(35.0))),
+                    label: Text("Agregar nuevo producto",
+                        style: TextStyle(fontSize: 18.0, color: Colors.white)),
                     icon: Container(), // Icon( Icons.add,color: Colors.white),
                     textColor: Colors.white,
-                  ):Container(),
+                  )
+                : Container(),
           ],
         ),
       ),
@@ -93,8 +133,8 @@ class _WidgetSeachProductState extends State<WidgetSeachProduct> {
     Global.getProductosPrecargado(idProducto: id)
         .getDataProductoGlobal()
         .then((product) {
-      if(product!= null) {
-        if(product.convertProductoNegocio() != null) {
+      if (product != null) {
+        if (product.convertProductoNegocio() != null) {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
               builder: (BuildContext context) =>
@@ -104,12 +144,12 @@ class _WidgetSeachProductState extends State<WidgetSeachProduct> {
         } else {
           texto = "No existee!";
           buscando = false;
-          buttonAddProduct= true;
+          buttonAddProduct = true;
           setState(() {});
         }
       } else {
         texto = "No existe!";
-        buttonAddProduct= true;
+        buttonAddProduct = true;
         buscando = false;
         setState(() {});
       }
