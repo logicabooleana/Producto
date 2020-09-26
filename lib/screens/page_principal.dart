@@ -291,31 +291,31 @@ class PagePrincipal extends StatelessWidget {
   }
 
   void selectCuenta(BuildContext buildContext) {
+    bool createCuentaEmpresa=true;
     // muestre la hoja inferior modal
     showModalBottomSheet(
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+        shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
         backgroundColor: Theme.of(buildContext).canvasColor,
         context: buildContext,
         builder: (ctx) {
           return ClipRRect(
             child: Container(
               child: FutureBuilder(
-                future: Global.getListNegocioAdmin(idNegocio: firebaseUser.uid)
-                    .getDataAdminPerfilNegocioAll(),
+                future: Global.getListNegocioAdmin(idNegocio: firebaseUser.uid).getDataAdminPerfilNegocioAll(),
                 builder: (c, snapshot) {
+
+                  for (PerfilNegocio item in snapshot.data) {
+                    if( firebaseUser.uid==item.id){
+                      createCuentaEmpresa=false;
+                    }
+                  }
+
                   if (snapshot.hasData) {
                     Global.listAdminPerfilNegocio = snapshot.data;
-
-                    return ListView.builder(
-                      padding: EdgeInsets.symmetric(vertical: 15.0),
-                      shrinkWrap: true,
-                      itemCount: Global.listAdminPerfilNegocio.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        if (index == 0) {
-                          return Column(
-                            children: <Widget>[
-                              ListTile(
+                    if( Global.listAdminPerfilNegocio.length==0){
+                      return Column(
+                        children: [
+                          ListTile(
                                 contentPadding: EdgeInsets.symmetric(
                                     vertical: 15.0, horizontal: 15.0),
                                 leading: CircleAvatar(
@@ -327,6 +327,52 @@ class PagePrincipal extends StatelessWidget {
                                     style: TextStyle(fontSize: 16.0)),
                                 onTap: () {},
                               ),
+                              ListTile(
+                                contentPadding: EdgeInsets.symmetric(
+                                    vertical: 15.0, horizontal: 15.0),
+                                leading: CircleAvatar(
+                                  radius: 24.0,
+                                  child: Icon(Icons.close),
+                                ),
+                                dense: true,
+                                title: Text("Cerrar sesión",
+                                    style: TextStyle(fontSize: 16.0)),
+                                onTap: () async {
+                                  //TODO: Mejorar el metodo de cerrar sesion
+                                  showAlertDialog(buildContext);
+                                  Global.prefs.setIdNegocio = "";
+                                  AuthService auth = AuthService();
+                                  await auth.signOut();
+                                  Future.delayed(
+                                      const Duration(milliseconds: 800), () {
+                                    Navigator.pushReplacementNamed(
+                                        buildContext, '/');
+                                  });
+                                },
+                              ),
+                        ],
+                      );
+                    }else{
+                    return ListView.builder(
+                      padding: EdgeInsets.symmetric(vertical: 15.0),
+                      shrinkWrap: true,
+                      itemCount: Global.listAdminPerfilNegocio.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        if (index == 0) {
+                          return Column(
+                            children: <Widget>[
+                              createCuentaEmpresa?ListTile(
+                                contentPadding: EdgeInsets.symmetric(
+                                    vertical: 15.0, horizontal: 15.0),
+                                leading: CircleAvatar(
+                                  radius: 24.0,
+                                  child: Icon(Icons.add),
+                                ),
+                                dense: true,
+                                title: Text("Crear cuenta para empresa",
+                                    style: TextStyle(fontSize: 16.0)),
+                                onTap: () {},
+                              ):Container(),
                               FutureBuilder(
                                 future: Global.getNegocio(
                                         idNegocio: Global
@@ -579,7 +625,7 @@ class PagePrincipal extends StatelessWidget {
                           ],
                         );
                       },
-                    );
+                    );}
                   } else {
                     return Center(child: Text("Cargando..."));
                   }

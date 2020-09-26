@@ -65,8 +65,7 @@ class ProductScreen extends StatelessWidget {
         actions: [
           IconButton(
             padding: EdgeInsets.all(12.0),
-            icon: Icon(productoEnCatalogo ? Icons.edit : Icons.add_box,
-                color: Colors.white),
+            icon: Icon(productoEnCatalogo ? Icons.edit : Icons.add_box),
             onPressed: () {
               Navigator.of(context).pushReplacement(MaterialPageRoute(
                 builder: (BuildContext context) => producto != null
