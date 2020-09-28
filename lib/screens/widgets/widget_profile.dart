@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:catalogo/screens/page_buscadorProductos.dart';
 import 'package:catalogo/services/globals.dart';
-import 'package:catalogo/shared/widgets_image_circle.dart'as image;
+import 'package:catalogo/shared/widgets_image_circle.dart' as image;
 
 class WidgetProfile extends StatelessWidget {
   const WidgetProfile({Key key}) : super(key: key);
@@ -51,14 +51,18 @@ Widget profileUser({@required BuildContext context}) {
                 Padding(
                   padding: EdgeInsets.only(bottom: 20.0),
                   child: GestureDetector(
-                    child: image.viewCircleImage(url:Global.oPerfilNegocio.imagen_perfil, texto: Global.oPerfilNegocio.nombre_negocio, size: 120.0),
+                    child: image.viewCircleImage(
+                        url: Global.oPerfilNegocio.imagen_perfil,
+                        texto: Global.oPerfilNegocio.nombre_negocio,
+                        size: 120.0),
                     onTap: () => Navigator.pushNamed(context, '/profilCuenta'),
                   ),
                 ),
                 MaterialButton(
                   elevation: 0.0,
                   shape: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(20.0)),borderSide: BorderSide(
+                      borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                      borderSide: BorderSide(
                           color: Theme.of(context).canvasColor,
                           width: 0.0,
                           style: BorderStyle.solid)),
@@ -66,18 +70,29 @@ Widget profileUser({@required BuildContext context}) {
                   color: Theme.of(context).canvasColor,
                   child: Text(
                     'Editar',
-                    style: TextStyle(fontSize: 14.0,fontWeight: FontWeight.bold ),
+                    style:
+                        TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold),
                   ),
-                  onPressed:() => Navigator.pushNamed(context, '/profilCuenta'),
+                  onPressed: () =>
+                      Navigator.pushNamed(context, '/profilCuenta'),
                 )
               ],
             ),
             Column(children: <Widget>[
-              Text(
-                Global.listProudctosNegocio.length.toString(),
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
+              FutureBuilder(
+                initialData: [],
+                future: Global.getListSeguidores(idNegocio: Global.oPerfilNegocio.id).getListSeguidoresAll(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    if (snapshot.data.length!=0) {
+                      return Text(snapshot.data.length.toString(),overflow: TextOverflow.ellipsis,style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),textAlign: TextAlign.center);
+                    } else {
+                      return Text("0",overflow: TextOverflow.ellipsis,style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),textAlign: TextAlign.center);
+                    }
+                  } else {
+                    return Text("...",overflow: TextOverflow.ellipsis,style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),textAlign: TextAlign.center);
+                  }
+                },
               ),
               Text(
                 "Seguidores",
@@ -138,9 +153,6 @@ Widget widgetBuscadorView({@required BuildContext buildContext}) {
     ),
   );
 }
-
-
-
 
 /* Crea una vista de la descripción del perfil */
 Widget descripcion({@required BuildContext buildContext}) {

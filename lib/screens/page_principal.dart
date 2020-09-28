@@ -12,14 +12,13 @@ import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
 
 /* Dependencias */
+import 'package:catalogo/shared/widget_button.dart';
 import 'package:catalogo/shared/widgets_image_circle.dart';
-import 'package:catalogo/screens/profile.dart';
-import 'package:catalogo/shared/widgets_image_circle.dart'as image;
+import 'package:catalogo/shared/widgets_image_circle.dart' as image;
 import 'package:catalogo/services/preferencias_usuario.dart';
 import 'package:catalogo/screens/widgets/widgetSeachProductCatalogo.dart';
 import 'package:catalogo/screens/page_producto_view.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
-import 'package:catalogo/screens/widgets/widget_profile.dart';
 import 'package:catalogo/screens/widgets/widget_CatalogoGridList.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:catalogo/utils/dynamicTheme_lb.dart';
@@ -46,29 +45,54 @@ class PagePrincipal extends StatelessWidget {
 
     return Global.prefs.getIdNegocio == ""
         ? Scaffold(
+            appBar: AppBar(
+              elevation: 0.0,
+              backgroundColor: Theme.of(buildContext).canvasColor,
+              iconTheme: Theme.of(buildContext).iconTheme.copyWith(
+                  color: Theme.of(buildContext).textTheme.bodyText1.color),
+              title: InkWell(
+                onTap: () => selectCuenta(buildContext),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 12.0),
+                  child: Row(
+                    children: <Widget>[
+                      Text("Seleccionar cuenta",
+                          style: TextStyle(
+                              color: Theme.of(buildContext)
+                                  .textTheme
+                                  .bodyText1
+                                  .color)),
+                      Icon(Icons.keyboard_arrow_down)
+                    ],
+                  ),
+                ),
+              ),
+              actions: <Widget>[],
+            ),
             body: Center(
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
+                  Image(
+                      color:
+                          Theme.of(buildContext).brightness == Brightness.dark
+                              ? Colors.white24
+                              : Colors.black26,
+                      height: 200.0,
+                      width: 200.0,
+                      image: AssetImage('assets/barcode.png'),
+                      fit: BoxFit.contain),
                   RaisedButton(
-                    child: Text("Seleccionar cuenta"),
-                    onPressed: () => selectCuenta(buildContext),
-                    color: Colors.red,
-                    textColor: Colors.white,
-                    splashColor: Colors.grey,
-                    padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                  ),
-                  RaisedButton(
-                    child: Text("Cerrar sesion"),
-                    onPressed: () async {
-                      //TODO: Mejorar el metodo de cerrar sesion
-                      showAlertDialog(buildContext);
-                      Global.prefs.setIdNegocio = "";
-                      AuthService auth = AuthService();
-                      await auth.signOut();
-                      Future.delayed(const Duration(milliseconds: 800), () {
-                        Navigator.pushReplacementNamed(buildContext, '/');
-                      });
+                    child: Padding(
+                      padding: EdgeInsets.all(12.0),
+                      child: Text("Escanear código",
+                          style: TextStyle(fontSize: 24.0)),
+                    ),
+                    onPressed: () {
+                      Navigator.of(buildContext).push(MaterialPageRoute(
+                        builder: (BuildContext context) => WidgetSeachProduct(),
+                      ));
                     },
                   ),
                 ],
@@ -134,10 +158,7 @@ class PagePrincipal extends StatelessWidget {
             child: InkWell(
               customBorder: new CircleBorder(),
               splashColor: Colors.red,
-              onTap: () {
-                Navigator.of(buildContext).push(MaterialPageRoute(
-                    builder: (BuildContext context) => ProfileScreen()));
-              },
+              onTap: () => Navigator.pushNamed(buildContext, '/profilCuenta'),
               child: CircleAvatar(
                 radius: 17,
                 child: CircleAvatar(
@@ -150,7 +171,7 @@ class PagePrincipal extends StatelessWidget {
                       height: 35.0,
                       fadeInDuration: Duration(milliseconds: 200),
                       fit: BoxFit.cover,
-                      imageUrl: firebaseUser.photoURL,
+                      imageUrl: Global.oPerfilNegocio.imagen_perfil,
                       placeholder: (context, url) => FadeInImage(
                           image: AssetImage("assets/loading.gif"),
                           placeholder: AssetImage("assets/loading.gif")),
@@ -174,7 +195,7 @@ class PagePrincipal extends StatelessWidget {
         ],
       ),
       body: new StreamBuilder(
-        stream: Global.getCatalogoNegocio(idNegocio: perfilNegocio.id??"")
+        stream: Global.getCatalogoNegocio(idNegocio: perfilNegocio.id ?? "")
             .streamDataProductoAll(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
@@ -217,7 +238,6 @@ class PagePrincipal extends StatelessWidget {
     );
   }
 
-  String _scanBarcode = '';
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> scanBarcodeNormal({@required BuildContext context}) async {
     String barcodeScanRes;
@@ -225,7 +245,6 @@ class PagePrincipal extends StatelessWidget {
     try {
       barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
           "#ff6666", "Cancel", true, ScanMode.BARCODE);
-      print(barcodeScanRes);
     } on PlatformException {
       barcodeScanRes = 'Failed to get platform version.';
     }
@@ -234,10 +253,9 @@ class PagePrincipal extends StatelessWidget {
     // message was in flight, we want to discard the reply rather than calling
     // setState to update our non-existent appearance.
     //if (!mounted) return;
-    _scanBarcode = barcodeScanRes;
     bool coincidencia = false;
     for (ProductoNegocio producto in Global.listProudctosNegocio) {
-      if (producto.codigo == _scanBarcode) {
+      if (producto.codigo == barcodeScanRes) {
         coincidencia = true;
         Navigator.of(context).push(
           MaterialPageRoute(
@@ -278,7 +296,9 @@ class PagePrincipal extends StatelessWidget {
             ),
           ),
           onTap: () {
-            showSearch(context: buildContext,delegate: DataSearch(listOBJ: Global.listProudctosNegocio));
+            showSearch(
+                context: buildContext,
+                delegate: DataSearch(listOBJ: Global.listProudctosNegocio));
           },
         ),
         shape: RoundedRectangleBorder(
@@ -291,341 +311,75 @@ class PagePrincipal extends StatelessWidget {
   }
 
   void selectCuenta(BuildContext buildContext) {
-    bool createCuentaEmpresa=true;
+    bool createCuentaEmpresa = true;
     // muestre la hoja inferior modal
     showModalBottomSheet(
-        shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
         backgroundColor: Theme.of(buildContext).canvasColor,
         context: buildContext,
         builder: (ctx) {
           return ClipRRect(
             child: Container(
               child: FutureBuilder(
-                future: Global.getListNegocioAdmin(idNegocio: firebaseUser.uid).getDataAdminPerfilNegocioAll(),
+                future: Global.getListNegocioAdmin(idNegocio: firebaseUser.uid)
+                    .getDataAdminPerfilNegocioAll(),
                 builder: (c, snapshot) {
-
-                  for (PerfilNegocio item in snapshot.data) {
-                    if( firebaseUser.uid==item.id){
-                      createCuentaEmpresa=false;
-                    }
-                  }
-
                   if (snapshot.hasData) {
+                    // Verificamos si ahi una cuenta creada
+                    for (PerfilNegocio item in snapshot.data) {
+                      if (firebaseUser.uid == item.id) {
+                        createCuentaEmpresa = false;
+                      }
+                    }
+
                     Global.listAdminPerfilNegocio = snapshot.data;
-                    if( Global.listAdminPerfilNegocio.length==0){
+                    if (Global.listAdminPerfilNegocio.length == 0) {
                       return Column(
                         children: [
-                          ListTile(
-                                contentPadding: EdgeInsets.symmetric(
-                                    vertical: 15.0, horizontal: 15.0),
-                                leading: CircleAvatar(
-                                  radius: 24.0,
-                                  child: Icon(Icons.add),
-                                ),
-                                dense: true,
-                                title: Text("Crear cuenta para empresa",
-                                    style: TextStyle(fontSize: 16.0)),
-                                onTap: () {},
-                              ),
-                              ListTile(
-                                contentPadding: EdgeInsets.symmetric(
-                                    vertical: 15.0, horizontal: 15.0),
-                                leading: CircleAvatar(
-                                  radius: 24.0,
-                                  child: Icon(Icons.close),
-                                ),
-                                dense: true,
-                                title: Text("Cerrar sesión",
-                                    style: TextStyle(fontSize: 16.0)),
-                                onTap: () async {
-                                  //TODO: Mejorar el metodo de cerrar sesion
-                                  showAlertDialog(buildContext);
-                                  Global.prefs.setIdNegocio = "";
-                                  AuthService auth = AuthService();
-                                  await auth.signOut();
-                                  Future.delayed(
-                                      const Duration(milliseconds: 800), () {
-                                    Navigator.pushReplacementNamed(
-                                        buildContext, '/');
-                                  });
-                                },
-                              ),
+                          createCuentaEmpresa == false
+                              ? WidgetButtonListTile(buildContext: buildContext)
+                                  .buttonListTileCrearCuenta(
+                                      context: buildContext)
+                              : Container(),
+                          WidgetButtonListTile(buildContext: buildContext).buttonListTileCerrarSesion(context: buildContext),
                         ],
                       );
-                    }else{
-                    return ListView.builder(
-                      padding: EdgeInsets.symmetric(vertical: 15.0),
-                      shrinkWrap: true,
-                      itemCount: Global.listAdminPerfilNegocio.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        if (index == 0) {
+                    } else {
+                      return ListView.builder(
+                        padding: EdgeInsets.symmetric(vertical: 15.0),
+                        shrinkWrap: true,
+                        itemCount: Global.listAdminPerfilNegocio.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          if (index == 0) {
+                            return Column(
+                              children: <Widget>[
+                                createCuentaEmpresa == false
+                                    ? WidgetButtonListTile(
+                                            buildContext: buildContext)
+                                        .buttonListTileCrearCuenta(
+                                            context: buildContext)
+                                    : Container(),
+                                WidgetButtonListTile(buildContext: buildContext).buttonListTileItemCuenta(context: buildContext, perfilNegocio: Global.listAdminPerfilNegocio[index]),
+                              ],
+                            );
+                          }
+                          if (index ==Global.listAdminPerfilNegocio.length - 1) {
+                            return Column(
+                              children: <Widget>[
+                                WidgetButtonListTile(buildContext: buildContext).buttonListTileItemCuenta(context: buildContext, perfilNegocio: Global.listAdminPerfilNegocio[index]),
+                                WidgetButtonListTile(buildContext: buildContext).buttonListTileCerrarSesion(context: buildContext),
+                              ],
+                            );
+                          }
                           return Column(
                             children: <Widget>[
-                              createCuentaEmpresa?ListTile(
-                                contentPadding: EdgeInsets.symmetric(
-                                    vertical: 15.0, horizontal: 15.0),
-                                leading: CircleAvatar(
-                                  radius: 24.0,
-                                  child: Icon(Icons.add),
-                                ),
-                                dense: true,
-                                title: Text("Crear cuenta para empresa",
-                                    style: TextStyle(fontSize: 16.0)),
-                                onTap: () {},
-                              ):Container(),
-                              FutureBuilder(
-                                future: Global.getNegocio(
-                                        idNegocio: Global
-                                            .listAdminPerfilNegocio[index].id)
-                                    .getDataPerfilNegocio(),
-                                builder: (context, snapshot) {
-                                  if (snapshot.hasData) {
-                                    PerfilNegocio perfilNegocio = snapshot.data;
-                                    return Column(
-                                      children: <Widget>[
-                                        ListTile(
-                                          leading: perfilNegocio
-                                                          .imagen_perfil ==
-                                                      "" ||
-                                                  perfilNegocio.imagen_perfil ==
-                                                      "default"
-                                              ? CircleAvatar(
-                                                  backgroundColor:
-                                                      Colors.black26,
-                                                  radius: 24.0,
-                                                  child: Text(
-                                                      perfilNegocio
-                                                          .nombre_negocio
-                                                          .substring(0, 1),
-                                                      style: TextStyle(
-                                                          fontSize: 18.0,
-                                                          color: Colors.white,
-                                                          fontWeight:
-                                                              FontWeight.bold)),
-                                                )
-                                              : CachedNetworkImage(
-                                                  imageUrl: perfilNegocio
-                                                      .imagen_perfil,
-                                                  placeholder: (context, url) =>
-                                                      const CircleAvatar(
-                                                    backgroundColor:
-                                                        Colors.grey,
-                                                    radius: 24.0,
-                                                  ),
-                                                  imageBuilder:
-                                                      (context, image) =>
-                                                          CircleAvatar(
-                                                    backgroundImage: image,
-                                                    radius: 24.0,
-                                                  ),
-                                                ),
-                                          dense: true,
-                                          title: Text(
-                                              perfilNegocio.nombre_negocio),
-                                          subtitle: _getAdminUserData(
-                                              idNegocio: perfilNegocio.id),
-                                          onTap: () {
-                                            if (perfilNegocio.id != "") {
-                                              Global.oPerfilNegocio =
-                                                  perfilNegocio;
-                                              buildContext
-                                                  .read<ProviderPerfilNegocio>()
-                                                  .setCuentaNegocio = perfilNegocio;
-                                              prefs.setIdNegocio =
-                                                  perfilNegocio.id.toString();
-                                              Navigator.pop(context);
-                                            }
-                                          },
-                                        ),
-                                        Divider(endIndent: 12.0, indent: 12.0),
-                                      ],
-                                    );
-                                  } else {
-                                    return ListTile(title: Text("Cargando..."));
-                                  }
-                                },
-                              ),
+                              WidgetButtonListTile(buildContext: buildContext).buttonListTileItemCuenta(context: buildContext, perfilNegocio: Global.listAdminPerfilNegocio[index]),
                             ],
                           );
-                        }
-                        if (index == Global.listAdminPerfilNegocio.length - 1) {
-                          return Column(
-                            children: <Widget>[
-                              FutureBuilder(
-                                future: Global.getNegocio(
-                                        idNegocio: Global
-                                            .listAdminPerfilNegocio[index].id)
-                                    .getDataPerfilNegocio(),
-                                builder: (context, snapshot) {
-                                  if (snapshot.hasData) {
-                                    PerfilNegocio perfilNegocio = snapshot.data;
-                                    return Column(
-                                      children: <Widget>[
-                                        ListTile(
-                                          leading: perfilNegocio
-                                                          .imagen_perfil ==
-                                                      "" ||
-                                                  perfilNegocio.imagen_perfil ==
-                                                      "default"
-                                              ? CircleAvatar(
-                                                  backgroundColor:
-                                                      Colors.black26,
-                                                  radius: 24.0,
-                                                  child: Text(
-                                                      perfilNegocio
-                                                          .nombre_negocio
-                                                          .substring(0, 1),
-                                                      style: TextStyle(
-                                                          fontSize: 18.0,
-                                                          color: Colors.white,
-                                                          fontWeight:
-                                                              FontWeight.bold)),
-                                                )
-                                              : CachedNetworkImage(
-                                                  imageUrl: perfilNegocio
-                                                      .imagen_perfil,
-                                                  placeholder: (context, url) =>
-                                                      const CircleAvatar(
-                                                    backgroundColor:
-                                                        Colors.grey,
-                                                    radius: 24.0,
-                                                  ),
-                                                  imageBuilder:
-                                                      (context, image) =>
-                                                          CircleAvatar(
-                                                    backgroundImage: image,
-                                                    radius: 24.0,
-                                                  ),
-                                                ),
-                                          dense: true,
-                                          title: Text(
-                                              perfilNegocio.nombre_negocio),
-                                          subtitle: _getAdminUserData(
-                                              idNegocio: perfilNegocio.id),
-                                          onTap: () {
-                                            if (perfilNegocio.id != "") {
-                                              Global.oPerfilNegocio =
-                                                  perfilNegocio;
-                                              buildContext
-                                                  .read<ProviderPerfilNegocio>()
-                                                  .setCuentaNegocio = perfilNegocio;
-                                              prefs.setIdNegocio =
-                                                  perfilNegocio.id.toString();
-                                              Navigator.pop(context);
-                                            }
-                                          },
-                                        ),
-                                        Divider(endIndent: 12.0, indent: 12.0),
-                                      ],
-                                    );
-                                  } else {
-                                    return ListTile(title: Text("Cargando..."));
-                                  }
-                                },
-                              ),
-                              ListTile(
-                                contentPadding: EdgeInsets.symmetric(
-                                    vertical: 15.0, horizontal: 15.0),
-                                leading: CircleAvatar(
-                                  radius: 24.0,
-                                  child: Icon(Icons.close),
-                                ),
-                                dense: true,
-                                title: Text("Cerrar sesión",
-                                    style: TextStyle(fontSize: 16.0)),
-                                onTap: () async {
-                                  //TODO: Mejorar el metodo de cerrar sesion
-                                  showAlertDialog(buildContext);
-                                  Global.prefs.setIdNegocio = "";
-                                  AuthService auth = AuthService();
-                                  await auth.signOut();
-                                  Future.delayed(
-                                      const Duration(milliseconds: 800), () {
-                                    Navigator.pushReplacementNamed(
-                                        buildContext, '/');
-                                  });
-                                },
-                              ),
-                            ],
-                          );
-                        }
-                        return Column(
-                          children: <Widget>[
-                            FutureBuilder(
-                              future: Global.getNegocio(
-                                      idNegocio: Global
-                                          .listAdminPerfilNegocio[index].id)
-                                  .getDataPerfilNegocio(),
-                              builder: (context, snapshot) {
-                                if (snapshot.hasData) {
-                                  PerfilNegocio perfilNegocio = snapshot.data;
-                                  return Column(
-                                    children: <Widget>[
-                                      ListTile(
-                                        leading: perfilNegocio.imagen_perfil ==
-                                                    "" ||
-                                                perfilNegocio.imagen_perfil ==
-                                                    "default"
-                                            ? CircleAvatar(
-                                                backgroundColor: Colors.black26,
-                                                radius: 24.0,
-                                                child: Text(
-                                                    perfilNegocio.nombre_negocio
-                                                        .substring(0, 1),
-                                                    style: TextStyle(
-                                                        fontSize: 18.0,
-                                                        color: Colors.white,
-                                                        fontWeight:
-                                                            FontWeight.bold)),
-                                              )
-                                            : CachedNetworkImage(
-                                                imageUrl:
-                                                    perfilNegocio.imagen_perfil,
-                                                placeholder: (context, url) =>
-                                                    const CircleAvatar(
-                                                  backgroundColor: Colors.grey,
-                                                  radius: 24.0,
-                                                ),
-                                                imageBuilder:
-                                                    (context, image) =>
-                                                        CircleAvatar(
-                                                  backgroundImage: image,
-                                                  radius: 24.0,
-                                                ),
-                                              ),
-                                        dense: true,
-                                        title:
-                                            Text(perfilNegocio.nombre_negocio),
-                                        subtitle: _getAdminUserData(
-                                            idNegocio: perfilNegocio.id),
-                                        onTap: () {
-                                          if (perfilNegocio.id != "") {
-                                            Global.oPerfilNegocio =
-                                                perfilNegocio;
-                                            buildContext
-                                                .read<ProviderPerfilNegocio>()
-                                                .setCuentaNegocio = perfilNegocio;
-                                            buildContext
-                                                .read<ProviderCatalogo>()
-                                                .setClean = true;
-                                            prefs.setIdNegocio =
-                                                perfilNegocio.id.toString();
-                                            Navigator.pop(context);
-                                          }
-                                        },
-                                      ),
-                                      Divider(endIndent: 12.0, indent: 12.0),
-                                    ],
-                                  );
-                                } else {
-                                  return ListTile(title: Text("Cargando..."));
-                                }
-                              },
-                            ),
-                          ],
-                        );
-                      },
-                    );}
+                        },
+                      );
+                    }
                   } else {
                     return Center(child: Text("Cargando..."));
                   }
@@ -663,7 +417,7 @@ class PagePrincipal extends StatelessWidget {
           return [
             SliverList(
               delegate: SliverChildListDelegate([
-                WidgetProfile(),
+                //WidgetProfile(),
                 SizedBox(height: 12.0),
                 Global.listProudctosNegocio.length == 0
                     ? Container()
@@ -693,7 +447,9 @@ class PagePrincipal extends StatelessWidget {
                     context: buildContext,
                     builder: (ctx) {
                       return ClipRRect(
-                        child: ViewCategoria(buildContext: buildContext,),
+                        child: ViewCategoria(
+                          buildContext: buildContext,
+                        ),
                       );
                     });
               },
@@ -799,7 +555,10 @@ class PagePrincipal extends StatelessWidget {
                                       gradientColor: colorGradientInstagram,
                                       child: Padding(
                                         padding: EdgeInsets.all(5.0),
-                                        child: image.viewCircleImage(url:marca.url_imagen,texto:marca.titulo, size:50),
+                                        child: image.viewCircleImage(
+                                            url: marca.url_imagen,
+                                            texto: marca.titulo,
+                                            size: 50),
                                       ),
                                     ),
                                     SizedBox(
@@ -824,10 +583,10 @@ class PagePrincipal extends StatelessWidget {
                               return DashedCircle(
                                 dashes: 1,
                                 gradientColor: colorGradientInstagram,
-                                child:CircleAvatar(
-          backgroundColor: Colors.black26,
-          radius: 30,
-        ),
+                                child: CircleAvatar(
+                                  backgroundColor: Colors.black26,
+                                  radius: 30,
+                                ),
                               );
                             }
                           },

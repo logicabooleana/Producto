@@ -66,7 +66,7 @@ class Global {
     // Firestore References for Writes
     return  Document<PerfilNegocio>(path: '/NEGOCIOS/$idNegocio'); // '/APP/ARG/PRODUCTOS'
   }
-  static Document<Seguidor> getSeguidores( { String idNegocio,String idSeguirdor } ){
+  static Document<Seguidor> getDataSeguidores( { @required String idNegocio,@required String idSeguirdor } ){
     // Firestore References for Writes
     return  Document<Seguidor>(path: '/NEGOCIOS/$idNegocio/SEGUIDORES/$idSeguirdor'); // '/APP/ARG/PRODUCTOS'
   }
@@ -99,23 +99,23 @@ class Global {
     // Firestore References for Writes
     return  Collection<Marca>(path: '/APP/ARG/MARCAS');
   }
-  static Collection<Precio> getListPreciosProducto( { String idProducto,String isoPAis="ARG"} ){
+  static Collection<Precio> getListPreciosProducto( { @required String idProducto,String isoPAis="ARG"} ){
     // Firestore References for Writes
     return  Collection<Precio>(path: '/APP/$isoPAis/PRODUCTOS/$idProducto/REGISTRO_PRECIOS_$isoPAis'); // '/APP/ARG/PRODUCTOS'
   }
-  static Collection<PerfilNegocio> getListNegocioAdmin( { String idNegocio} ){
+  static Collection<PerfilNegocio> getListNegocioAdmin( { @required String idNegocio} ){
     // Firestore References for Writes
     return  Collection<PerfilNegocio>(path: '/USUARIOS/$idNegocio/ADMINISTRADOR_NEGOCIOS'); // '/APP/ARG/PRODUCTOS'
   }
-  static Collection<ProductoNegocio> getListSeguidores( { String idNegocio} ){
+  static Collection<Seguidor> getListSeguidores( { @required String idNegocio} ){
     // Firestore References for Writes
-    return  Collection<ProductoNegocio>(path: '/NEGOCIOS/$idNegocio/SEGUIDORES'); 
+    return  Collection<Seguidor>(path: '/NEGOCIOS/$idNegocio/SEGUIDORES'); 
   }
   static Collection<ProductoNegocio> getCatalogoNegocio( { String idNegocio} ){
     // Firestore References for Writes
     return  Collection<ProductoNegocio>(path: '/NEGOCIOS/$idNegocio/EXTENSION_CATALOGO'); // '/APP/ARG/PRODUCTOS'
   }
-  static Collection<Categoria> getCatalogoCategorias( { String idNegocio} ){
+  static Collection<Categoria> getCatalogoCategorias( { @required String idNegocio} ){
     // Firestore References for Writes
     return  Collection<Categoria>(path: '/NEGOCIOS/$idNegocio/EXTENSION_CATALOGO_CATEGORIA'); // '/APP/ARG/PRODUCTOS'
   }
@@ -123,7 +123,7 @@ class Global {
     // Firestore References for Writes
     return  Collection<Categoria>(path: '/NEGOCIOS/$idNegocio/EXTENSION_CATALOGO_CATEGORIA/$idCategoria/SUBCATEGORIA'); // '/APP/ARG/PRODUCTOS'
   }
-  static Collection<Producto> getProductosPrecargadoAll({ String idProducto,String isoPAis="ARG"} ){
+  static Collection<Producto> getProductosPrecargadoAll({ @required String idProducto,String isoPAis="ARG"} ){
     // Firestore References for Writes
     return  Collection<Producto>(path: '/APP/$isoPAis/PRODUCTOS/$idProducto'); 
   }
@@ -164,6 +164,10 @@ class Global {
     listAdminPerfilNegocio.clear();
     listSeguidoresRef.clear();
     oPerfilNegocio=perfilNegocio;
+    prefs.setIdNegocio=perfilNegocio==null?"":perfilNegocio.id;
+
+    ProviderCatalogo().categoria=null;
+    ProviderCatalogo().subcategoria=null;
   }
 
   

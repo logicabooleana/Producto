@@ -21,12 +21,15 @@ class ProductScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    for (ProductoNegocio item in Global.listProudctosNegocio) {
+
+    if( Global.oPerfilNegocio!=null ){
+      for (ProductoNegocio item in Global.listProudctosNegocio) {
       if (item.id == producto.id) {
         producto = item;
         productoEnCatalogo = true;
         break;
       }
+    }
     }
 
     return Scaffold(
@@ -63,7 +66,8 @@ class ProductScreen extends StatelessWidget {
           ),
         ),
         actions: [
-          IconButton(
+          Global.oPerfilNegocio!=null
+          ?IconButton(
             padding: EdgeInsets.all(12.0),
             icon: Icon(productoEnCatalogo ? Icons.edit : Icons.add_box),
             onPressed: () {
@@ -74,7 +78,7 @@ class ProductScreen extends StatelessWidget {
                         body: Center(child: Text("Se produjo un Error!"))),
               ));
             },
-          ),
+          ):Container(),
         ],
       ),
       body:Builder(builder: (contextBuilder) {
