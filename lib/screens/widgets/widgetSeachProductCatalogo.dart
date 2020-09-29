@@ -96,6 +96,7 @@ class _WidgetSeachProductState extends State<WidgetSeachProduct> {
                 ? Container(
                   width: double.infinity,
                   child: RaisedButton.icon(
+                    color: Theme.of(context).primaryColor,
                     padding: EdgeInsets.all(12.0),
                       icon: Icon(Icons.search),
                       onPressed: () {
@@ -109,6 +110,7 @@ class _WidgetSeachProductState extends State<WidgetSeachProduct> {
                         }
                       },
                       label: Text("Buscar"),
+                      textColor: Colors.white,
                     ),
                 )
                 : SizedBox(
@@ -121,6 +123,7 @@ class _WidgetSeachProductState extends State<WidgetSeachProduct> {
                 ? Container(
                   width: double.infinity,
                   child: RaisedButton.icon(
+                    color: Theme.of(context).primaryColor,
                     padding: EdgeInsets.all(12.0),
                   icon: Image(
                       color: Colors.white,
@@ -128,7 +131,8 @@ class _WidgetSeachProductState extends State<WidgetSeachProduct> {
                       width: 20.0,
                       image: AssetImage('assets/barcode.png'),
                       fit: BoxFit.contain),
-                  label: Text('Escanea el código'),
+                  label: Text('Escanea el código',style: TextStyle(color: Colors.white)),
+                  textColor: Colors.white,
                   onPressed: () {
                     scanBarcodeNormal(context: context);
                   }),

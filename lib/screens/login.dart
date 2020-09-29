@@ -1,5 +1,4 @@
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../services/services.dart';
@@ -16,13 +15,6 @@ class LoginScreenState extends State<LoginScreen> {
   void initState() {
     super.initState();
 
-
-    auth.user.first.then((value) {
-      if (value!= null) {
-          Navigator.pushReplacementNamed(context, '/page_catalogo');
-          //Navigator.of(context).pushNamedAndRemoveUntil('/page_catalogo', (Route<dynamic> route) => false);
-        }
-    });
      
   }
 
@@ -30,7 +22,19 @@ class LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
 
-    //return Center(child: Text("data",textDirection: TextDirection.rtl),);
+    auth.user.first.then((value) {
+      if (value!= null) {
+          Navigator.pushReplacementNamed(context, '/page_principal');
+          //Navigator.of(context).pushNamedAndRemoveUntil('/page_catalogo', (Route<dynamic> route) => false);
+        }else{
+          return scaffold();
+        }
+    });
+    
+    return Scaffold(body: Center(child: CircularProgressIndicator()));
+  }
+
+  Widget scaffold (){
     return Scaffold(
       body: Container(
         padding: EdgeInsets.all(30),
@@ -89,7 +93,7 @@ class LoginButton extends StatelessWidget {
         onPressed: () async {
           var user = await loginMethod();
           if (user != null) {
-            Navigator.pushReplacementNamed(context, '/page_catalogo');
+            Navigator.of(context).pushNamedAndRemoveUntil('/page_principal', (Route<dynamic> route) => false);
           }
         },
         label: Expanded(

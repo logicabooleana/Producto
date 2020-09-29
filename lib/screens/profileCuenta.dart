@@ -72,7 +72,9 @@ void dispose() {
             children: [
               Column(
                 children: <Widget>[
-                  CachedNetworkImage(
+                  Hero(
+                    tag: "fotoperfiltoolbar",
+                    child: CachedNetworkImage(
                     fit: BoxFit.cover,
                     imageUrl: Global.oPerfilNegocio.imagen_perfil,
                     placeholder: (context, url) => CircleAvatar(
@@ -84,6 +86,8 @@ void dispose() {
                       radius: 100.0,
                     ),
                   ),
+                  ),
+                  
                   SizedBox(height: 24.0,),
                   Text("Cambiar imagen"),
                   widgetFormEditText(),

@@ -163,77 +163,85 @@ class WidgetButtonListTile extends StatelessWidget {
     );
   }
 
-  Widget buttonListTileCerrarSesion({@required BuildContext context}) {
+  Widget buttonListTileCerrarSesion({@required BuildContext buildContext}) {
     User firebaseUser = Provider.of<User>(buildContext);
     return ListTile(
       contentPadding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 15.0),
-      leading: firebaseUser.photoURL == "" ||firebaseUser.photoURL== "default"
-                    ? CircleAvatar(
-                        backgroundColor: Colors.black26,
-                        radius: 24.0,
-                        child: Text(
-                            firebaseUser.displayName.substring(0, 1),
-                            style: TextStyle(
-                                fontSize: 18.0,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold)),
-                      )
-                    : CachedNetworkImage(
-                        imageUrl: firebaseUser.photoURL,
-                        placeholder: (context, url) => CircleAvatar(
-                        backgroundColor: Colors.black26,
-                        radius: 24.0,
-                        child: Text(
-                            firebaseUser.displayName.substring(0, 1),
-                            style: TextStyle(
-                                fontSize: 18.0,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold)),
-                      ),
-                        imageBuilder: (context, image) => CircleAvatar(
-                          backgroundImage: image,
-                          radius: 24.0,
-                        ),
-                      ),
+      leading: firebaseUser.photoURL == "" || firebaseUser.photoURL == "default"
+          ? CircleAvatar(
+              backgroundColor: Colors.black26,
+              radius: 24.0,
+              child: Text(firebaseUser.displayName.substring(0, 1),
+                  style: TextStyle(
+                      fontSize: 18.0,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold)),
+            )
+          : CachedNetworkImage(
+              imageUrl: firebaseUser.photoURL,
+              placeholder: (context, url) => CircleAvatar(
+                backgroundColor: Colors.black26,
+                radius: 24.0,
+                child: Text(firebaseUser.displayName.substring(0, 1),
+                    style: TextStyle(
+                        fontSize: 18.0,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold)),
+              ),
+              imageBuilder: (context, image) => CircleAvatar(
+                backgroundImage: image,
+                radius: 24.0,
+              ),
+            ),
       dense: true,
       title: Text("Cerrar sesión", style: TextStyle(fontSize: 16.0)),
-      subtitle:Text(firebaseUser.email) ,
+      subtitle: Text(firebaseUser.email),
       trailing: Icon(Icons.close),
-      onTap: () async {
-        //TODO: Mejorar el metodo de cerrar sesion
-        showAlertDialog(buildContext);
-        // Default values 
-        Global.actualizarPerfilNegocio(perfilNegocio:null);
-        AuthService auth = AuthService();
-        await auth.signOut();
-        Future.delayed(const Duration(milliseconds: 800), () {
-          Navigator.pushReplacementNamed(buildContext, '/');
-        });
+      onTap: ()  {
+        showDialogCerrarSesion(buildContext: buildContext);
       },
     );
   }
 
-  showAlertDialog(BuildContext context) {
-    AlertDialog alert = AlertDialog(
-      content: new Row(
-        children: [
-          CircularProgressIndicator(),
-          Container(margin: EdgeInsets.only(left: 5), child: Text("Loading")),
-        ],
-      ),
-    );
+  void showDialogCerrarSesion({@required BuildContext buildContext}) {
     showDialog(
-      barrierDismissible: false,
-      context: context,
+      context: buildContext,
       builder: (BuildContext context) {
-        return alert;
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Cerrar sesión"),
+          content: new Text("¿Estás seguro de que quieres cerrar la sesión?"),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Cancelar"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            new FlatButton(
+              child: new Text("si"),
+              onPressed: () async{
+                // Default values
+                Global.actualizarPerfilNegocio(perfilNegocio: null);
+                AuthService auth = AuthService();
+                await auth.signOut();
+                Future.delayed(const Duration(milliseconds: 800), () {
+                  Navigator.of(buildContext).pushNamedAndRemoveUntil(
+                      '/', (Route<dynamic> route) => false);
+                });
+              },
+            ),
+          ],
+        );
       },
     );
   }
 
   Widget buttonListTileItemCuenta(
-      {@required BuildContext context, @required PerfilNegocio perfilNegocio}) {
-    PreferenciasUsuario prefs = new PreferenciasUsuario();
+      {@required BuildContext buildContext, @required perfilNegocio}) {
+    
+    if(perfilNegocio.id==null){return Container();}
     return FutureBuilder(
       future:
           Global.getNegocio(idNegocio: perfilNegocio.id).getDataPerfilNegocio(),
@@ -269,15 +277,26 @@ class WidgetButtonListTile extends StatelessWidget {
                 dense: true,
                 title: Text(perfilNegocio.nombre_negocio),
                 subtitle: _getAdminUserData(idNegocio: perfilNegocio.id),
+                trailing: Radio(
+                  activeColor: Theme.of(context).primaryColor,
+                  value:Global.oPerfilNegocio!=null? Global.oPerfilNegocio.id == perfilNegocio.id ? 0 : 1:1,
+                  groupValue: 0,
+                  onChanged: (val) {
+                    Global.actualizarPerfilNegocio(
+                        perfilNegocio: perfilNegocio);
+                    Navigator.of(buildContext).pushNamedAndRemoveUntil(
+                        '/page_principal', (Route<dynamic> route) => false);
+                  },
+                ),
                 onTap: () {
                   if (perfilNegocio.id != "") {
-                    Global.actualizarPerfilNegocio(perfilNegocio: perfilNegocio);
-                    context.read<ProviderPerfilNegocio>().setCuentaNegocio =perfilNegocio;
-                    Navigator.pushReplacementNamed(context, '/page_catalogo');
+                    Global.actualizarPerfilNegocio(
+                        perfilNegocio: perfilNegocio);
+                    Navigator.of(buildContext).pushNamedAndRemoveUntil(
+                        '/page_principal', (Route<dynamic> route) => false);
                   }
                 },
               ),
-              Divider(endIndent: 12.0, indent: 12.0),
             ],
           );
         } else {

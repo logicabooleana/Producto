@@ -1,5 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:catalogo/models/models_catalogo.dart';
 import 'package:catalogo/services/globals.dart';
+import 'package:catalogo/utils/dynamicTheme_lb.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -8,7 +10,8 @@ class ViewCategoria extends StatefulWidget {
   ViewCategoria({@required this.buildContext});
 
   @override
-  _ViewCategoriaState createState() =>_ViewCategoriaState(buildContextPrincipal: buildContext);
+  _ViewCategoriaState createState() =>
+      _ViewCategoriaState(buildContextPrincipal: buildContext);
 }
 
 class _ViewCategoriaState extends State<ViewCategoria> {
@@ -38,14 +41,17 @@ class _ViewCategoriaState extends State<ViewCategoria> {
         title: Text("Categoria"),
       ),
       body: FutureBuilder(
-        future:Global.getCatalogoCategorias(idNegocio: Global.oPerfilNegocio.id).getDataCategoriaAll(),
+        future:
+            Global.getCatalogoCategorias(idNegocio: Global.oPerfilNegocio.id)
+                .getDataCategoriaAll(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             Global.listCategoriasCatalogo = snapshot.data;
             if (Global.listCategoriasCatalogo.length == 0) {
               return crearCategoria == false
                   ? ListTile(
-                      contentPadding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 15.0),
+                      contentPadding: EdgeInsets.symmetric(
+                          vertical: 15.0, horizontal: 15.0),
                       leading: CircleAvatar(
                         radius: 24.0,
                         child: Icon(Icons.add),
@@ -105,7 +111,7 @@ class _ViewCategoriaState extends State<ViewCategoria> {
                                         .setNombreFiltro = "Mostrar todos";
                                     buildContext
                                         .read<ProviderCatalogo>()
-                                        .setCategoria =null;
+                                        .setCategoria = null;
                                     buildContext
                                         .read<ProviderCatalogo>()
                                         .setIdMarca = "";
@@ -196,7 +202,9 @@ class _ViewCategoriaState extends State<ViewCategoria> {
                       );
               },
             );
-          } else{return Center(child: Text("Cargando..."));}
+          } else {
+            return Center(child: Text("Cargando..."));
+          }
         },
       ),
     );
@@ -498,6 +506,74 @@ class ViewSubCategoriaState extends State<ViewSubCategoria> {
               },
             )
           : CircularProgressIndicator(),
+    );
+  }
+}
+
+
+Future<void> showModalBottomSheetConfig({@required BuildContext buildContext}) async {
+    showModalBottomSheet(
+        shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+        backgroundColor: Theme.of(buildContext).canvasColor,
+        context: buildContext,
+        builder: (ctx) {
+          return ClipRRect(
+            borderRadius:  
+            BorderRadius.circular(20), 
+            child: ViewConfig(
+              buildContext: buildContext,
+            ),
+          );
+        });
+  }
+class ViewConfig extends StatefulWidget {
+  BuildContext buildContext;
+  ViewConfig({@required this.buildContext});
+  @override
+  _ViewConfigState createState() =>_ViewConfigState(buildContext: buildContext);
+}
+class _ViewConfigState extends State<ViewConfig> {
+  BuildContext buildContext;
+  _ViewConfigState({@required this.buildContext});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        margin: const EdgeInsets.symmetric(vertical: 12.0),
+        child: ListView(
+          children: [
+            ListTile( 
+              leading: Global.oPerfilNegocio.imagen_perfil == "" ||
+                      Global.oPerfilNegocio.imagen_perfil == "default"
+                  ? CircleAvatar(
+                      backgroundColor: Colors.black26,
+                      radius: 18.0,
+                      child: Text(
+                          Global.oPerfilNegocio.nombre_negocio.substring(0, 1),
+                          style: TextStyle(
+                              fontSize: 18.0,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold)),
+                    )
+                  : CachedNetworkImage(
+                      imageUrl: Global.oPerfilNegocio.imagen_perfil,
+                      placeholder: (context, url) => const CircleAvatar(
+                        backgroundColor: Colors.grey,
+                        radius: 18.0,
+                      ),
+                      imageBuilder: (context, image) => CircleAvatar(
+                        backgroundImage: image,
+                        radius: 18.0,
+                      ),
+                    ),
+              title: Text('Editar'),
+              onTap: () => Navigator.pushNamed(buildContext, '/profilCuenta'),
+            ),
+            Divider(endIndent: 12.0,indent: 12.0),
+            DynamicTheme.of(buildContext).getViewListTileSelectTheme(buildContext: buildContext),
+          ],
+        ),
+      ),
     );
   }
 }

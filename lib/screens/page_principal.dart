@@ -21,7 +21,6 @@ import 'package:catalogo/screens/page_producto_view.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:catalogo/screens/widgets/widget_CatalogoGridList.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:catalogo/utils/dynamicTheme_lb.dart';
 import 'package:catalogo/services/services.dart';
 import 'package:catalogo/screens/page_buscadorProductos.dart';
 import 'package:catalogo/models/models_profile.dart';
@@ -61,7 +60,9 @@ class PagePrincipal extends StatelessWidget {
                               color: Theme.of(buildContext)
                                   .textTheme
                                   .bodyText1
-                                  .color)),
+                                  .color),
+                                  overflow: TextOverflow.fade,
+                              softWrap: false),
                       Icon(Icons.keyboard_arrow_down)
                     ],
                   ),
@@ -115,8 +116,7 @@ class PagePrincipal extends StatelessWidget {
                   }),
                 );
               } else {
-                return Scaffold(
-                    body: Center(child: CircularProgressIndicator()));
+                return Scaffold(body: Center(child: CircularProgressIndicator()));
               }
             },
           );
@@ -139,27 +139,31 @@ class PagePrincipal extends StatelessWidget {
               children: <Widget>[
                 Text(
                     perfilNegocio == null
-                        ? "Default"
+                        ? "Seleccionar cuenta"
                         : perfilNegocio.username == ""
                             ? perfilNegocio.nombre_negocio
                             : perfilNegocio.username,
                     style: TextStyle(
                         color:
-                            Theme.of(buildContext).textTheme.bodyText1.color)),
+                            Theme.of(buildContext).textTheme.bodyText1.color),overflow: TextOverflow.fade,
+                              softWrap: false),
                 Icon(Icons.keyboard_arrow_down)
               ],
             ),
           ),
         ),
         actions: <Widget>[
-          DynamicTheme.of(buildContext).getIConButton(buildContext),
           Container(
             padding: EdgeInsets.all(12.0),
             child: InkWell(
               customBorder: new CircleBorder(),
               splashColor: Colors.red,
-              onTap: () => Navigator.pushNamed(buildContext, '/profilCuenta'),
-              child: CircleAvatar(
+              onTap: () {
+                showModalBottomSheetConfig(buildContext: buildContext);
+              },
+              child: Hero(
+                tag: "fotoperfiltoolbar",
+                child: CircleAvatar(
                 radius: 17,
                 child: CircleAvatar(
                   radius: 15,
@@ -189,6 +193,7 @@ class PagePrincipal extends StatelessWidget {
                     ),
                   ),
                 ),
+              ),
               ),
             ),
           ),
@@ -270,6 +275,7 @@ class PagePrincipal extends StatelessWidget {
 
   /* Devuelve una widget de una barra para buscar */
   Widget widgetBuscadorView({@required BuildContext buildContext}) {
+
     return Padding(
       padding: EdgeInsets.all(12.0),
       child: Card(
@@ -314,17 +320,16 @@ class PagePrincipal extends StatelessWidget {
     bool createCuentaEmpresa = true;
     // muestre la hoja inferior modal
     showModalBottomSheet(
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+        shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
         backgroundColor: Theme.of(buildContext).canvasColor,
         context: buildContext,
         builder: (ctx) {
           return ClipRRect(
             child: Container(
               child: FutureBuilder(
-                future: Global.getListNegocioAdmin(idNegocio: firebaseUser.uid)
-                    .getDataAdminPerfilNegocioAll(),
+                future: Global.getListNegocioAdmin(idNegocio: firebaseUser.uid).getDataAdminPerfilNegocioAll(),
                 builder: (c, snapshot) {
+                  
                   if (snapshot.hasData) {
                     // Verificamos si ahi una cuenta creada
                     for (PerfilNegocio item in snapshot.data) {
@@ -332,17 +337,13 @@ class PagePrincipal extends StatelessWidget {
                         createCuentaEmpresa = false;
                       }
                     }
-
                     Global.listAdminPerfilNegocio = snapshot.data;
                     if (Global.listAdminPerfilNegocio.length == 0) {
                       return Column(
                         children: [
-                          createCuentaEmpresa == false
-                              ? WidgetButtonListTile(buildContext: buildContext)
-                                  .buttonListTileCrearCuenta(
-                                      context: buildContext)
-                              : Container(),
-                          WidgetButtonListTile(buildContext: buildContext).buttonListTileCerrarSesion(context: buildContext),
+                          createCuentaEmpresa? WidgetButtonListTile(buildContext: buildContext).buttonListTileCrearCuenta(context: buildContext): Container(),
+                          Divider(endIndent: 12.0, indent: 12.0),
+                          WidgetButtonListTile(buildContext: buildContext).buttonListTileCerrarSesion(buildContext: buildContext),
                         ],
                       );
                     } else {
@@ -354,27 +355,23 @@ class PagePrincipal extends StatelessWidget {
                           if (index == 0) {
                             return Column(
                               children: <Widget>[
-                                createCuentaEmpresa == false
-                                    ? WidgetButtonListTile(
-                                            buildContext: buildContext)
-                                        .buttonListTileCrearCuenta(
-                                            context: buildContext)
-                                    : Container(),
-                                WidgetButtonListTile(buildContext: buildContext).buttonListTileItemCuenta(context: buildContext, perfilNegocio: Global.listAdminPerfilNegocio[index]),
+                                createCuentaEmpresa?WidgetButtonListTile(buildContext: buildContext).buttonListTileCrearCuenta(context: buildContext): Container(),
+                                WidgetButtonListTile(buildContext: buildContext).buttonListTileItemCuenta(buildContext: buildContext, perfilNegocio: Global.listAdminPerfilNegocio[index]),
                               ],
                             );
                           }
                           if (index ==Global.listAdminPerfilNegocio.length - 1) {
                             return Column(
                               children: <Widget>[
-                                WidgetButtonListTile(buildContext: buildContext).buttonListTileItemCuenta(context: buildContext, perfilNegocio: Global.listAdminPerfilNegocio[index]),
-                                WidgetButtonListTile(buildContext: buildContext).buttonListTileCerrarSesion(context: buildContext),
+                                WidgetButtonListTile(buildContext: buildContext).buttonListTileItemCuenta(buildContext: buildContext, perfilNegocio: Global.listAdminPerfilNegocio[index]),
+                                Divider(endIndent: 12.0, indent: 12.0),
+                                WidgetButtonListTile(buildContext: buildContext).buttonListTileCerrarSesion(buildContext: buildContext),
                               ],
                             );
                           }
                           return Column(
                             children: <Widget>[
-                              WidgetButtonListTile(buildContext: buildContext).buttonListTileItemCuenta(context: buildContext, perfilNegocio: Global.listAdminPerfilNegocio[index]),
+                              WidgetButtonListTile(buildContext: buildContext).buttonListTileItemCuenta(buildContext: buildContext, perfilNegocio: Global.listAdminPerfilNegocio[index]),
                             ],
                           );
                         },
@@ -417,15 +414,10 @@ class PagePrincipal extends StatelessWidget {
           return [
             SliverList(
               delegate: SliverChildListDelegate([
-                //WidgetProfile(),
-                SizedBox(height: 12.0),
-                Global.listProudctosNegocio.length == 0
-                    ? Container()
-                    : widgetsListaHorizontalMarcas(buildContext: buildContext),
-                Global.listProudctosNegocio.length == 0
-                    ? Container()
-                    : widgetBuscadorView(buildContext: buildContext),
-                SizedBox(height: 12.0),
+                Global.listProudctosNegocio.length!=0?SizedBox(height: 12.0):Container(),
+                Global.listProudctosNegocio.length!=0?widgetsListaHorizontalMarcas(buildContext: buildContext):Container(),
+                Global.listProudctosNegocio.length!=0?widgetBuscadorView(buildContext: buildContext):Container(),
+                Global.listProudctosNegocio.length!=0?SizedBox(height: 12.0):Container(),
               ]),
             ),
           ];
@@ -441,8 +433,7 @@ class PagePrincipal extends StatelessWidget {
                   : Colors.black,
               onTap: (value) {
                 showModalBottomSheet(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.0)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
                     backgroundColor: Theme.of(buildContext).canvasColor,
                     context: buildContext,
                     builder: (ctx) {

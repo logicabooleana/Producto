@@ -47,14 +47,14 @@ class MyApp extends StatelessWidget {
         
         // Check for errors
         if (snapshot.hasError) {
-          return Center(child: Text("Firebase ERROR",textDirection: TextDirection.rtl));
+          return Center(child: Text("ERROR",textDirection: TextDirection.rtl));
         }
         // Once complete, show your application
         if (snapshot.connectionState == ConnectionState.done) {
           return WidgetMaterialApp();
         }
         // Otherwise, show something whilst waiting for initialization to complete
-        return Center(child: Text("Firebase Loading...",textDirection: TextDirection.rtl));
+        return Scaffold(body: Center(child: Text("Producto")));
       },
     );
   }
@@ -96,7 +96,7 @@ class WidgetMaterialApp extends StatelessWidget {
               routes: {
                 '/': (context) => LoginScreen(),
                 'init': (context) => MyApp(),
-                '/page_catalogo': (context) =>PagePrincipal(), // CatalogoNegocio(),
+                '/page_principal': (context) =>PagePrincipal(), // CatalogoNegocio(),
                 '/profile': (context) => ProfileScreen(),
                 '/profilCuenta': (context) => ProfileCuenta(),
                 '/about': (context) => AboutScreen(),
