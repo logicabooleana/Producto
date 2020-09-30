@@ -1,12 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:catalogo/models/models_catalogo.dart';
-import 'package:catalogo/models/models_profile.dart';
-import 'package:catalogo/screens/page_producto_edit.dart';
-import 'package:catalogo/services/models.dart';
-import 'package:catalogo/shared/widgets_load.dart';
+import 'package:producto/models/models_catalogo.dart';
+import 'package:producto/models/models_profile.dart';
+import 'package:producto/screens/page_producto_edit.dart';
+import 'package:producto/services/models.dart';
+import 'package:producto/shared/widgets_load.dart';
 import 'package:flutter/material.dart';
-import 'package:catalogo/utils/utils.dart';
-import 'package:catalogo/services/globals.dart';
+import 'package:producto/utils/utils.dart';
+import 'package:producto/services/globals.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/services.dart';
 

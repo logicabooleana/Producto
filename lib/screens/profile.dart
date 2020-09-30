@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 
-import 'package:catalogo/services/preferencias_usuario.dart';
+import 'package:producto/services/preferencias_usuario.dart';
 import '../services/services.dart';
 import '../shared/shared.dart';
 

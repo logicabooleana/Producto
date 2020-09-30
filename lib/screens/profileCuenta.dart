@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../services/services.dart';
-import 'package:catalogo/services/globals.dart';
-import 'package:catalogo/models/models_profile.dart';
+import 'package:producto/services/globals.dart';
+import 'package:producto/models/models_profile.dart';
 
 class ProfileCuenta extends StatefulWidget {
   @override

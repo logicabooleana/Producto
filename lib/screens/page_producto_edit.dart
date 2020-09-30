@@ -1,15 +1,15 @@
 import 'dart:io';
-import 'package:catalogo/screens/page_marca_create.dart';
+import 'package:producto/screens/page_marca_create.dart';
 import 'package:flutter/services.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:catalogo/services/models.dart';
+import 'package:producto/services/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:catalogo/services/globals.dart';
-import 'package:catalogo/models/models_catalogo.dart';
+import 'package:producto/services/globals.dart';
+import 'package:producto/models/models_catalogo.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:catalogo/screens/widgets/widgetSeachMarcaProducto.dart';
+import 'package:producto/screens/widgets/widgetSeachMarcaProducto.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
 
 class ProductEdit extends StatefulWidget {

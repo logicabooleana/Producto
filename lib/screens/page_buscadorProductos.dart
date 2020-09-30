@@ -1,7 +1,7 @@
-import 'package:catalogo/services/models.dart';
+import 'package:producto/services/models.dart';
 import 'package:flutter/material.dart';
-import 'package:catalogo/screens/page_producto_view.dart';
-import 'package:catalogo/utils/utils.dart';
+import 'package:producto/screens/page_producto_view.dart';
+import 'package:producto/utils/utils.dart';
 
 class DataSearch extends SearchDelegate {
   List listOBJ;

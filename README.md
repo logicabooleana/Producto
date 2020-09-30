@@ -1,4 +1,4 @@
-# catalogo
+# producto
 
 A new Flutter project.
 

@@ -1,8 +1,8 @@
 
 import 'package:flutter/material.dart';
-import 'package:catalogo/utils/utils.dart';
-import 'package:catalogo/models/models_catalogo.dart';
-import 'package:catalogo/shared/widgets_image_circle.dart';
+import 'package:producto/utils/utils.dart';
+import 'package:producto/models/models_catalogo.dart';
+import 'package:producto/shared/widgets_image_circle.dart';
 
 
 

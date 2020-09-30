@@ -12,21 +12,22 @@ import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
 
 /* Dependencias */
-import 'package:catalogo/shared/widget_button.dart';
-import 'package:catalogo/shared/widgets_image_circle.dart';
-import 'package:catalogo/shared/widgets_image_circle.dart' as image;
-import 'package:catalogo/services/preferencias_usuario.dart';
-import 'package:catalogo/screens/widgets/widgetSeachProductCatalogo.dart';
-import 'package:catalogo/screens/page_producto_view.dart';
+import 'package:producto/shared/widget_button.dart';
+import 'package:producto/shared/widgets_image_circle.dart';
+import 'package:producto/shared/widgets_image_circle.dart' as image;
+import 'package:producto/services/preferencias_usuario.dart';
+import 'package:producto/screens/widgets/widgetSeachProductCatalogo.dart';
+import 'package:producto/screens/page_producto_view.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
-import 'package:catalogo/screens/widgets/widget_CatalogoGridList.dart';
+import 'package:producto/screens/widgets/widget_CatalogoGridList.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:catalogo/services/services.dart';
-import 'package:catalogo/screens/page_buscadorProductos.dart';
-import 'package:catalogo/models/models_profile.dart';
-import 'package:catalogo/services/globals.dart';
-import 'package:catalogo/models/models_catalogo.dart';
-import 'package:catalogo/screens/widgets/widgets_categoria.dart';
+import 'package:producto/services/services.dart';
+import 'package:producto/screens/page_buscadorProductos.dart';
+import 'package:producto/models/models_profile.dart';
+import 'package:producto/services/globals.dart';
+import 'package:producto/models/models_catalogo.dart';
+import 'package:producto/screens/widgets/widgets_categoria.dart';
+import 'package:producto/utils/dynamicTheme_lb.dart';
 /*  DESCRIPCIÓN */
 /*  Pantalla principal de la aplicación Catalogo app  */
 
@@ -68,7 +69,9 @@ class PagePrincipal extends StatelessWidget {
                   ),
                 ),
               ),
-              actions: <Widget>[],
+              actions: <Widget>[
+                DynamicTheme.of(buildContext).getIConButton(buildContext),
+              ],
             ),
             body: Center(
               child: Column(

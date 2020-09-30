@@ -1,4 +1,4 @@
-import 'package:catalogo/utils/dynamicTheme_lb.dart';
+import 'package:producto/utils/dynamicTheme_lb.dart';
 import 'package:flutter/material.dart';
 
 

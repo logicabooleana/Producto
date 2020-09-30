@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:catalogo/services/services.dart';
-import 'package:catalogo/services/globals.dart';
-import 'package:catalogo/models/models_profile.dart';
+import 'package:producto/services/services.dart';
+import 'package:producto/services/globals.dart';
+import 'package:producto/models/models_profile.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:catalogo/services/preferencias_usuario.dart';
+import 'package:producto/services/preferencias_usuario.dart';
 
 class WidgetButtonCricle extends StatelessWidget {
   BuildContext context;

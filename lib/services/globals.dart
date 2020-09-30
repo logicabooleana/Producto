@@ -1,13 +1,13 @@
 import 'dart:async';
+import 'services.dart';
 
-import 'package:catalogo/services/preferencias_usuario.dart';
 import 'package:flutter/material.dart';
 import 'package:loadany/loadany_widget.dart';
 
-import 'services.dart';
+import 'package:producto/services/preferencias_usuario.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:catalogo/models/models_catalogo.dart';
-import 'package:catalogo/models/models_profile.dart';
+import 'package:producto/models/models_catalogo.dart';
+import 'package:producto/models/models_profile.dart';
 
 
 /// Static global state. Immutable services that do not care about build context. 

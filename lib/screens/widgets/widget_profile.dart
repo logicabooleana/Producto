@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:catalogo/screens/page_buscadorProductos.dart';
-import 'package:catalogo/services/globals.dart';
-import 'package:catalogo/shared/widgets_image_circle.dart' as image;
+import 'package:producto/screens/page_buscadorProductos.dart';
+import 'package:producto/services/globals.dart';
+import 'package:producto/shared/widgets_image_circle.dart' as image;
 
 class WidgetProfile extends StatelessWidget {
   const WidgetProfile({Key key}) : super(key: key);

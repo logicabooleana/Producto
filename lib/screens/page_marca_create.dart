@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:catalogo/models/models_catalogo.dart';
-import 'package:catalogo/services/globals.dart';
-import 'package:catalogo/screens/widgets/widgets_notify.dart';
+import 'package:producto/models/models_catalogo.dart';
+import 'package:producto/services/globals.dart';
+import 'package:producto/screens/widgets/widgets_notify.dart';
 import 'package:image_picker/image_picker.dart';
 
 class PageCreateMarca extends StatefulWidget {

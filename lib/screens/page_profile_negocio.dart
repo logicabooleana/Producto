@@ -4,22 +4,22 @@ import 'dart:ui';
 
 import 'package:animated_floatactionbuttons/animated_floatactionbuttons.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:catalogo/screens/page_producto_view.dart';
-import 'package:catalogo/services/preferencias_usuario.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 
 /* Dependencias */
+import 'package:producto/screens/page_producto_view.dart';
+import 'package:producto/services/preferencias_usuario.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart'; /* font_awesome_flutter: ^x.x.x */
-import 'package:catalogo/utils/utils.dart';
-import 'package:catalogo/utils/dynamicTheme_lb.dart';
-import 'package:catalogo/services/services.dart';
-import 'package:catalogo/screens/page_buscadorProductos.dart';
-import 'package:catalogo/models/models_profile.dart';
-import 'package:catalogo/services/globals.dart';
-import 'package:catalogo/models/models_catalogo.dart';
+import 'package:producto/utils/utils.dart';
+import 'package:producto/utils/dynamicTheme_lb.dart';
+import 'package:producto/services/services.dart';
+import 'package:producto/screens/page_buscadorProductos.dart';
+import 'package:producto/models/models_profile.dart';
+import 'package:producto/services/globals.dart';
+import 'package:producto/models/models_catalogo.dart';
 
 /*  DESCRIPCIÓN */
 /*  Pantalla principal de la aplicación Catalogo app  */

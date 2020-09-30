@@ -129,17 +129,17 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:232181553323:android:fc2050068134a8609b3fee",
+        "mobilesdk_app_id": "1:232181553323:android:4bad672932d0f6e19b3fee",
         "android_client_info": {
-          "package_name": "com.logicabooleana.commer.catalogo"
+          "package_name": "com.logicabooleana.commer.producto"
         }
       },
       "oauth_client": [
         {
-          "client_id": "232181553323-hmft0oi05236qld01eo27bbli5og3eaa.apps.googleusercontent.com",
+          "client_id": "232181553323-8566he4jmu7ehe8l7b9281je41q6nah0.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.logicabooleana.commer.catalogo",
+            "package_name": "com.logicabooleana.commer.producto",
             "certificate_hash": "8898a08aac6d1f9e17956fdb12cba035e42f6a9b"
           }
         },

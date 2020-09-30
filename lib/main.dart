@@ -1,4 +1,4 @@
-import 'package:catalogo/screens/app_preferences/page_theme_preference.dart';
+import 'package:producto/screens/app_preferences/page_theme_preference.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -6,10 +6,10 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:provider/provider.dart';
 import 'services/services.dart';
 import 'screens/screens.dart';
-import 'package:catalogo/utils/dynamicTheme_lb.dart';
-import 'package:catalogo/services/preferencias_usuario.dart';
-import 'package:catalogo/screens/page_principal.dart';
-import 'package:catalogo/screens/profileCuenta.dart';
+import 'package:producto/utils/dynamicTheme_lb.dart';
+import 'package:producto/services/preferencias_usuario.dart';
+import 'package:producto/screens/page_principal.dart';
+import 'package:producto/screens/profileCuenta.dart';
 // Import the firebase_core plugin
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -47,14 +47,14 @@ class MyApp extends StatelessWidget {
         
         // Check for errors
         if (snapshot.hasError) {
-          return Center(child: Text("ERROR",textDirection: TextDirection.rtl));
+          return Center(child: Text("error",textDirection: TextDirection.rtl));
         }
         // Once complete, show your application
         if (snapshot.connectionState == ConnectionState.done) {
           return WidgetMaterialApp();
         }
         // Otherwise, show something whilst waiting for initialization to complete
-        return Scaffold(body: Center(child: Text("Producto")));
+        return Center(child: Text("Producto",textDirection: TextDirection.rtl));
       },
     );
   }

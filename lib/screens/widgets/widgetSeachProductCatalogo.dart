@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:catalogo/services/globals.dart';
-import 'package:catalogo/screens/page_producto_view.dart';
-import 'package:catalogo/screens/page_producto_new.dart';
+import 'package:producto/services/globals.dart';
+import 'package:producto/screens/page_producto_view.dart';
+import 'package:producto/screens/page_producto_new.dart';
 import 'package:flutter/services.dart';
 import 'package:clipboard/clipboard.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';

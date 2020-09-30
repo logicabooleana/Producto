@@ -1,4 +1,4 @@
-package com.logicabooleana.commer.catalogo
+package com.logicabooleana.commer.producto
 
 import io.flutter.embedding.android.FlutterActivity
 

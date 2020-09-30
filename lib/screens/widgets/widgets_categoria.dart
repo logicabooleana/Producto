@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:catalogo/models/models_catalogo.dart';
-import 'package:catalogo/services/globals.dart';
-import 'package:catalogo/utils/dynamicTheme_lb.dart';
+import 'package:producto/models/models_catalogo.dart';
+import 'package:producto/services/globals.dart';
+import 'package:producto/utils/dynamicTheme_lb.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
