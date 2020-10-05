@@ -148,7 +148,7 @@ class Collection<T> {
     return snapshots.docs.map((doc) => Global.modelsProducto[T](doc.data()) as T ).toList();
   }
   Stream<List<T>> streamDataProductoAll() {
-    return ref.snapshots().map( (list) => list.docs.map((doc) => Global.modelsProducto[T](doc.data()) as T).toList() );
+    return ref.orderBy('timestamp_actualizacion', descending: true).snapshots().map( (list) => list.docs.map((doc) => Global.modelsProducto[T](doc.data()) as T).toList() );
   }
 
   // Model MARCA

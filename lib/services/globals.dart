@@ -322,7 +322,7 @@ class ProviderCatalogo with ChangeNotifier {
     // Carga las marca de los prosductos mostrados de la categoria
     _updateMarcas(listaProductos:  this.listCatalogoFilter);
     this.cataloLoadMore.clear();
-    for (var i = 0; i < 15; ++i) {
+    for (var i = 0; i < 27; ++i) {
         if( this.cataloLoadMore.length < this.listCatalogoFilter.length ){
           this.cataloLoadMore.add(this.listCatalogoFilter[ i]);
         }

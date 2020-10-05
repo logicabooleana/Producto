@@ -56,7 +56,7 @@ class DataSearch extends SearchDelegate {
     }
     List<ProductoNegocio> resutlList = new List();
     for (int i = 0; i < listOBJ.length; i++) {
-      if (Buscardor.buscar(listOBJ[i].titulo, query)) {
+      if (Buscardor.buscar(listOBJ[i].titulo, query)||Buscardor.buscar(listOBJ[i].descripcion, query)) { 
         resutlList.add(listOBJ[i]);
       }
     }

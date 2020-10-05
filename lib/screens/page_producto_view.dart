@@ -11,6 +11,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:flutter/services.dart';
 
 class ProductScreen extends StatelessWidget {
+  
   // Variables
   BuildContext contextScaffold;
   String sSignoMoneda;
@@ -21,7 +22,6 @@ class ProductScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     if( Global.oPerfilNegocio!=null ){
       for (ProductoNegocio item in Global.listProudctosNegocio) {
       if (item.id == producto.id) {
@@ -31,7 +31,7 @@ class ProductScreen extends StatelessWidget {
       }
     }
     }
-
+    
     return Scaffold(
       appBar: AppBar(
         elevation: 0.0,
@@ -143,25 +143,16 @@ class ProductScreen extends StatelessWidget {
             children: [
               producto.precio_venta != null && producto.precio_venta != 0.0
                   ? Text(
-                      Publicaciones.getFormatoPrecio(
-                          monto: producto.precio_venta),
+                      Publicaciones.getFormatoPrecio(monto: producto.precio_venta),
                       style: TextStyle(
                           height: 2, fontSize: 30, fontWeight: FontWeight.bold),
                       textAlign: TextAlign.end,
                     )
                   : Container(),
-              producto.precio_venta != null && producto.precio_venta != 0.0
-                  ? Text(
-                      Publicaciones.getFechaPublicacion(
-                              producto.timestamp_actualizacion.toDate(),
-                              new DateTime.now())
-                          .toLowerCase(),
+              producto.timestamp_actualizacion != null
+                  ? Text(Publicaciones.getFechaPublicacion(producto.timestamp_actualizacion.toDate(),new DateTime.now()).toLowerCase(),
                       textAlign: TextAlign.end,
-                      style: TextStyle(
-                          fontStyle: FontStyle.normal,
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? Colors.white70
-                              : Colors.black54),
+                      style: TextStyle(fontStyle: FontStyle.normal,color: Theme.of(context).brightness==Brightness.dark?Colors.white70 : Colors.black54),
                     )
                   : Container(),
             ],
@@ -516,8 +507,7 @@ class ProductoItemHorizontal extends StatelessWidget {
                                           softWrap: false)
                                       : Container(),
                                   producto.precio_venta != 0.0
-                                      ? Text(
-                                          "${producto.signo_moneda}${producto.precio_venta}",
+                                      ? Text("${Publicaciones.getFormatoPrecio(monto: producto.precio_venta)}",
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 16.0,

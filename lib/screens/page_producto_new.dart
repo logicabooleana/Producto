@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:producto/screens/page_marca_create.dart';
-import 'package:producto/screens/widgets/widgets_categoria.dart';
+import 'package:producto/screens/widgets/widgets_showModalBottomSheet.dart';
 import 'package:flutter/services.dart';
 import 'package:producto/services/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -294,6 +294,9 @@ class _ProductNewState extends State<ProductNew> {
               : Container(),
           this.marca == null
               ? TextField(
+                minLines: 1,
+            maxLines: 5,
+            keyboardType: TextInputType.multiline,
                   enabled: !producto.verificado,
                   onChanged: (value) => producto.titulo = value,
                   decoration: InputDecoration(
@@ -307,6 +310,9 @@ class _ProductNewState extends State<ProductNew> {
               : Container(),
           SizedBox(height: 16.0),
           TextField(
+            minLines: 1,
+            maxLines: 5,
+            keyboardType: TextInputType.multiline,
             enabled: !producto.verificado,
             onChanged: (value) => producto.descripcion = value,
             decoration: InputDecoration(
@@ -425,6 +431,8 @@ class _ProductNewState extends State<ProductNew> {
 
                 // TODO: Por defecto verificado es TRUE // Cambiar esto cuando se lanze a producción
                 producto.verificado = true;
+                producto.timestamp_actualizacion=Timestamp.fromDate(new DateTime.now());
+                producto.timestamp_creation=Timestamp.fromDate(new DateTime.now());
                 producto.categoria = this.categoria.id;
                 producto.subcategoria = this.subcategoria.id;
                 producto.id_marca = this.marca.id;

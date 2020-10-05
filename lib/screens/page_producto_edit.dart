@@ -172,14 +172,14 @@ class _ProductEditState extends State<ProductEdit> {
             ],
           ),
           body: FutureBuilder(
-            future: Global.getProductosPrecargado(idProducto: this.producto.id)
-                .getDataProductoGlobal(),
+            future: Global.getProductosPrecargado(idProducto: this.producto.id).getDataProductoGlobal(),
             builder: (BuildContext context, AsyncSnapshot snapshot) {
               if (snapshot.hasData) {
                 Producto productoGlobal = snapshot.data;
                 this.producto.urlimagen = productoGlobal.urlimagen;
                 this.producto.titulo = productoGlobal.titulo;
                 this.producto.descripcion = productoGlobal.descripcion;
+                this.producto.codigo=productoGlobal.codigo;
                 // TODO: Eliminar condicion para producción
                 if( editable==false ){
                   this.producto.verificado = productoGlobal.verificado;
@@ -373,6 +373,9 @@ class _ProductEditState extends State<ProductEdit> {
               : Container(),
           this.marca == null
               ? TextField(
+                minLines: 1,
+            maxLines: 5,
+            keyboardType: TextInputType.multiline,
                   enabled: producto.verificado==true?false:true,
                   onChanged: (value) => producto.titulo = value,
                   decoration: InputDecoration(
@@ -386,6 +389,9 @@ class _ProductEditState extends State<ProductEdit> {
               : Container(),
           SizedBox(height: 16.0),
           TextField(
+            minLines: 1,
+            maxLines: 5,
+            keyboardType: TextInputType.multiline,
             enabled: !producto.verificado,
             onChanged: (value) => producto.descripcion = value,
             decoration: InputDecoration(
@@ -554,8 +560,7 @@ class _ProductEditState extends State<ProductEdit> {
                   StorageUploadTask uploadTask =
                       ref.putFile(File(_imageFile.path));
                   // obtenemos la url de la imagen guardada
-                  urlIamgen =
-                      await (await uploadTask.onComplete).ref.getDownloadURL();
+                  urlIamgen=await (await uploadTask.onComplete).ref.getDownloadURL();
                   // TODO: Por el momento los datos del producto se guarda junto a la referencia de la cuenta del negocio
                   producto.urlimagen = urlIamgen;
                 }
@@ -1105,6 +1110,7 @@ class _ProductEditState extends State<ProductEdit> {
 
                 // TODO: Por defecto verificado es TRUE // Cambiar esto cuando se lanze a producción
                 producto.verificado = true;
+                producto.timestamp_actualizacion=Timestamp.fromDate(new DateTime.now());
                 producto.categoria = this.categoria.id;
                 producto.subcategoria = this.subcategoria.id;
                 producto.id_marca = this.marca.id;
@@ -1154,13 +1160,6 @@ class _ProductEditState extends State<ProductEdit> {
             idProducto: producto.id,
             isoPAis: "ARG")
         .upSetPrecioProducto(precio.toJson());
-    if (urlIamgen == "") {
-      producto.timestamp_actualizacion=Timestamp.fromDate(new DateTime.now());
-      producto.urlimagen="default";
-    } else {
-      producto.timestamp_actualizacion=Timestamp.fromDate(new DateTime.now());
-      producto.urlimagen=urlIamgen;
-    }
     // set ( id del usuario que actualizo el producto )
     producto.id_negocio=Global.oPerfilNegocio.id;
     //producto.id_usuario=Global.us;

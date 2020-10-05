@@ -59,7 +59,7 @@ dependencies:
   clipboard: ^0.1.2+8
   screenshot: ^0.2.0 # Un complemento simple para capturar widgets como imágenes.
   smooth_page_indicator: ^0.2.0 # Indicador de página animada personalizable con un conjunto de efectos integrados.
-
+  liquid_swipe: ^1.5.0
 
 flutter_icons:
   android: true

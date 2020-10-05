@@ -26,7 +26,7 @@ import 'package:producto/screens/page_buscadorProductos.dart';
 import 'package:producto/models/models_profile.dart';
 import 'package:producto/services/globals.dart';
 import 'package:producto/models/models_catalogo.dart';
-import 'package:producto/screens/widgets/widgets_categoria.dart';
+import 'package:producto/screens/widgets/widgets_showModalBottomSheet.dart';
 import 'package:producto/utils/dynamicTheme_lb.dart';
 /*  DESCRIPCIÓN */
 /*  Pantalla principal de la aplicación Catalogo app  */
@@ -43,6 +43,10 @@ class PagePrincipal extends StatelessWidget {
     prefs = new PreferenciasUsuario();
     firebaseUser = Provider.of<User>(buildContext);
 
+    Color color = Theme.of(buildContext).brightness == Brightness.dark
+        ? Colors.white54
+        : Colors.black26;
+
     return Global.prefs.getIdNegocio == ""
         ? Scaffold(
             appBar: AppBar(
@@ -56,14 +60,14 @@ class PagePrincipal extends StatelessWidget {
                   padding: EdgeInsets.symmetric(vertical: 12.0),
                   child: Row(
                     children: <Widget>[
-                      Text("Seleccionar cuenta",
+                      Text("Mi catálogo",
                           style: TextStyle(
                               color: Theme.of(buildContext)
                                   .textTheme
                                   .bodyText1
                                   .color),
-                                  overflow: TextOverflow.fade,
-                              softWrap: false),
+                          overflow: TextOverflow.ellipsis,
+                          softWrap: false),
                       Icon(Icons.keyboard_arrow_down)
                     ],
                   ),
@@ -78,25 +82,41 @@ class PagePrincipal extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  Image(
-                      color:
-                          Theme.of(buildContext).brightness == Brightness.dark
-                              ? Colors.white24
-                              : Colors.black26,
-                      height: 200.0,
-                      width: 200.0,
-                      image: AssetImage('assets/barcode.png'),
-                      fit: BoxFit.contain),
+                  Container(
+                    margin: const EdgeInsets.all(30.0),
+                    padding: const EdgeInsets.all(30.0),
+                    decoration: BoxDecoration(
+                        color: Colors.transparent,
+                        border: Border.all(width: 0.1, color: color),
+                        borderRadius: BorderRadius.all(Radius.circular(30.0))),
+                    child: Image(
+                        color: color,
+                        height: 200.0,
+                        width: 200.0,
+                        image: AssetImage('assets/barcode.png'),
+                        fit: BoxFit.contain),
+                  ),
+                  Container(
+                    margin: EdgeInsets.symmetric(horizontal: 40.0),
+                    child: Text("Escanea un producto para conocer su precio",
+                        style: TextStyle(
+                            fontFamily: "POPPINS_FONT",
+                            fontWeight: FontWeight.bold,
+                            color: color,
+                            fontSize: 24.0),
+                        textAlign: TextAlign.center),
+                  ),
                   RaisedButton(
-                    child: Padding(
-                      padding: EdgeInsets.all(12.0),
-                      child: Text("Escanear código",
-                          style: TextStyle(fontSize: 24.0)),
-                    ),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+                    color: Theme.of(buildContext).primaryColor,
+                    child: Text("Escanear",
+                        style: TextStyle(fontSize: 24.0, color: Colors.white)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30.0),
+                        side: BorderSide(color: Colors.transparent)),
                     onPressed: () {
-                      Navigator.of(buildContext).push(MaterialPageRoute(
-                        builder: (BuildContext context) => WidgetSeachProduct(),
-                      ));
+                      scanBarcodeNormal(context: buildContext);
                     },
                   ),
                 ],
@@ -119,7 +139,8 @@ class PagePrincipal extends StatelessWidget {
                   }),
                 );
               } else {
-                return Scaffold(body: Center(child: CircularProgressIndicator()));
+                return Scaffold(
+                    body: Center(child: CircularProgressIndicator()));
               }
             },
           );
@@ -148,8 +169,9 @@ class PagePrincipal extends StatelessWidget {
                             : perfilNegocio.username,
                     style: TextStyle(
                         color:
-                            Theme.of(buildContext).textTheme.bodyText1.color),overflow: TextOverflow.fade,
-                              softWrap: false),
+                            Theme.of(buildContext).textTheme.bodyText1.color),
+                    overflow: TextOverflow.fade,
+                    softWrap: false),
                 Icon(Icons.keyboard_arrow_down)
               ],
             ),
@@ -167,36 +189,36 @@ class PagePrincipal extends StatelessWidget {
               child: Hero(
                 tag: "fotoperfiltoolbar",
                 child: CircleAvatar(
-                radius: 17,
-                child: CircleAvatar(
-                  radius: 15,
-                  backgroundColor: Colors.white,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(10000.0),
-                    child: CachedNetworkImage(
-                      width: 35.0,
-                      height: 35.0,
-                      fadeInDuration: Duration(milliseconds: 200),
-                      fit: BoxFit.cover,
-                      imageUrl: Global.oPerfilNegocio.imagen_perfil,
-                      placeholder: (context, url) => FadeInImage(
-                          image: AssetImage("assets/loading.gif"),
-                          placeholder: AssetImage("assets/loading.gif")),
-                      errorWidget: (context, url, error) => Container(
-                        color: Colors.grey,
-                        width: MediaQuery.of(context).size.width,
-                        height: MediaQuery.of(context).size.width,
-                        child: Center(
-                          child: Text(
-                            firebaseUser.displayName.substring(0, 1),
-                            style: TextStyle(fontSize: 16.0),
+                  radius: 17,
+                  child: CircleAvatar(
+                    radius: 15,
+                    backgroundColor: Colors.white,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10000.0),
+                      child: CachedNetworkImage(
+                        width: 35.0,
+                        height: 35.0,
+                        fadeInDuration: Duration(milliseconds: 200),
+                        fit: BoxFit.cover,
+                        imageUrl: Global.oPerfilNegocio.imagen_perfil,
+                        placeholder: (context, url) => FadeInImage(
+                            image: AssetImage("assets/loading.gif"),
+                            placeholder: AssetImage("assets/loading.gif")),
+                        errorWidget: (context, url, error) => Container(
+                          color: Colors.grey,
+                          width: MediaQuery.of(context).size.width,
+                          height: MediaQuery.of(context).size.width,
+                          child: Center(
+                            child: Text(
+                              firebaseUser.displayName.substring(0, 1),
+                              style: TextStyle(fontSize: 16.0),
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
               ),
             ),
           ),
@@ -248,7 +270,7 @@ class PagePrincipal extends StatelessWidget {
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> scanBarcodeNormal({@required BuildContext context}) async {
-    String barcodeScanRes;
+    String barcodeScanRes = "";
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
       barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
@@ -262,23 +284,34 @@ class PagePrincipal extends StatelessWidget {
     // setState to update our non-existent appearance.
     //if (!mounted) return;
     bool coincidencia = false;
-    for (ProductoNegocio producto in Global.listProudctosNegocio) {
-      if (producto.codigo == barcodeScanRes) {
-        coincidencia = true;
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (BuildContext context) =>
-                ProductScreen(producto: producto),
-          ),
-        );
-        break;
+    ProductoNegocio productoSelected;
+
+    if (Global.listProudctosNegocio.length != 0) {
+      for (ProductoNegocio producto in Global.listProudctosNegocio) {
+            if (producto.codigo == barcodeScanRes) {
+              productoSelected = producto;
+              coincidencia = true;
+              break;
+            }
+          }
+    }
+
+    if (coincidencia) {
+      Navigator.of(context).push(MaterialPageRoute(
+          builder: (BuildContext context) =>
+              ProductScreen(producto: productoSelected)));
+    } else {
+      if (barcodeScanRes.toString() != "") {
+        if (barcodeScanRes.toString() != "-1") {
+          Navigator.of(context).push(MaterialPageRoute(
+          builder: (BuildContext context) =>WidgetSeachProduct(codigo: barcodeScanRes)));
+        }
       }
     }
   }
 
   /* Devuelve una widget de una barra para buscar */
   Widget widgetBuscadorView({@required BuildContext buildContext}) {
-
     return Padding(
       padding: EdgeInsets.all(12.0),
       child: Card(
@@ -323,16 +356,17 @@ class PagePrincipal extends StatelessWidget {
     bool createCuentaEmpresa = true;
     // muestre la hoja inferior modal
     showModalBottomSheet(
-        shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
         backgroundColor: Theme.of(buildContext).canvasColor,
         context: buildContext,
         builder: (ctx) {
           return ClipRRect(
             child: Container(
               child: FutureBuilder(
-                future: Global.getListNegocioAdmin(idNegocio: firebaseUser.uid).getDataAdminPerfilNegocioAll(),
+                future: Global.getListNegocioAdmin(idNegocio: firebaseUser.uid)
+                    .getDataAdminPerfilNegocioAll(),
                 builder: (c, snapshot) {
-                  
                   if (snapshot.hasData) {
                     // Verificamos si ahi una cuenta creada
                     for (PerfilNegocio item in snapshot.data) {
@@ -344,9 +378,15 @@ class PagePrincipal extends StatelessWidget {
                     if (Global.listAdminPerfilNegocio.length == 0) {
                       return Column(
                         children: [
-                          createCuentaEmpresa? WidgetButtonListTile(buildContext: buildContext).buttonListTileCrearCuenta(context: buildContext): Container(),
-                          Divider(endIndent: 12.0, indent: 12.0),
-                          WidgetButtonListTile(buildContext: buildContext).buttonListTileCerrarSesion(buildContext: buildContext),
+                          createCuentaEmpresa
+                              ? WidgetButtonListTile(buildContext: buildContext)
+                                  .buttonListTileCrearCuenta(
+                                      context: buildContext)
+                              : Container(),
+                          Divider(endIndent: 12.0, indent: 12.0,height: 0.0),
+                          WidgetButtonListTile(buildContext: buildContext)
+                              .buttonListTileCerrarSesion(
+                                  buildContext: buildContext),
                         ],
                       );
                     } else {
@@ -358,23 +398,43 @@ class PagePrincipal extends StatelessWidget {
                           if (index == 0) {
                             return Column(
                               children: <Widget>[
-                                createCuentaEmpresa?WidgetButtonListTile(buildContext: buildContext).buttonListTileCrearCuenta(context: buildContext): Container(),
-                                WidgetButtonListTile(buildContext: buildContext).buttonListTileItemCuenta(buildContext: buildContext, perfilNegocio: Global.listAdminPerfilNegocio[index]),
+                                createCuentaEmpresa
+                                    ? WidgetButtonListTile(
+                                            buildContext: buildContext)
+                                        .buttonListTileCrearCuenta(
+                                            context: buildContext)
+                                    : Container(),
+                                WidgetButtonListTile(buildContext: buildContext)
+                                    .buttonListTileItemCuenta(
+                                        buildContext: buildContext,
+                                        perfilNegocio: Global
+                                            .listAdminPerfilNegocio[index]),
                               ],
                             );
                           }
-                          if (index ==Global.listAdminPerfilNegocio.length - 1) {
+                          if (index ==
+                              Global.listAdminPerfilNegocio.length - 1) {
                             return Column(
                               children: <Widget>[
-                                WidgetButtonListTile(buildContext: buildContext).buttonListTileItemCuenta(buildContext: buildContext, perfilNegocio: Global.listAdminPerfilNegocio[index]),
-                                Divider(endIndent: 12.0, indent: 12.0),
-                                WidgetButtonListTile(buildContext: buildContext).buttonListTileCerrarSesion(buildContext: buildContext),
+                                WidgetButtonListTile(buildContext: buildContext)
+                                    .buttonListTileItemCuenta(
+                                        buildContext: buildContext,
+                                        perfilNegocio: Global
+                                            .listAdminPerfilNegocio[index]),
+                                Divider(endIndent: 12.0, indent: 12.0,height: 0.0),
+                                WidgetButtonListTile(buildContext: buildContext)
+                                    .buttonListTileCerrarSesion(
+                                        buildContext: buildContext),
                               ],
                             );
                           }
                           return Column(
                             children: <Widget>[
-                              WidgetButtonListTile(buildContext: buildContext).buttonListTileItemCuenta(buildContext: buildContext, perfilNegocio: Global.listAdminPerfilNegocio[index]),
+                              WidgetButtonListTile(buildContext: buildContext)
+                                  .buttonListTileItemCuenta(
+                                      buildContext: buildContext,
+                                      perfilNegocio:
+                                          Global.listAdminPerfilNegocio[index]),
                             ],
                           );
                         },
@@ -417,10 +477,18 @@ class PagePrincipal extends StatelessWidget {
           return [
             SliverList(
               delegate: SliverChildListDelegate([
-                Global.listProudctosNegocio.length!=0?SizedBox(height: 12.0):Container(),
-                Global.listProudctosNegocio.length!=0?widgetsListaHorizontalMarcas(buildContext: buildContext):Container(),
-                Global.listProudctosNegocio.length!=0?widgetBuscadorView(buildContext: buildContext):Container(),
-                Global.listProudctosNegocio.length!=0?SizedBox(height: 12.0):Container(),
+                Global.listProudctosNegocio.length != 0
+                    ? SizedBox(height: 12.0)
+                    : Container(),
+                Global.listProudctosNegocio.length != 0
+                    ? widgetsListaHorizontalMarcas(buildContext: buildContext)
+                    : Container(),
+                Global.listProudctosNegocio.length != 0
+                    ? widgetBuscadorView(buildContext: buildContext)
+                    : Container(),
+                Global.listProudctosNegocio.length != 0
+                    ? SizedBox(height: 12.0)
+                    : Container(),
               ]),
             ),
           ];
@@ -436,7 +504,8 @@ class PagePrincipal extends StatelessWidget {
                   : Colors.black,
               onTap: (value) {
                 showModalBottomSheet(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20.0)),
                     backgroundColor: Theme.of(buildContext).canvasColor,
                     context: buildContext,
                     builder: (ctx) {

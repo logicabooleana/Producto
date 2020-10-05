@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../services/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:liquid_swipe/liquid_swipe.dart';
 
 class LoginScreen extends StatefulWidget {
   createState() => LoginScreenState();
@@ -10,18 +10,24 @@ class LoginScreen extends StatefulWidget {
 
 class LoginScreenState extends State<LoginScreen> {
   /* Declarar variables */
-  PageController _controller = PageController(initialPage: 0);
+  int page = 0; /* Posición de la página */
+  bool enableSlideIcon =
+      true; /* Controla el estado de la visibilidad de iconButton para deslizar la pantalla del lado izquierdo */
+  bool isDarkGlobal = false; /* Controla el brillo de la barra de estado */
   AuthService auth = AuthService();
   Size screenSize;
-
+  bool authState = false;
+  bool loadAuth = false;
   @override
   void initState() {
+    if (FirebaseAuth.instance == null) {
+      Navigator.pushReplacementNamed(context, '/page_principal');
+    }
     super.initState();
   }
 
   @override
   void dispose() {
-    _controller.dispose();
     super.dispose();
   }
 
@@ -32,47 +38,132 @@ class LoginScreenState extends State<LoginScreen> {
     //TODO: Verificar metodo de authenticacion
     FirebaseAuth.instance.authStateChanges().listen((User user) {
       if (user == null) {
+        setState(() {
+          authState = true;
+        });
       } else {
         Navigator.pushReplacementNamed(context, '/page_principal');
       }
     });
-    return scaffold();
-    //return Scaffold(body: Center(child: CircularProgressIndicator()));
+
+    if (authState) {
+      return scaffold();
+    } else {
+      return Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
   }
 
   Widget scaffold() {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            /* Image.asset(
-              'assets/barcode.png',
-              width: 100.0,
-              height: 100.0,
-              color: Theme.of(context).brightness==Brightness.dark?Colors.white:Colors.black,
+      body: LiquidSwipe(
+        initialPage: 0,
+        fullTransitionValue: 500,
+        /* Establece la distancia de desplazamiento o la sensibilidad para un deslizamiento completo. */
+        enableSlideIcon: enableSlideIcon,
+        /* Se usa para habilitar el ícono de diapositiva a la derecha de dónde se originaría la onda */
+        enableLoop: false,
+        /* Habilitar o deshabilitar la recurrencia de páginas. */
+        positionSlideIcon: 0.00,
+        /* Coloque su icono en el eje y en el lado derecho de la pantalla */
+        slideIconWidget: Icon(Icons.arrow_back_ios,
+            color: isDarkGlobal ? Colors.black : Colors.white),
+        pages: [
+          componentePersonado(
+              color: Colors.purple[600],
+              iconData: Icons.search,
+              texto: "ESCANEAR",
+              descripcion:
+                  "Solo tenes que enfocar el producto y obtenes la información en el acto",
+              brightness: Brightness.light),
+          componente(
+              color: Colors.orange[600],
+              iconData: Icons.monetization_on,
+              texto: "¿QUERES SABER EL PRECIO?",
+              descripcion:
+                  "Compara el precios de diferentes comerciantes o compartir tu precio",
+              brightness: Brightness.light),
+          componente(
+              color: Colors.lightBlue[600],
+              iconData: Icons.category,
+              texto: "Crea tu catálogo",
+              descripcion: "Arma tu catalogo de productos",
+              brightness: Brightness.light),
+        ],
+        /* Establecer las páginas / vistas / contenedores */
+        onPageChangeCallback: onPageChangeCallback,
+        /* Pase su método como devolución de llamada, devolverá un número de página. */
+        waveType: WaveType
+            .liquidReveal, /* Seleccione el tipo de revelación que desea. */
+      ),
+    );
+  }
+
+  Widget componente(
+      {@required IconData iconData,
+      @required String texto,
+      @required String descripcion,
+      @required Color color,
+      Brightness brightness = Brightness.light}) {
+    Color colorPrimary =
+        brightness != Brightness.light ? Colors.black : Colors.white;
+    return Container(
+      color: color,
+      padding: EdgeInsets.symmetric(horizontal: 30.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Flexible(
+            flex: 3,
+            child: Container(
+              color: Colors.transparent,
+              child: Stack(
+                children: [
+                  Center(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(iconData, size: 100.0, color: colorPrimary),
+                        SizedBox(height: 12.0),
+                        Text(texto,
+                            style:
+                                TextStyle(fontSize: 24.0, color: colorPrimary),
+                            textAlign: TextAlign.center),
+                        descripcion != ""
+                            ? Text(
+                                descripcion,
+                                style: TextStyle(
+                                  fontSize: 16.0,
+                                  color: colorPrimary,
+                                ),
+                                textAlign: TextAlign.center,
+                              )
+                            : Container(),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-            Text(
-              'Producto',
-              style: TextStyle(fontStyle: FontStyle.normal,fontSize: 30.0,color: Theme.of(context).brightness==Brightness.dark?Colors.white:Colors.black),
-              textAlign: TextAlign.center,
-            ),
-            Text('👋'), */
-            onboading(),
-            SmoothPageIndicator(
-                controller: _controller,
-                count: 3,
-                effect: WormEffect( dotColor: Theme.of(context).brightness == Brightness.dark?Colors.white24:Colors.black26, activeDotColor: Theme.of(context).brightness == Brightness.dark?Colors.white:Colors.black,)),
-            LoginButton(
-              text: 'INICIAR SESIÓN CON GOOGLE',
-              icon: FontAwesomeIcons.google,
-              color: Colors.white,
-              colorbutton: Theme.of(context).primaryColor,
-              loginMethod: auth.googleSignIn,
-            ),
-            Row(
+          ),
+          Flexible(
+            flex: 2,
+            child: loadAuth == false
+                ? loginButton(
+                    text: 'INICIAR SESIÓN CON GOOGLE',
+                    icon: FontAwesomeIcons.google,
+                    color: colorPrimary,
+                    colorbutton: Colors.transparent,
+                    loginMethod: auth.googleSignIn,
+                  )
+                : Center(
+                    child: CircularProgressIndicator(
+                        backgroundColor: Colors.white)),
+          ),
+          Flexible(
+            flex: 1,
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
@@ -83,84 +174,7 @@ class LoginScreenState extends State<LoginScreen> {
                 ),
                 Text(
                   "Commer",
-                  style: TextStyle(fontSize: 18.0),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget onboading() {
-    return Container(
-      width: screenSize.width,
-      height: screenSize.height / 2,
-      child: PageView(
-        /* Una lista desplazable que funciona página por página. */
-        controller: _controller,
-        /*  El initialPageparámetro establecido en 0 significa que el primer elemento secundario del widget PageViewse mostrará primero (ya que es un índice basado en cero) */
-        pageSnapping: true,
-        /* Deslizaiento automatico */
-        scrollDirection: Axis.horizontal,
-        /* Dirección de deslizamiento */
-        children: <Widget>[
-          Container(
-            color: Colors.transparent,
-            child: Stack(
-              children: [
-                Center(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image(
-                      color:Theme.of(context).brightness == Brightness.dark?Colors.white:Colors.black,
-                      height: 100.0,
-                      width: 100.0,
-                      image: AssetImage('assets/barcode.png'),
-                      fit: BoxFit.contain),
-                      SizedBox(height: 12.0),
-                      Text("Escanea un producto",style: TextStyle(fontSize: 24.0)),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            color: Colors.transparent,
-            child: Stack(
-              children: [
-                Center(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.monetization_on,size: 100.0),
-                      SizedBox(height: 12.0),
-                      Text("Compara precios",style: TextStyle(fontSize: 24.0)),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            color: Colors.transparent,
-            child: Stack(
-              children: [
-                Center(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.category,size: 100.0),
-                      SizedBox(height: 12.0),
-                      Text("crea tu catalogo",style: TextStyle(fontSize: 24.0)),
-                    ],
-                  ),
+                  style: TextStyle(fontSize: 18.0, color: colorPrimary),
                 ),
               ],
             ),
@@ -169,44 +183,149 @@ class LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
-}
 
-class LoginButton extends StatelessWidget {
-  final Color color;
-  final Color colorbutton;
-  final IconData icon;
-  final String text;
-  final Function loginMethod;
-
-  const LoginButton(
-      {Key key,
-      this.text,
-      this.icon,
-      this.color,
-      this.colorbutton,
-      this.loginMethod})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
+  Widget componentePersonado(
+      {@required IconData iconData,
+      @required String texto,
+      @required String descripcion,
+      @required Color color,
+      Brightness brightness = Brightness.light}) {
+    Color colorPrimary =
+        brightness != Brightness.light ? Colors.black : Colors.white;
     return Container(
-      margin: EdgeInsets.only(bottom: 10),
-      child: FlatButton.icon(
-        padding: EdgeInsets.all(30),
-        icon: Icon(icon, color: color),
-        color: colorbutton,
-        onPressed: () async {
-          var user = await loginMethod();
-          if (user != null) {
-            Navigator.of(context).pushNamedAndRemoveUntil(
-                '/page_principal', (Route<dynamic> route) => false);
-          }
-        },
-        label: Expanded(
-          child: Text(
-            '$text',
-            textAlign: TextAlign.center,
-            style: TextStyle(color: color),
+      padding: EdgeInsets.symmetric(horizontal: 30.0),
+      color: color,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Flexible(
+            flex: 3,
+            child: Container(
+              color: Colors.transparent,
+              child: Stack(
+                children: [
+                  Center(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image(
+                            color: colorPrimary,
+                            height: 100.0,
+                            width: 100.0,
+                            image: AssetImage('assets/barcode.png'),
+                            fit: BoxFit.contain),
+                        SizedBox(height: 12.0),
+                        Text(texto,
+                            style:
+                                TextStyle(fontSize: 24.0, color: colorPrimary),
+                            textAlign: TextAlign.center),
+                        descripcion != ""
+                            ? Text(
+                                descripcion,
+                                style: TextStyle(
+                                  fontSize: 16.0,
+                                  color: colorPrimary,
+                                ),
+                                textAlign: TextAlign.center,
+                              )
+                            : Container(),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Flexible(
+            flex: 2,
+            child: loadAuth == false
+                ? loginButton(
+                    text: 'INICIAR SESIÓN CON GOOGLE',
+                    icon: FontAwesomeIcons.google,
+                    color: colorPrimary,
+                    colorbutton: Colors.transparent,
+                    loginMethod: auth.googleSignIn,
+                  )
+                : Center(
+                    child: CircularProgressIndicator(
+                        backgroundColor: Colors.white)),
+          ),
+          Flexible(
+            flex: 1,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Image.asset('assets/ic_launcher_commer.png',
+                    width: 30.0, height: 30.0),
+                SizedBox(
+                  width: 8.0,
+                ),
+                Text(
+                  "Commer",
+                  style: TextStyle(fontSize: 18.0, color: colorPrimary),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /* liquid_swipe / Pase su método como devolución de llamada, devolverá un número de página. */
+  onPageChangeCallback(int lpage) {
+    setState(
+        // Controla el estado de la visibilidad de iconButton para deslizar la pantalla del lado izquierdo
+        () {
+      page = lpage;
+      if (2 == page) {
+        /* Esconde el iconButton de desplazamiento */
+        enableSlideIcon = false;
+        /* Aplicar color oscuro al iconButton de deslizamiento */
+        isDarkGlobal = true;
+      } else {
+        /* Muestra el iconButton de desplazamiento */
+        enableSlideIcon = true;
+        /* Por default aplica el brillo al iconButton */
+        isDarkGlobal = false;
+      }
+    });
+  }
+
+  Widget loginButton(
+      {String text,
+      IconData icon,
+      Color color,
+      Color colorbutton,
+      var loginMethod}) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+      child: Container(
+        margin: EdgeInsets.only(bottom: 12),
+        child: FlatButton.icon(
+          shape: OutlineInputBorder(
+              borderSide: BorderSide(width: 2.0, color: color)),
+          padding: EdgeInsets.all(30),
+          icon: Icon(icon, color: color),
+          color: colorbutton,
+          onPressed: () async {
+            setState(() {loadAuth = true;});
+            var user = await loginMethod();
+            if (user != null) {
+              Navigator.of(context).pushNamedAndRemoveUntil('/page_principal', (Route<dynamic> route) => false);
+            }else{
+              setState(() { loadAuth = false; });
+            }
+          },
+          label: Expanded(
+            child: Text(
+              '$text',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: color),
+            ),
           ),
         ),
       ),

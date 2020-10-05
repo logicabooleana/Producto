@@ -50,8 +50,7 @@ class _ViewCategoriaState extends State<ViewCategoria> {
             if (Global.listCategoriasCatalogo.length == 0) {
               return crearCategoria == false
                   ? ListTile(
-                      contentPadding: EdgeInsets.symmetric(
-                          vertical: 15.0, horizontal: 15.0),
+                      contentPadding:EdgeInsets.symmetric(vertical: 8.0,horizontal: 12.0),
                       leading: CircleAvatar(
                         radius: 24.0,
                         child: Icon(Icons.add),
@@ -77,8 +76,7 @@ class _ViewCategoriaState extends State<ViewCategoria> {
                         children: <Widget>[
                           crearCategoria == false
                               ? ListTile(
-                                  contentPadding: EdgeInsets.symmetric(
-                                      vertical: 15.0, horizontal: 15.0),
+                                  contentPadding:EdgeInsets.symmetric(vertical: 8.0,horizontal: 12.0),
                                   leading: CircleAvatar(
                                     radius: 24.0,
                                     child: Icon(Icons.add),
@@ -94,10 +92,11 @@ class _ViewCategoriaState extends State<ViewCategoria> {
                               : widgetCrearCategoria(
                                   buildContext: buildContext),
                           Global.listCategoriasCatalogo != 0
-                              ? Divider(endIndent: 12.0, indent: 12.0)
+                              ? Divider(endIndent: 12.0, indent: 12.0,height: 0.0)
                               : Container(),
                           Global.listCategoriasCatalogo != 0
                               ? ListTile(
+                                contentPadding:EdgeInsets.symmetric(vertical: 8.0,horizontal: 12.0),
                                   leading: CircleAvatar(
                                     radius: 24.0,
                                     child: Icon(Icons.all_inclusive),
@@ -120,8 +119,9 @@ class _ViewCategoriaState extends State<ViewCategoria> {
                                   },
                                 )
                               : Container(),
-                          Divider(endIndent: 12.0, indent: 12.0),
+                          Divider(endIndent: 12.0, indent: 12.0,height: 0.0),
                           ListTile(
+                            contentPadding:EdgeInsets.symmetric(vertical: 8.0,horizontal: 12.0),
                             leading: CircleAvatar(
                               backgroundColor: Colors.black26,
                               radius: 24.0,
@@ -134,18 +134,11 @@ class _ViewCategoriaState extends State<ViewCategoria> {
                             dense: true,
                             title: Text(categoria.nombre),
                             onTap: () {
-                              buildContext
-                                  .read<ProviderCatalogo>()
-                                  .setNombreFiltro = categoria.nombre;
-                              buildContext
-                                  .read<ProviderCatalogo>()
-                                  .setCategoria = categoria;
+                              buildContext.read<ProviderCatalogo>().setNombreFiltro = categoria.nombre;
+                              buildContext.read<ProviderCatalogo>().setCategoria = categoria;
                               showModalBottomSheet(
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(20.0)),
-                                  backgroundColor:
-                                      Theme.of(buildContext).canvasColor,
+                                  shape: RoundedRectangleBorder(borderRadius:BorderRadius.circular(20.0)),
+                                  backgroundColor:Theme.of(buildContext).canvasColor,
                                   context: buildContextPrincipal,
                                   builder: (ctx) {
                                     return ClipRRect(
@@ -157,12 +150,13 @@ class _ViewCategoriaState extends State<ViewCategoria> {
                                   });
                             },
                           ),
-                          Divider(endIndent: 12.0, indent: 12.0),
+                          Divider(endIndent: 12.0, indent: 12.0,height: 0.0),
                         ],
                       )
                     : Column(
                         children: <Widget>[
                           ListTile(
+                            contentPadding:EdgeInsets.symmetric(vertical: 8.0,horizontal: 12.0),
                             leading: CircleAvatar(
                               backgroundColor: Colors.black26,
                               radius: 24.0,
@@ -197,7 +191,7 @@ class _ViewCategoriaState extends State<ViewCategoria> {
                                   });
                             },
                           ),
-                          Divider(endIndent: 12.0, indent: 12.0),
+                          Divider(endIndent: 12.0, indent: 12.0,height: 0.0),
                         ],
                       );
               },
@@ -315,8 +309,7 @@ class ViewSubCategoriaState extends State<ViewSubCategoria> {
                 children: [
                   crearCategoria == false
                       ? ListTile(
-                          contentPadding: EdgeInsets.symmetric(
-                              vertical: 15.0, horizontal: 15.0),
+                          contentPadding:EdgeInsets.symmetric(vertical: 8.0,horizontal: 12.0),
                           leading: CircleAvatar(
                             radius: 24.0,
                             child: Icon(Icons.add),
@@ -331,6 +324,7 @@ class ViewSubCategoriaState extends State<ViewSubCategoria> {
                         )
                       : widgetCrearSubcategoria(idCategoria: paramCategoria.id),
                   ListTile(
+                    contentPadding:EdgeInsets.symmetric(vertical: 8.0,horizontal: 12.0),
                     leading: CircleAvatar(
                       radius: 24.0,
                       child: Icon(Icons.all_inclusive),
@@ -357,8 +351,7 @@ class ViewSubCategoriaState extends State<ViewSubCategoria> {
                         children: <Widget>[
                           crearCategoria == false
                               ? ListTile(
-                                  contentPadding: EdgeInsets.symmetric(
-                                      vertical: 15.0, horizontal: 15.0),
+                                contentPadding:EdgeInsets.symmetric(vertical: 8.0,horizontal: 12.0),
                                   leading: CircleAvatar(
                                     radius: 24.0,
                                     child: Icon(Icons.add),
@@ -374,10 +367,11 @@ class ViewSubCategoriaState extends State<ViewSubCategoria> {
                               : widgetCrearSubcategoria(
                                   idCategoria: paramCategoria.id),
                           listaSubcategoria.length != 0
-                              ? Divider(endIndent: 12.0, indent: 12.0)
+                              ? Divider(endIndent: 12.0, indent: 12.0,height: 0.0)
                               : Container(),
                           listaSubcategoria.length != 0
                               ? ListTile(
+                                contentPadding:EdgeInsets.symmetric(vertical: 8.0,horizontal: 12.0),
                                   leading: CircleAvatar(
                                     radius: 24.0,
                                     child: Icon(Icons.all_inclusive),
@@ -391,8 +385,9 @@ class ViewSubCategoriaState extends State<ViewSubCategoria> {
                                   },
                                 )
                               : Container(),
-                          Divider(endIndent: 12.0, indent: 12.0),
+                          Divider(endIndent: 12.0, indent: 12.0,height: 0.0),
                           ListTile(
+                            contentPadding:EdgeInsets.symmetric(vertical: 8.0,horizontal: 12.0),
                             leading: CircleAvatar(
                               backgroundColor: Colors.black26,
                               radius: 24.0,
@@ -416,12 +411,13 @@ class ViewSubCategoriaState extends State<ViewSubCategoria> {
                               Navigator.pop(buildContextSubcategoria);
                             },
                           ),
-                          Divider(endIndent: 12.0, indent: 12.0),
+                          Divider(endIndent: 12.0, indent: 12.0,height: 0.0),
                         ],
                       )
                     : Column(
                         children: <Widget>[
                           ListTile(
+                            contentPadding:EdgeInsets.symmetric(vertical: 8.0,horizontal: 12.0),
                             leading: CircleAvatar(
                               backgroundColor: Colors.black26,
                               radius: 24.0,
@@ -445,7 +441,7 @@ class ViewSubCategoriaState extends State<ViewSubCategoria> {
                               Navigator.pop(buildContextSubcategoria);
                             },
                           ),
-                          Divider(endIndent: 12.0, indent: 12.0),
+                          Divider(endIndent: 12.0, indent: 12.0,height: 0.0),
                         ],
                       );
               },
@@ -539,10 +535,11 @@ class _ViewConfigState extends State<ViewConfig> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        margin: const EdgeInsets.symmetric(vertical: 12.0),
+        margin: const EdgeInsets.all(12.0),
         child: ListView(
           children: [
             ListTile( 
+              contentPadding:EdgeInsets.symmetric(vertical: 8.0,horizontal: 13.0),
               leading: Global.oPerfilNegocio.imagen_perfil == "" ||
                       Global.oPerfilNegocio.imagen_perfil == "default"
                   ? CircleAvatar(
@@ -569,7 +566,7 @@ class _ViewConfigState extends State<ViewConfig> {
               title: Text('Editar'),
               onTap: () => Navigator.pushNamed(buildContext, '/profilCuenta'),
             ),
-            Divider(endIndent: 12.0,indent: 12.0),
+            Divider(endIndent: 12.0, indent: 12.0,height: 0.0),
             DynamicTheme.of(buildContext).getViewListTileSelectTheme(buildContext: buildContext),
           ],
         ),

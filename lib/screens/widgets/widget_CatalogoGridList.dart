@@ -38,11 +38,7 @@ class _WidgetCatalogoGridListState extends State<WidgetCatalogoGridList> {
             status: providerCatalogo.statusCargaGridListCatalogo,
             loadingMsg: 'Cargando...',
             errorMsg: 'errorMsg',
-            finishMsg: providerCatalogo.listCatalogoFilter.length == 1
-                ? providerCatalogo.listCatalogoFilter.length.toString() +
-                    " resultado"
-                : providerCatalogo.listCatalogoFilter.length.toString() +
-                    " resultados",
+            finishMsg: providerCatalogo.listCatalogoFilter.length==1?providerCatalogo.listCatalogoFilter.length.toString()+"resultado":providerCatalogo.listCatalogoFilter.length.toString()+"resultados",
             child: CustomScrollView(
               slivers: <Widget>[
                 SliverGrid(

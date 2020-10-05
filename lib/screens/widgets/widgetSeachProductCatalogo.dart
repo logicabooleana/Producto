@@ -5,23 +5,27 @@ import 'package:producto/screens/page_producto_new.dart';
 import 'package:flutter/services.dart';
 import 'package:clipboard/clipboard.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:animate_do/animate_do.dart';
 
 class WidgetSeachProduct extends StatefulWidget {
-  WidgetSeachProduct({Key key}) : super(key: key);
+  String codigo;
+  WidgetSeachProduct({this.codigo});
 
   @override
-  _WidgetSeachProductState createState() => _WidgetSeachProductState();
+  _WidgetSeachProductState createState() =>
+      _WidgetSeachProductState(codigoBar: codigo);
 }
 
 class _WidgetSeachProductState extends State<WidgetSeachProduct> {
   TextEditingController textEditingController = new TextEditingController();
-
   String codigoBar = "";
-  TextStyle textStyle = new TextStyle(fontSize: 30.0);
   bool buscando = false;
   String textoTextResult = "";
-  String texto = "";
   bool buttonAddProduct = false;
+  Color colorView;
+  bool resultState = true;
+
+  _WidgetSeachProductState({this.codigoBar = ""});
 
   @override
   void dispose() {
@@ -29,10 +33,22 @@ class _WidgetSeachProductState extends State<WidgetSeachProduct> {
   }
 
   @override
+  void initState() {
+    if (codigoBar != null) {
+      getIdProducto(id: codigoBar ?? "");
+    }
+    textEditingController = TextEditingController(text: codigoBar ?? "");
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    colorView =
+        resultState == true ? Theme.of(context).primaryColor : Colors.red[400];
     return Scaffold(
       appBar: AppBar(
-        title: Text("Buscar"),
+        backgroundColor: colorView,
+        title: Text(resultState ? "Buscar" : "No se encontro coincidencia"),
       ),
       body: _body(),
     );
@@ -49,12 +65,11 @@ class _WidgetSeachProductState extends State<WidgetSeachProduct> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             Row(
-              crossAxisAlignment:CrossAxisAlignment.center ,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Flexible(
                   child: TextField(
                     controller: textEditingController,
-                    //keyboardType: TextInputType.number,
                     keyboardType:
                         TextInputType.numberWithOptions(decimal: false),
                     inputFormatters: [
@@ -68,8 +83,26 @@ class _WidgetSeachProductState extends State<WidgetSeachProduct> {
                       });
                     },
                     decoration: InputDecoration(
-                        border: OutlineInputBorder(), labelText: "Código"),
-                    style: textStyle,
+                        suffixIcon: IconButton(
+                          onPressed: (){
+                            setState(() {
+                              textEditingController.clear();
+                              buttonAddProduct = false;
+                              resultState = true;
+                            });
+                          },
+                          icon: Icon(Icons.clear,color: colorView),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: colorView)),
+                        border: OutlineInputBorder(
+                            borderSide: BorderSide(color: colorView)),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: colorView)),
+                        labelStyle: TextStyle(color: colorView),
+                        labelText: "Código",
+                        suffixStyle: TextStyle(color: colorView)),
+                    style: TextStyle(fontSize: 30.0),
                   ),
                 ),
                 IconButton(
@@ -80,8 +113,8 @@ class _WidgetSeachProductState extends State<WidgetSeachProduct> {
                       setState(() {
                         textEditingController.text = value ?? "";
                         buttonAddProduct = false;
-                        texto = "";
                         codigoBar = value;
+                        resultState = true;
                       });
                     });
                   },
@@ -89,61 +122,61 @@ class _WidgetSeachProductState extends State<WidgetSeachProduct> {
               ],
             ),
             Column(
-              crossAxisAlignment:CrossAxisAlignment.center ,
+              crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 !buscando
-                ? Container(
-                  width: double.infinity,
-                  child: RaisedButton.icon(
-                    color: Theme.of(context).primaryColor,
-                    padding: EdgeInsets.all(12.0),
-                      icon: Icon(Icons.search),
-                      onPressed: () {
-                        if (textEditingController.text != "") {
-                          setState(() {
-                            buscando = true;
-                            buttonAddProduct = false;
-                            texto = "";
-                            getIdProducto(id: codigoBar ?? "");
-                          });
-                        }
-                      },
-                      label: Text("Buscar"),
-                      textColor: Colors.white,
-                    ),
-                )
-                : SizedBox(
-                    child: CircularProgressIndicator(),
-                    height: screenSize.width / 2,
-                    width: screenSize.width / 2,
-                  ),
-            !buscando?SizedBox(width: 12.0,height: 12.0):Container(),
-            !buscando
-                ? Container(
-                  width: double.infinity,
-                  child: RaisedButton.icon(
-                    color: Theme.of(context).primaryColor,
-                    padding: EdgeInsets.all(12.0),
-                  icon: Image(
-                      color: Colors.white,
-                      height: 20.0,
-                      width: 20.0,
-                      image: AssetImage('assets/barcode.png'),
-                      fit: BoxFit.contain),
-                  label: Text('Escanea el código',style: TextStyle(color: Colors.white)),
-                  textColor: Colors.white,
-                  onPressed: () {
-                    scanBarcodeNormal(context: context);
-                  }),
-                )
-                : Container(),
+                    ? FadeInRight(
+                        child: Container(
+                        width: double.infinity,
+                        child: RaisedButton.icon(
+                          color: colorView,
+                          padding: EdgeInsets.all(16.0),
+                          icon: Icon(Icons.search),
+                          onPressed: () {
+                            if (textEditingController.text != "") {
+                              setState(() {
+                                getIdProducto(id: codigoBar ?? "");
+                              });
+                            }
+                          },
+                          label: Text("Buscar"),
+                          textColor: Colors.white,
+                        ),
+                      ))
+                    : SizedBox(
+                        child: CircularProgressIndicator(),
+                        height: screenSize.width / 2,
+                        width: screenSize.width / 2,
+                      ),
+                !buscando ? SizedBox(width: 12.0, height: 12.0) : Container(),
+                !buscando
+                    ? FadeInLeft(
+                        child: Container(
+                        width: double.infinity,
+                        child: RaisedButton.icon(
+                            color: colorView,
+                            padding: EdgeInsets.all(16.0),
+                            icon: Image(
+                                color: Colors.white,
+                                height: 20.0,
+                                width: 20.0,
+                                image: AssetImage('assets/barcode.png'),
+                                fit: BoxFit.contain),
+                            label: Text('Escanea el código',
+                                style: TextStyle(color: Colors.white)),
+                            textColor: Colors.white,
+                            onPressed: () {
+                              scanBarcodeNormal(context: context);
+                            }),
+                      ))
+                    : Container(),
               ],
             ),
-            !buscando?Text(texto):Container(),
-            buttonAddProduct? Container(
-              width: double.infinity,
-              child: RaisedButton.icon(
+            buttonAddProduct
+                ? Container(
+                    width: double.infinity,
+                    child: RaisedButton.icon(
                       onPressed: () {
                         Navigator.of(context).pushReplacement(MaterialPageRoute(
                           builder: (BuildContext context) => ProductNew(
@@ -154,11 +187,12 @@ class _WidgetSeachProductState extends State<WidgetSeachProduct> {
                       color: Theme.of(context).primaryColor,
                       padding: EdgeInsets.all(12.0),
                       label: Text("Agregar nuevo producto",
-                          style: TextStyle(fontSize: 18.0, color: Colors.white)),
+                          style:
+                              TextStyle(fontSize: 18.0, color: Colors.white)),
                       icon: Icon(Icons.add),
                       textColor: Colors.white,
                     ),
-            )
+                  )
                 : Container(),
           ],
         ),
@@ -167,6 +201,15 @@ class _WidgetSeachProductState extends State<WidgetSeachProduct> {
   }
 
   void getIdProducto({@required String id}) {
+    buscando = true;
+    buttonAddProduct = false;
+    if (id == null) {
+      id = "null";
+    }
+    if (id == "") {
+      id = "null";
+    }
+
     Global.getProductosPrecargado(idProducto: id)
         .getDataProductoGlobal()
         .then((product) {
@@ -179,15 +222,17 @@ class _WidgetSeachProductState extends State<WidgetSeachProduct> {
             ),
           );
         } else {
-          texto = "No existee!";
           buscando = false;
           buttonAddProduct = true;
+          colorView = Colors.red;
+          resultState = false;
           setState(() {});
         }
       } else {
-        texto = "No existe!";
         buttonAddProduct = true;
         buscando = false;
+        colorView = Colors.red;
+        resultState = false;
         setState(() {});
       }
     });
@@ -205,12 +250,11 @@ class _WidgetSeachProductState extends State<WidgetSeachProduct> {
     }
 
     setState(() {
-          textEditingController.text = barcodeScanRes ?? "";
-          codigoBar = barcodeScanRes ?? "";
-          buscando = true;
-          buttonAddProduct = false;
-          texto = "";
-          getIdProducto(id: barcodeScanRes ?? "");
-        });
+      textEditingController.text = barcodeScanRes ?? "";
+      codigoBar = barcodeScanRes ?? "";
+      buscando = true;
+      buttonAddProduct = false;
+      getIdProducto(id: barcodeScanRes ?? "");
+    });
   }
 }
