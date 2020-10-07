@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 
+
+
 class Option {
   String value;
   String detail;
@@ -13,7 +15,63 @@ class Option {
     correct = data['correct'];
   }
 }
+  class Usuario {
 
+    // informacion perfil
+    String id="";
+    String nombre="";
+    String apellido="";
+    String urlfotoPerfil="default";
+    Timestamp timestamp_creation; // Fecha de creacion
+    Timestamp timestamp_sesion; // Fecha de la ultima hora que inicio sesin a la app
+    String email="";
+
+    /*
+   Referencia a la cuenta de negocios del usuario
+   si es null el usuario no tiene una cuenta
+    */
+    String id_cuenta_negocio="";
+
+  Usuario({ this.id, this.nombre, this.apellido,this.urlfotoPerfil, this.timestamp_creation, this.timestamp_sesion , this.email , this.id_cuenta_negocio });
+  Usuario.fromMap(Map data) {
+    id = data['id']?? "";
+    nombre = data['nombre'] ?? "";
+    apellido = data['apellido']??"";
+    urlfotoPerfil = data['urlfotoPerfil']?? "";
+    timestamp_creation = data['timestamp_creation'];
+    timestamp_sesion = data['timestamp_sesion'];
+    email = data['email']?? "";
+  }
+  
+  Map<String, dynamic> toJson() => {
+        "id": id??"",
+        "nombre": nombre??true,
+        "apellido": apellido??"",
+        "urlfotoPerfil": urlfotoPerfil??"",
+        "timestamp_creation": timestamp_creation,
+        "timestamp_sesion": timestamp_sesion,
+        "email": email??"",
+    };
+
+  }
+class AsuarioAdministrador {
+  String id_usuario="";
+  bool habilitado=true;
+  int tipocuenta=0 ;// 0 = administrador | 1 = etandar  
+
+  AsuarioAdministrador({ this.id_usuario, this.habilitado, this.tipocuenta });
+  AsuarioAdministrador.fromMap(Map data) {
+    id_usuario = data['id_usuario']?? "";
+    habilitado = data['habilitado'] ?? true;
+    tipocuenta = data['tipocuenta']?? 0;
+  }
+  
+  Map<String, dynamic> toJson() => {
+        "id_usuario": id_usuario??"",
+        "habilitado": habilitado??true,
+        "tipocuenta": tipocuenta??"",
+    };
+}
 
 
 class ProductoNegocio  {

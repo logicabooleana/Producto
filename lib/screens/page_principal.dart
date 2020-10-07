@@ -13,7 +13,6 @@ import 'package:flutter/cupertino.dart';
 
 /* Dependencias */
 import 'package:producto/shared/widget_button.dart';
-import 'package:producto/shared/widgets_image_circle.dart';
 import 'package:producto/shared/widgets_image_circle.dart' as image;
 import 'package:producto/services/preferencias_usuario.dart';
 import 'package:producto/screens/widgets/widgetSeachProductCatalogo.dart';
@@ -398,16 +397,9 @@ class PagePrincipal extends StatelessWidget {
                             return Column(
                               children: <Widget>[
                                 createCuentaEmpresa
-                                    ? WidgetButtonListTile(
-                                            buildContext: buildContext)
-                                        .buttonListTileCrearCuenta(
-                                            context: buildContext)
+                                    ? WidgetButtonListTile(buildContext: buildContext).buttonListTileCrearCuenta(context: buildContext)
                                     : Container(),
-                                WidgetButtonListTile(buildContext: buildContext)
-                                    .buttonListTileItemCuenta(
-                                        buildContext: buildContext,
-                                        perfilNegocio: Global
-                                            .listAdminPerfilNegocio[index]),
+                                WidgetButtonListTile(buildContext: buildContext).buttonListTileItemCuenta(buildContext: buildContext,perfilNegocio: Global.listAdminPerfilNegocio[index],adminPropietario: Global.listAdminPerfilNegocio[index].id==firebaseUser.uid),
                               ],
                             );
                           }
@@ -417,9 +409,9 @@ class PagePrincipal extends StatelessWidget {
                               children: <Widget>[
                                 WidgetButtonListTile(buildContext: buildContext)
                                     .buttonListTileItemCuenta(
+                                      adminPropietario:Global.listAdminPerfilNegocio[index].id==firebaseUser.uid ,
                                         buildContext: buildContext,
-                                        perfilNegocio: Global
-                                            .listAdminPerfilNegocio[index]),
+                                        perfilNegocio: Global.listAdminPerfilNegocio[index]),
                                 Divider(endIndent: 12.0, indent: 12.0,height: 0.0),
                                 WidgetButtonListTile(buildContext: buildContext)
                                     .buttonListTileCerrarSesion(
@@ -432,8 +424,9 @@ class PagePrincipal extends StatelessWidget {
                               WidgetButtonListTile(buildContext: buildContext)
                                   .buttonListTileItemCuenta(
                                       buildContext: buildContext,
-                                      perfilNegocio:
-                                          Global.listAdminPerfilNegocio[index]),
+                                      perfilNegocio:Global.listAdminPerfilNegocio[index],
+                                      adminPropietario: Global.listAdminPerfilNegocio[index].id==firebaseUser.uid
+                                      ),
                             ],
                           );
                         },
@@ -610,7 +603,7 @@ class PagePrincipal extends StatelessWidget {
                                 },
                                 child: Column(
                                   children: <Widget>[
-                                    DashedCircle(
+                                    image.DashedCircle(
                                       dashes:
                                           catalogo.getNumeroDeProductosDeMarca(
                                               id: marca.id),
@@ -642,7 +635,7 @@ class PagePrincipal extends StatelessWidget {
                                 ),
                               );
                             } else {
-                              return DashedCircle(
+                              return image.DashedCircle(
                                 dashes: 1,
                                 gradientColor: colorGradientInstagram,
                                 child: CircleAvatar(

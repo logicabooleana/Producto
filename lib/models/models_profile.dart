@@ -5,7 +5,7 @@ class PerfilNegocio {
   // Informacion del negocios
     String id="";
     String username="";
-    String imagen_perfil="default";
+    String imagen_perfil="";
     String nombre_negocio="";
     String telefono="";
     String categoria="";
@@ -40,7 +40,7 @@ class PerfilNegocio {
     // Informacion del negocios
     this.id="",
     this.username="",
-    this.imagen_perfil="default",
+    this.imagen_perfil="",
     this.nombre_negocio="",
     this.telefono="",
     this.categoria="",
@@ -74,7 +74,7 @@ class PerfilNegocio {
   PerfilNegocio.fromMap(Map data) {
     id = data['id'];
     username = data['username']??"";
-    imagen_perfil = data['imagen_perfil'] ?? 'default';
+    imagen_perfil = data['imagen_perfil'] ?? '';
     nombre_negocio = data['nombre_negocio'];
     telefono = data['telefono'];
     categoria = data['categoria'];

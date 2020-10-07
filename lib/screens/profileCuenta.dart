@@ -11,22 +11,29 @@ import 'package:producto/models/models_profile.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:producto/screens/widgets/widgets_notify.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:producto/shared/progress_bar.dart';
 
 class ProfileCuenta extends StatefulWidget {
   PerfilNegocio perfilNegocio;
-  ProfileCuenta({@required this.perfilNegocio});
+  bool createCuenta;
+  ProfileCuenta({@required this.perfilNegocio, this.createCuenta = false});
   @override
-  _ProfileCuentaState createState() => _ProfileCuentaState(perfilNegocio: perfilNegocio);
+  _ProfileCuentaState createState() => _ProfileCuentaState(
+      perfilNegocio: perfilNegocio, createCuenta: createCuenta);
 }
 
 class _ProfileCuentaState extends State<ProfileCuenta> {
-  _ProfileCuentaState({@required this.perfilNegocio});
+  _ProfileCuentaState(
+      {@required this.perfilNegocio, this.createCuenta = false});
   // Image
   String urlIamgen = "";
   PickedFile _imageFile;
   dynamic _pickImageError;
   final ImagePicker _picker = ImagePicker();
   User firebaseUser;
+  bool createCuenta;
+  String titleAppBar = "Crear cuenta";
 
   // VAriables
   bool saveIndicador = false;
@@ -41,6 +48,17 @@ class _ProfileCuentaState extends State<ProfileCuenta> {
   TextEditingController controllerTextEdit_ciudad;
   TextEditingController controllerTextEdit_provincia;
   TextEditingController controllerTextEdit_pais;
+
+  final FocusNode _focus_TextEdit_nombre = FocusNode();
+  final FocusNode _focus_TextEdit_descripcion = FocusNode();
+  final FocusNode _focus_TextEdit_username = FocusNode();
+  final FocusNode _focus_TextEdit_categoria_nombre = FocusNode();
+  final FocusNode _focus_TextEdit_telefono = FocusNode();
+  final FocusNode _focus_TextEdit_direccion = FocusNode();
+  final FocusNode _focus_TextEdit_sitio_web = FocusNode();
+  final FocusNode _focus_TextEdit_ciudad = FocusNode();
+  final FocusNode _focus_TextEdit_provincia = FocusNode();
+  final FocusNode _focus_TextEdit_pais = FocusNode();
 
   @override
   void initState() {
@@ -82,32 +100,31 @@ class _ProfileCuentaState extends State<ProfileCuenta> {
 
   @override
   Widget build(BuildContext context) {
+    // Proveedor de datoss del usuario autenticado
     firebaseUser = Provider.of<User>(context);
+    if (createCuenta) {
+      this.perfilNegocio.id = firebaseUser.uid;
+    }
 
     if (perfilNegocio.id != null) {
-      perfilNegocio.id = firebaseUser.uid;
       if (perfilNegocio.id != "") {
         return Scaffold(
           appBar: AppBar(
-            title: Text("Perfil de cuenta"),
+            title: Text(!saveIndicador
+                ? createCuenta ? "Crear cuenta" : "Editar"
+                : "Actualizando"),
             actions: <Widget>[
               Builder(builder: (contextBuilder) {
                 return IconButton(
-                  icon: saveIndicador == false
-                      ? Icon(Icons.check)
-                      : Container(
-                          width: 24.0,
-                          height: 24.0,
-                          child: CircularProgressIndicator(
-                            backgroundColor: Colors.white,
-                          ),
-                        ),
+                  icon:
+                      saveIndicador == false ? Icon(Icons.check) : Container(),
                   onPressed: () {
-                    guardar(context: contextBuilder);
+                    guardar(context: context, contextBuilder: contextBuilder);
                   },
                 );
               }),
             ],
+            bottom: saveIndicador ? linearProgressBarApp() : null,
           ),
           body: Container(
             padding: EdgeInsets.all(12.0),
@@ -120,8 +137,11 @@ class _ProfileCuentaState extends State<ProfileCuenta> {
                       height: 24.0,
                     ),
                     FlatButton(
-                      onPressed: () =>
-                          _showModalBottomSheetCambiarImagen(context: context),
+                      onPressed: () {
+                        if (saveIndicador == false) {
+                          _showModalBottomSheetCambiarImagen(context: context);
+                        }
+                      },
                       child: Text(
                         "Cambiar imagen",
                       ),
@@ -168,33 +188,41 @@ class _ProfileCuentaState extends State<ProfileCuenta> {
   }
 
   Widget widgetsImagen() {
-    return Column(
-      children: [
-        _imageFile == null
-            ? CachedNetworkImage(
-                fit: BoxFit.cover,
-                imageUrl: perfilNegocio.imagen_perfil != ""
-                    ? perfilNegocio.imagen_perfil
-                    : "default",
-                placeholder: (context, url) => CircleAvatar(
-                  backgroundColor: Colors.grey,
+    return Container(
+      padding: EdgeInsets.all(12.0),
+      child: Column(
+        children: [
+          _imageFile == null
+              ? perfilNegocio.imagen_perfil != ""
+                  ? CachedNetworkImage(
+                      fit: BoxFit.cover,
+                      imageUrl: perfilNegocio.imagen_perfil != ""
+                          ? perfilNegocio.imagen_perfil
+                          : "default",
+                      placeholder: (context, url) => CircleAvatar(
+                        backgroundColor: Colors.grey,
+                        radius: 100.0,
+                      ),
+                      imageBuilder: (context, image) => CircleAvatar(
+                        backgroundImage: image,
+                        radius: 100.0,
+                      ),
+                      errorWidget: (context, url, error) => CircleAvatar(
+                        backgroundColor: Colors.grey,
+                        radius: 100.0,
+                      ),
+                    )
+                  : CircleAvatar(
+                      backgroundColor: Colors.grey,
+                      radius: 100.0,
+                    )
+              : CircleAvatar(
                   radius: 100.0,
+                  backgroundColor: Colors.transparent,
+                  backgroundImage: FileImage(File(_imageFile.path)),
                 ),
-                imageBuilder: (context, image) => CircleAvatar(
-                  backgroundImage: image,
-                  radius: 100.0,
-                ),
-                errorWidget: (context, url, error) => CircleAvatar(
-                  backgroundColor: Colors.grey,
-                  radius: 100.0,
-                ),
-              )
-            : CircleAvatar(
-                radius: 100.0,
-                backgroundColor: Colors.transparent,
-                backgroundImage: FileImage(File(_imageFile.path)),
-              ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -216,12 +244,19 @@ class _ProfileCuentaState extends State<ProfileCuenta> {
     }
   }
 
+  _fieldFocusChange(
+      BuildContext context, FocusNode currentFocus, FocusNode nextFocus) {
+    currentFocus.unfocus();
+    FocusScope.of(context).requestFocus(nextFocus);
+  }
+
   Widget widgetFormEditText() {
     return Container(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           TextField(
+            enabled: !saveIndicador,
             minLines: 1,
             maxLines: 5,
             keyboardType: TextInputType.multiline,
@@ -230,8 +265,14 @@ class _ProfileCuentaState extends State<ProfileCuenta> {
               labelText: "Nombre",
             ),
             controller: controllerTextEdit_nombre,
+            textInputAction: TextInputAction.next,
+            focusNode: _focus_TextEdit_nombre,
+            onSubmitted: (term) {
+              _fieldFocusChange(context, _focus_TextEdit_nombre, _focus_TextEdit_descripcion);
+            },
           ),
           TextField(
+            enabled: !saveIndicador,
             minLines: 1,
             maxLines: 5,
             keyboardType: TextInputType.multiline,
@@ -240,49 +281,85 @@ class _ProfileCuentaState extends State<ProfileCuenta> {
               labelText: "Descripción",
             ),
             controller: controllerTextEdit_descripcion,
+            textInputAction: TextInputAction.next,
+            focusNode: _focus_TextEdit_descripcion,
+            onSubmitted: (term) {
+              _fieldFocusChange(context, _focus_TextEdit_descripcion, _focus_TextEdit_username);
+            },
           ),
           TextField(
+            enabled: !saveIndicador,
             onChanged: (value) => perfilNegocio.username = value,
             decoration: InputDecoration(
               labelText: "username",
             ),
             controller: controllerTextEdit_username,
+            textInputAction: TextInputAction.next,
+            focusNode: _focus_TextEdit_username,
+            onSubmitted: (term) {
+              _fieldFocusChange(context, _focus_TextEdit_username, _focus_TextEdit_categoria_nombre);
+            },
           ),
           TextField(
+            enabled: !saveIndicador,
             onChanged: (value) => perfilNegocio.categoria_nombre = value,
             decoration: InputDecoration(
               labelText: "Categoria",
             ),
             controller: controllerTextEdit_categoria_nombre,
+            textInputAction: TextInputAction.next,
+            focusNode: _focus_TextEdit_categoria_nombre,
+            onSubmitted: (term) {
+              _fieldFocusChange(context, _focus_TextEdit_categoria_nombre, _focus_TextEdit_telefono);
+            },
           ),
           TextField(
+            enabled: !saveIndicador,
             onChanged: (value) => perfilNegocio.telefono = value,
             decoration: InputDecoration(
-              labelText: "Telefono",
+              labelText: "Telefono (ocional)",
             ),
             controller: controllerTextEdit_telefono,
+            textInputAction: TextInputAction.next,
+            focusNode: _focus_TextEdit_telefono,
+            onSubmitted: (term) {
+              _fieldFocusChange(context, _focus_TextEdit_telefono, _focus_TextEdit_sitio_web);
+            },
           ),
           TextField(
+            enabled: !saveIndicador,
             onChanged: (value) => perfilNegocio.sitio_web = value,
             decoration: InputDecoration(
-              labelText: "Sitio web",
+              labelText: "Sitio web (ocional)",
             ),
             controller: controllerTextEdit_sitio_web,
+            textInputAction: TextInputAction.next,
+            focusNode: _focus_TextEdit_sitio_web,
+            onSubmitted: (term) {
+              _fieldFocusChange(context, _focus_TextEdit_sitio_web, _focus_TextEdit_direccion);
+            },
           ),
           SizedBox(
             height: 24.0,
           ),
           Text("Ubicación", style: TextStyle(fontSize: 24.0)),
           TextField(
+            enabled: !saveIndicador,
             onChanged: (value) => perfilNegocio.direccion = value,
             decoration: InputDecoration(
-              labelText: "Dirección",
+              labelText: "Dirección (ocional)" ,
             ),
             controller: controllerTextEdit_direccion,
+            textInputAction: TextInputAction.next,
+            focusNode: _focus_TextEdit_direccion,
+            onSubmitted: (term) {
+              _fieldFocusChange(context, _focus_TextEdit_direccion, _focus_TextEdit_ciudad);
+            },
           ),
           TextField(
+            enabled: !saveIndicador,
             onChanged: (value) => perfilNegocio.ciudad = value,
-            decoration: InputDecoration(labelText: "Ciudad"),
+            decoration: InputDecoration(labelText: "Ciudad (ocional)"),
             controller: controllerTextEdit_ciudad,
           ),
           InkWell(
@@ -391,13 +468,18 @@ class _ProfileCuentaState extends State<ProfileCuenta> {
         });
   }
 
-  void guardar({@required BuildContext context}) async {
+  void guardar(
+      {@required BuildContext contextBuilder,
+      @required BuildContext context}) async {
+
+    perfilNegocio.provincia=controllerTextEdit_provincia.text;
+    perfilNegocio.pais=controllerTextEdit_pais.text;
     if (perfilNegocio.id != "") {
-      if (controllerTextEdit_nombre.text != "") {
-        if (controllerTextEdit_username.text != "") {
-          if (controllerTextEdit_ciudad.text != "") {
-            if (controllerTextEdit_provincia.text != "") {
-              if (controllerTextEdit_pais.text != "") {
+      if (perfilNegocio.nombre_negocio != "") {
+        if (perfilNegocio.username != "") {
+          if (perfilNegocio.ciudad != "") {
+            if (perfilNegocio.provincia!= "") {
+              if (perfilNegocio.pais != "") {
                 setState(() {
                   saveIndicador = true;
                 });
@@ -410,42 +492,75 @@ class _ProfileCuentaState extends State<ProfileCuenta> {
                       .child(perfilNegocio.id)
                       .child("PERFIL")
                       .child("imagen_perfil");
-                  StorageUploadTask uploadTask =
-                      ref.putFile(File(_imageFile.path));
+                  StorageUploadTask uploadTask =ref.putFile(File(_imageFile.path));
                   // obtenemos la url de la imagen guardada
-                  urlIamgen =
-                      await (await uploadTask.onComplete).ref.getDownloadURL();
+                  urlIamgen =await (await uploadTask.onComplete).ref.getDownloadURL();
                   // TODO: Por el momento los datos del producto se guarda junto a la referencia de la cuenta del negocio
                   perfilNegocio.imagen_perfil = urlIamgen;
                 }
 
-                await Global.getNegocio(idNegocio: perfilNegocio.id)
-                    .upSetPerfilNegocio(perfilNegocio.toJson());
-                Navigator.pop(context);
+                // Cuando se crea una cuenta , se copia referencias del id de usuario de la cuenta
+                if (this.createCuenta) {
+                  // guarda un documento con la referencia del id de la cuenta en una lista en los datos del usuario
+                  await Global.getDataReferenceCuentaUsuarioAministrador(
+                          idNegocio: perfilNegocio.id,
+                          idUsuario: firebaseUser.uid)
+                      .upSetDocument({'id': perfilNegocio.id});
+                  // Guarda datos del usuario y la referencia del id de la cuenta
+                  await Global.getDataUsuario(idUsuario: firebaseUser.uid)
+                      .upSetDocument(new Usuario(
+                              email: firebaseUser.email,
+                              id: firebaseUser.uid,
+                              id_cuenta_negocio: firebaseUser.uid,
+                              nombre: firebaseUser.displayName,
+                              urlfotoPerfil: firebaseUser.photoURL,
+                              timestamp_creation:
+                                  Timestamp.fromDate(new DateTime.now()))
+                          .toJson());
+                  // guarda un documento con la referencia del usuario, en la lista de administradores de la cuenta
+                  await Global.getDataAsuarioAdministrador(
+                          idNegocio: perfilNegocio.id,
+                          idUsuario: firebaseUser.uid)
+                      .upSetDocument(new AsuarioAdministrador(
+                              id_usuario: firebaseUser.uid, tipocuenta: 0)
+                          .toJson());
+                  Global.actualizarPerfilNegocio(perfilNegocio: perfilNegocio);
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                      '/page_principal', (Route<dynamic> route) => false);
+                } else {
+                  // guarda los datos de la cuenta
+                  await Global.getNegocio(idNegocio: perfilNegocio.id)
+                      .upSetPerfilNegocio(perfilNegocio.toJson());
+                  Navigator.pop(context);
+                }
               } else {
                 showSnackBar(
-                    context: context,
+                    context: contextBuilder,
                     message: 'Debe proporcionar un pais de origen');
               }
             } else {
               showSnackBar(
-                  context: context, message: 'Debe proporcionar una provincia');
+                  context: contextBuilder,
+                  message: 'Debe proporcionar una provincia');
             }
           } else {
             showSnackBar(
-                context: context, message: 'Debe proporcionar una ciudad');
+                context: contextBuilder,
+                message: 'Debe proporcionar una ciudad');
           }
         } else {
           showSnackBar(
-              context: context,
+              context: contextBuilder,
               message: 'Debe proporcionar un nombre de usuario');
         }
       } else {
-        showSnackBar(context: context, message: 'Debe proporcionar un nombre');
+        showSnackBar(
+            context: contextBuilder, message: 'Debe proporcionar un nombre');
       }
     } else {
       showSnackBar(
-          context: context, message: 'El ID del usuario de proveedor es NULO');
+          context: contextBuilder,
+          message: 'El ID del usuario de proveedor es NULO');
     }
   }
 }

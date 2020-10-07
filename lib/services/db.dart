@@ -13,6 +13,10 @@ class Document<T> {
     ref = _db.doc(path);
   }
 
+  Future<void> upSetDocument(Map data) {
+    return ref.set(Map<String, dynamic>.from(data), SetOptions(merge: true));
+  }
+
 
   // Models Perfil User Admin Negocio
   Future<T> getDataAdminUsuarioCuenta() {
@@ -34,8 +38,16 @@ class Document<T> {
   Future<void> upSetDataSeguidorRef(Map data) {
     return ref.set(Map<String, dynamic>.from(data), SetOptions(merge: true));
   }
+  // Models Usuario Administrador
+  Future<T> getDataUsuarioAdministrador() {
+    return ref.get().then((v) => Global.modelsArminUsuario[T](v.data()) as T);
+  }
+  Stream<T> streamDataUsuarioAdministrador() {
+    return ref.snapshots().map((v) => Global.modelsArminUsuario[T](v.data()) as T);
+  }
 
   // Models Perfil Negocio
+  
   Future<T> getDataPerfilNegocio() {
     return ref.get().then((v) => Global.modelsPerfilNegocio[T](v.data()) as T);
   }

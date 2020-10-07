@@ -24,6 +24,9 @@ class Global {
   static final FirebaseAnalytics analytics = FirebaseAnalytics();
 
     // Data Models
+    static final Map modelsArminUsuario = {
+    AsuarioAdministrador: (data) => AsuarioAdministrador.fromMap(data),
+  };
   static final Map modelsSeguidor = {
     Seguidor: (data) => Seguidor.fromMap(data),
   };
@@ -63,8 +66,16 @@ class Global {
     return  Document<Precio>(path: '/APP/$isoPAis/PRODUCTOS/$idProducto/REGISTRO_PRECIOS_$isoPAis/$idNegocio'); // '/APP/ARG/PRODUCTOS'
   }
   static Document<PerfilNegocio> getNegocio( {@required String idNegocio} ){
-    // Firestore References for Writes
-    return  Document<PerfilNegocio>(path: '/NEGOCIOS/$idNegocio'); // '/APP/ARG/PRODUCTOS'
+    return  Document<PerfilNegocio>(path: '/NEGOCIOS/$idNegocio'); 
+  }
+  static Document<AsuarioAdministrador> getDataAsuarioAdministrador( {@required String idNegocio,@required String idUsuario} ){
+    return  Document<AsuarioAdministrador>(path: '/NEGOCIOS/$idNegocio/ADMINISTRADOR_NEGOCIOS/$idUsuario'); 
+  }
+  static Document<Usuario> getDataReferenceCuentaUsuarioAministrador( {@required String idUsuario,@required String idNegocio} ){
+    return  Document<Usuario>(path: '/USUARIOS/$idUsuario/ADMINISTRADOR_NEGOCIOS/$idNegocio'); 
+  }
+   static Document<Usuario> getDataUsuario( {@required String idUsuario} ){
+    return  Document<Usuario>(path: '/USUARIOS/$idUsuario'); 
   }
   static Document<Seguidor> getDataSeguidores( { @required String idNegocio,@required String idSeguirdor } ){
     // Firestore References for Writes
@@ -95,6 +106,9 @@ class Global {
   }
 
   // Consultas DB ( Colecction )
+  static Collection<AsuarioAdministrador> getListDataAsuarioAdministrador( {@required String idNegocio} ){
+    return  Collection<AsuarioAdministrador>(path: '/NEGOCIOS/$idNegocio/ADMINISTRADOR_NEGOCIOS/'); 
+  }
   static Collection<Marca> getMarcasAll( {String isoPais="ARG"} ){
     // Firestore References for Writes
     return  Collection<Marca>(path: '/APP/ARG/MARCAS');
