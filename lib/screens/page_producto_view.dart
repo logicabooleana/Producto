@@ -55,13 +55,9 @@ class ProductScreen extends StatelessWidget {
               producto.verificado == true
                   ? Padding(
                       padding: EdgeInsets.only(right: 3.0),
-                      child: new Image.asset('assets/icon_verificado.png',
-                          width: 16.0, height: 16.0))
+                      child: new Image.asset('assets/icon_verificado.png', width: 16.0, height: 16.0))
                   : new Container(),
-              Text(this.producto.id,
-                  style: TextStyle(
-                      fontSize: 18.0,
-                      color: Theme.of(context).textTheme.bodyText1.color)),
+              Text(this.producto.id,style: TextStyle(fontSize: 18.0,color: Theme.of(context).textTheme.bodyText1.color)),
             ],
           ),
         ),

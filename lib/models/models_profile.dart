@@ -36,6 +36,41 @@ class PerfilNegocio {
     GeoPoint geopoint;
     String codigo_postal="";
 
+  PerfilNegocio({
+    // Informacion del negocios
+    this.id="",
+    this.username="",
+    this.imagen_perfil="default",
+    this.nombre_negocio="",
+    this.telefono="",
+    this.categoria="",
+    this.categoria_nombre="",
+    this.sitio_web="",
+    this.descripcion="",
+    this.timestamp_creation, // Fecha en la que se creo la cuenta
+    this.timestamp_login, // Fecha de las ultima ves que inicio la app
+    this.signo_moneda ="\$" ,
+
+    // Configuracion
+    this.cuenta_privada=false,
+    this.horario=true,
+
+    // informacion de cuenta
+    this.bloqueo=false,
+    this.mensaje_bloqueo="",
+    this.cuenta_activa = true, // Estado de el uso de la cuenta dependiendo el uso // Las cuentas desactivadas no aprecen en el mapa
+    this.cuenta_verificada=false, // Cuenta verificada
+
+    // Ubicacion
+    this.geolocation =false, // true si la geolocalizacion del negocios esta activada
+    this.codigo_pais="",
+    this.pais="",
+    this.provincia="",
+    this.ciudad="",
+    this.direccion="",
+    this.geopoint,
+    this.codigo_postal="",
+    });
   PerfilNegocio.fromMap(Map data) {
     id = data['id'];
     username = data['username']??"";

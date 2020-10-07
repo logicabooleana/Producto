@@ -11,6 +11,7 @@ import 'package:producto/models/models_catalogo.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:producto/screens/widgets/widgetSeachMarcaProducto.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
+import 'package:producto/screens/widgets/widgets_notify.dart';
 
 class ProductEdit extends StatefulWidget {
   final ProductoNegocio producto;
@@ -207,7 +208,6 @@ class _ProductEditState extends State<ProductEdit> {
   String urlIamgen = "";
   PickedFile _imageFile;
   dynamic _pickImageError;
-  String _retrieveDataError;
   final ImagePicker _picker = ImagePicker();
 
   Widget widgetsImagen() {
@@ -270,8 +270,7 @@ class _ProductEditState extends State<ProductEdit> {
                             borderRadius:
                                 BorderRadius.all(Radius.circular(5.0))),
                         onPressed: () {
-                          _onImageButtonPressed(ImageSource.gallery,
-                              context: context);
+                          _onImageButtonPressed(ImageSource.gallery,context: context);
                         },
                         icon: const Icon(Icons.photo_library,
                             color: Colors.white),
@@ -284,8 +283,7 @@ class _ProductEditState extends State<ProductEdit> {
                     child: MaterialButton(
                       elevation: 1.0,
                       color: Theme.of(context).accentColor,
-                      onPressed: () => _onImageButtonPressed(ImageSource.camera,
-                          context: context),
+                      onPressed: () => _onImageButtonPressed(ImageSource.camera,context: context),
                       child: Icon(Icons.camera_alt, color: Colors.white),
                       padding: EdgeInsets.all(14.0),
                       shape: RoundedRectangleBorder(
@@ -541,10 +539,10 @@ class _ProductEditState extends State<ProductEdit> {
   void guardar({@required BuildContext buildContext}) async {
     if (this.categoria != null) {
       if (this.subcategoria != null) {
-        if (producto.titulo != "") {
-          if (producto.descripcion != "") {
+        if (controllerTextEdit_titulo.text != "") {
+          if (controllerTextEdit_descripcion.text != "") {
             if (this.marca != null) {
-              if (producto.precio_venta != 0.0) {
+              if (controllerTextEdit_precio_venta.numberValue!= 0.0) {
                 setState(() {
                   saveIndicador = true;
                 });
@@ -567,6 +565,11 @@ class _ProductEditState extends State<ProductEdit> {
                 // Set ( values )
                 // TODO: Por defecto verificado es TRUE // Cambiar esto cuando se lanze a producción
                 producto.verificado = true;
+                producto.titulo=controllerTextEdit_titulo.text;
+                producto.descripcion=controllerTextEdit_descripcion.text;
+                producto.precio_venta=controllerTextEdit_precio_venta.numberValue;
+                producto.precio_compra=controllerTextEdit_compra.numberValue;
+                producto.precio_comparacion=controllerTextEdit_comparacion.numberValue;
                 producto.timestamp_actualizacion=Timestamp.fromDate(new DateTime.now());
                 producto.categoria = this.categoria.id;
                 producto.subcategoria = this.subcategoria.id;
@@ -580,40 +583,31 @@ class _ProductEditState extends State<ProductEdit> {
 
                 Navigator.pop(context);
               } else {
-                viewSnackBar(
+                showSnackBar(
                     context: buildContext,
                     message: 'Asigne un precio de venta');
               }
             } else {
-              viewSnackBar(
+              showSnackBar(
                   context: buildContext, message: 'Debe seleccionar una marca');
             }
           } else {
-            viewSnackBar(
+            showSnackBar(
                 context: buildContext, message: 'Debe elegir una descripción');
           }
         } else {
-          viewSnackBar(context: buildContext, message: 'Debe elegir un titulo');
+          showSnackBar(context: buildContext, message: 'Debe elegir un titulo');
         }
       } else {
-        viewSnackBar(
+        showSnackBar(
             context: buildContext, message: 'Debe elegir una subcategoría');
       }
     } else {
-      viewSnackBar(context: buildContext, message: 'Debe elegir una categoría');
+      showSnackBar(context: buildContext, message: 'Debe elegir una categoría');
     }
   }
 
-  void viewSnackBar(
-      {@required BuildContext context, @required String message}) {
-    SnackBar snackBar = new SnackBar(
-        content: Text(message),
-        action: SnackBarAction(label: 'ok', onPressed: () {}));
-
-    // Find the Scaffold in the widget tree and use
-    // it to show a SnackBar.
-    Scaffold.of(context).showSnackBar(snackBar);
-  }
+  
 
   void updateProductoGlobal() async {
     // Valores para registrar el precio
@@ -662,12 +656,7 @@ class _ProductEditState extends State<ProductEdit> {
     }
   }
 
-  Widget _previewImage() {
-    final Text retrieveError = _getRetrieveErrorWidget();
-    if (retrieveError != null) {
-      return retrieveError;
-    }
-    if (_imageFile != null) {
+  Widget _previewImage() {    if (_imageFile != null) {
       return Image.file(File(_imageFile.path));
     } else if (_pickImageError != null) {
       return Text(
@@ -682,28 +671,7 @@ class _ProductEditState extends State<ProductEdit> {
     }
   }
 
-  Text _getRetrieveErrorWidget() {
-    if (_retrieveDataError != null) {
-      final Text result = Text(_retrieveDataError);
-      _retrieveDataError = null;
-      return result;
-    }
-    return null;
-  }
-
-  Future<void> retrieveLostData() async {
-    final LostData response = await _picker.getLostData();
-    if (response.isEmpty) {
-      return;
-    }
-    if (response.file != null) {
-      setState(() {
-        _imageFile = response.file;
-      });
-    } else {
-      _retrieveDataError = response.exception.code;
-    }
-  }
+ 
 
   // VIEWS
   getCategoria({@required BuildContext buildContext}) {
@@ -1083,10 +1051,10 @@ class _ProductEditState extends State<ProductEdit> {
   void guardarDeveloper({@required BuildContext buildContext}) async {
     if (this.categoria != null) {
       if (this.subcategoria != null) {
-        if (producto.titulo != "") {
-          if (producto.descripcion != "") {
+        if (controllerTextEdit_titulo.text != "") {
+          if (controllerTextEdit_descripcion.text != "") {
             if (this.marca != null) {
-              if (producto.precio_venta != 0.0) {
+              if (controllerTextEdit_precio_venta.numberValue!= 0.0) {
                 setState(() {
                   saveIndicador = true;
                 });
@@ -1110,40 +1078,43 @@ class _ProductEditState extends State<ProductEdit> {
 
                 // TODO: Por defecto verificado es TRUE // Cambiar esto cuando se lanze a producción
                 producto.verificado = true;
+                producto.titulo=controllerTextEdit_titulo.text;
+                producto.descripcion=controllerTextEdit_descripcion.text;
+                producto.precio_venta=controllerTextEdit_precio_venta.numberValue;
+                producto.precio_compra=controllerTextEdit_compra.numberValue;
+                producto.precio_comparacion=controllerTextEdit_comparacion.numberValue;
                 producto.timestamp_actualizacion=Timestamp.fromDate(new DateTime.now());
                 producto.categoria = this.categoria.id;
                 producto.subcategoria = this.subcategoria.id;
                 producto.id_marca = this.marca.id;
                 updateProductoGlobalDeveloper();
                 // Firebase set
-                await Global.getDataProductoNegocio(
-                        idNegocio: Global.prefs.getIdNegocio,
-                        idProducto: producto.id)
-                    .upSetProducto(producto.toJson());
+                if( Global.prefs.getIdNegocio!=""){
+                  await Global.getDataProductoNegocio(idNegocio: Global.prefs.getIdNegocio,idProducto: producto.id).upSetProducto(producto.toJson());
+                }
 
                 Navigator.pop(context);
               } else {
-                viewSnackBar(
+                showSnackBar(
                     context: buildContext,
                     message: 'Asigne un precio de venta');
               }
             } else {
-              viewSnackBar(
+              showSnackBar(
                   context: buildContext, message: 'Debe seleccionar una marca');
             }
           } else {
-            viewSnackBar(
-                context: buildContext, message: 'Debe elegir una descripción');
+            showSnackBar(context: buildContext, message: 'Debe elegir una descripción');
           }
         } else {
-          viewSnackBar(context: buildContext, message: 'Debe elegir un titulo');
+          showSnackBar(context: buildContext, message: 'Debe elegir un titulo');
         }
       } else {
-        viewSnackBar(
+        showSnackBar(
             context: buildContext, message: 'Debe elegir una subcategoría');
       }
     } else {
-      viewSnackBar(context: buildContext, message: 'Debe elegir una categoría');
+      showSnackBar(context: buildContext, message: 'Debe elegir una categoría');
     }
   }
 

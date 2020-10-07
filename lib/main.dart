@@ -71,8 +71,7 @@ class WidgetMaterialApp extends StatelessWidget {
     //return Center(child: Text("Hola",textDirection: TextDirection.rtl),);
     return DynamicTheme(
         // Este paquete gestiona el cambio de su tema durante el tiempo de ejecución y su persistencia.
-        defaultBrightness:
-            Global.prefs.getThemeIsDart ? Brightness.dark : Brightness.light,
+        defaultBrightness:Global.prefs.getThemeIsDart ? Brightness.dark : Brightness.light,
         data: (brightness) => new ThemeData(
               primarySwatch: Colors.purple,
               primaryColorDark: Colors.purple,
@@ -98,7 +97,6 @@ class WidgetMaterialApp extends StatelessWidget {
                 'init': (context) => MyApp(),
                 '/page_principal': (context) =>PagePrincipal(), // CatalogoNegocio(),
                 '/profile': (context) => ProfileScreen(),
-                '/profilCuenta': (context) => ProfileCuenta(),
                 '/about': (context) => AboutScreen(),
                 '/page_themeApp': (context) => PageThemePreferences(),
               },

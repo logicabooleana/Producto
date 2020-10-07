@@ -4,6 +4,7 @@ import 'package:producto/services/globals.dart';
 import 'package:producto/utils/dynamicTheme_lb.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:producto/screens/profileCuenta.dart';
 
 class ViewCategoria extends StatefulWidget {
   BuildContext buildContext;
@@ -564,7 +565,13 @@ class _ViewConfigState extends State<ViewConfig> {
                       ),
                     ),
               title: Text('Editar'),
-              onTap: () => Navigator.pushNamed(buildContext, '/profilCuenta'),
+              onTap: (){
+                Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (BuildContext context) => ProfileCuenta(perfilNegocio: Global.oPerfilNegocio,),
+                ),
+              );
+              },
             ),
             Divider(endIndent: 12.0, indent: 12.0,height: 0.0),
             DynamicTheme.of(buildContext).getViewListTileSelectTheme(buildContext: buildContext),

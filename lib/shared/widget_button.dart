@@ -5,7 +5,7 @@ import 'package:producto/services/globals.dart';
 import 'package:producto/models/models_profile.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:producto/services/preferencias_usuario.dart';
+import 'package:producto/screens/profileCuenta.dart';
 
 class WidgetButtonCricle extends StatelessWidget {
   BuildContext context;
@@ -159,7 +159,13 @@ class WidgetButtonListTile extends StatelessWidget {
       dense: true,
       title:
           Text("Crear cuenta para empresa", style: TextStyle(fontSize: 16.0)),
-      onTap: () {},
+      onTap: (){
+        Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (BuildContext context) => ProfileCuenta(perfilNegocio: null),
+                ),
+              );
+      },
     );
   }
 

@@ -168,8 +168,7 @@ class PagePrincipal extends StatelessWidget {
                             ? perfilNegocio.nombre_negocio
                             : perfilNegocio.username,
                     style: TextStyle(
-                        color:
-                            Theme.of(buildContext).textTheme.bodyText1.color),
+                        color:Theme.of(buildContext).textTheme.bodyText1.color),
                     overflow: TextOverflow.fade,
                     softWrap: false),
                 Icon(Icons.keyboard_arrow_down)
