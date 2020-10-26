@@ -9,10 +9,13 @@ import 'package:producto/utils/utils.dart';
 import 'package:producto/services/globals.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/services.dart';
+import 'package:producto/shared/widgets_image_circle.dart' as image;
 
 class ProductScreen extends StatelessWidget {
-  
   // Variables
+
+  Categoria categoria;
+  Categoria subcategoria;
   BuildContext contextScaffold;
   String sSignoMoneda;
   ProductoNegocio producto;
@@ -22,16 +25,16 @@ class ProductScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if( Global.oPerfilNegocio!=null ){
+    if (Global.oPerfilNegocio != null) {
       for (ProductoNegocio item in Global.listProudctosNegocio) {
-      if (item.id == producto.id) {
-        producto = item;
-        productoEnCatalogo = true;
-        break;
+        if (item.id == producto.id) {
+          producto = item;
+          productoEnCatalogo = true;
+          break;
+        }
       }
     }
-    }
-    
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0.0,
@@ -41,71 +44,75 @@ class ProductScreen extends StatelessWidget {
             .copyWith(color: Theme.of(context).textTheme.bodyText1.color),
         title: InkWell(
           onTap: () {
-            if( contextScaffold!=null){
+            if (contextScaffold != null) {
               Clipboard.setData(new ClipboardData(text: producto.codigo))
-                .then((_) {
-              Scaffold.of(contextScaffold).showSnackBar(
-                  SnackBar(content: Text("Código copiado en portapapeles")));
-            });
+                  .then((_) {
+                Scaffold.of(contextScaffold).showSnackBar(
+                    SnackBar(content: Text("Código copiado en portapapeles")));
+              });
             }
-            
           },
           child: Row(
             children: <Widget>[
               producto.verificado == true
                   ? Padding(
                       padding: EdgeInsets.only(right: 3.0),
-                      child: new Image.asset('assets/icon_verificado.png', width: 16.0, height: 16.0))
+                      child: new Image.asset('assets/icon_verificado.png',
+                          width: 16.0, height: 16.0))
                   : new Container(),
-              Text(this.producto.id,style: TextStyle(fontSize: 18.0,color: Theme.of(context).textTheme.bodyText1.color)),
+              Text(this.producto.id,
+                  style: TextStyle(
+                      fontSize: 18.0,
+                      color: Theme.of(context).textTheme.bodyText1.color)),
             ],
           ),
         ),
         actions: [
-          Global.oPerfilNegocio!=null
-          ?IconButton(
-            padding: EdgeInsets.all(12.0),
-            icon: Icon(productoEnCatalogo ? Icons.edit : Icons.add_box),
-            onPressed: () {
-              Navigator.of(context).pushReplacement(MaterialPageRoute(
-                builder: (BuildContext context) => producto != null
-                    ? ProductEdit(producto: producto)
-                    : Scaffold(
-                        body: Center(child: Text("Se produjo un Error!"))),
-              ));
-            },
-          ):Container(),
+          Global.oPerfilNegocio != null
+              ? IconButton(
+                  padding: EdgeInsets.all(12.0),
+                  icon: Icon(productoEnCatalogo ? Icons.edit : Icons.add_box),
+                  onPressed: () {
+                    Navigator.of(context).pushReplacement(MaterialPageRoute(
+                      builder: (BuildContext context) => producto != null
+                          ? ProductEdit(producto: producto)
+                          : Scaffold(
+                              body:
+                                  Center(child: Text("Se produjo un Error!"))),
+                    ));
+                  },
+                )
+              : Container(),
         ],
       ),
-      body:Builder(builder: (contextBuilder) {
-        contextScaffold=contextBuilder;
-          return SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                WidgetImagen(producto: producto),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      WidgetDescripcion(context),
-                      WidgetUltimosPrecios(producto: producto),
-                      productoEnCatalogo
-                          ? WidgetOtrosProductos(producto: producto)
-                          : Container(),
-                    ],
-                  ),
+      body: Builder(builder: (contextBuilder) {
+        contextScaffold = contextBuilder;
+        return SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              WidgetImagen(producto: producto),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    WidgetDescripcion(context),
+                    WidgetUltimosPrecios(producto: producto),
+                    productoEnCatalogo
+                        ? WidgetOtrosProductos(producto: producto)
+                        : Container(),
+                  ],
                 ),
-                const SizedBox(
-                  height: 60.0,
-                  width: 60.0,
-                ),
-              ],
-            ),
-          );
-        }
-      ),
+              ),
+              const SizedBox(
+                height: 60.0,
+                width: 60.0,
+              ),
+            ],
+          ),
+        );
+      }),
     );
   }
 
@@ -115,6 +122,54 @@ class ProductScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
+          FutureBuilder(
+            future: Global.getDataCatalogoCategoria(
+                    idNegocio: Global.oPerfilNegocio.id,
+                    idCategoria: producto.categoria)
+                .getDataCategoria(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                this.categoria = snapshot.data ?? Categoria();
+                if (this.categoria.subcategorias != null) {
+                  this.categoria.subcategorias.forEach((k, v) {
+                    Categoria subcategoria =
+                        new Categoria(id: k.toString(), nombre: v.toString());
+                    if (subcategoria.id == this.producto.subcategoria) {
+                      this.subcategoria = subcategoria ?? Categoria();
+                    }
+                  });
+                }
+
+                return Row(
+                  children: [
+                    Chip(
+                      avatar: CircleAvatar(
+                        backgroundColor: Colors.grey.shade800,
+                        child:Text(this.categoria.nombre.substring(0, 1) ?? "C"),
+                      ),
+                      label: Text(this.categoria.nombre),
+                    ),
+                    SizedBox(
+                      width: 3.0,
+                    ),
+                    this.subcategoria != null
+                        ? Chip(
+                            avatar: CircleAvatar(
+                              backgroundColor: Colors.grey.shade800,
+                              child: Text(
+                                  this.subcategoria.nombre.substring(0, 1) ??
+                                      "C"),
+                            ),
+                            label: Text(this.subcategoria.nombre),
+                          )
+                        : Container(),
+                  ],
+                );
+              } else {
+                return Container();
+              }
+            },
+          ),
           producto.titulo != ""
               ? Container(
                   child: Text(producto.titulo,
@@ -139,16 +194,25 @@ class ProductScreen extends StatelessWidget {
             children: [
               producto.precio_venta != null && producto.precio_venta != 0.0
                   ? Text(
-                      Publicaciones.getFormatoPrecio(monto: producto.precio_venta),
+                      Publicaciones.getFormatoPrecio(
+                          monto: producto.precio_venta),
                       style: TextStyle(
                           height: 2, fontSize: 30, fontWeight: FontWeight.bold),
                       textAlign: TextAlign.end,
                     )
                   : Container(),
               producto.timestamp_actualizacion != null
-                  ? Text(Publicaciones.getFechaPublicacion(producto.timestamp_actualizacion.toDate(),new DateTime.now()).toLowerCase(),
+                  ? Text(
+                      Publicaciones.getFechaPublicacion(
+                              producto.timestamp_actualizacion.toDate(),
+                              new DateTime.now())
+                          .toLowerCase(),
                       textAlign: TextAlign.end,
-                      style: TextStyle(fontStyle: FontStyle.normal,color: Theme.of(context).brightness==Brightness.dark?Colors.white70 : Colors.black54),
+                      style: TextStyle(
+                          fontStyle: FontStyle.normal,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white70
+                              : Colors.black54),
                     )
                   : Container(),
             ],
@@ -179,12 +243,12 @@ class ProductScreen extends StatelessWidget {
 }
 
 class WidgetImagen extends StatelessWidget {
-  const WidgetImagen({
-    Key key,
-    @required this.producto,
-  }) : super(key: key);
+
+  const WidgetImagen({@required this.producto,
+  });
 
   final ProductoNegocio producto;
+  
 
   @override
   Widget build(BuildContext context) {
@@ -193,30 +257,54 @@ class WidgetImagen extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
       child: Hero(
         tag: producto.id,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(0.0),
-          child: CachedNetworkImage(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.width,
-            fadeInDuration: Duration(milliseconds: 200),
-            fit: BoxFit.cover,
-            imageUrl: producto.urlimagen ?? "default",
-            placeholder: (context, url) => FadeInImage(
-                image: AssetImage("assets/loading.gif"),
-                placeholder: AssetImage("assets/loading.gif")),
-            errorWidget: (context, url, error) => Container(
-              color: Colors.grey,
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.width,
-              child: Center(
-                child: Text(
-                  producto.titulo.substring(0, 3),
-                  style: TextStyle(
-                      fontSize: MediaQuery.of(context).size.width * 0.25),
+        child: Stack(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(0.0),
+              child: CachedNetworkImage(
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.width,
+                fadeInDuration: Duration(milliseconds: 200),
+                fit: BoxFit.cover,
+                imageUrl: producto.urlimagen ?? "default",
+                placeholder: (context, url) => FadeInImage(
+                    image: AssetImage("assets/loading.gif"),
+                    placeholder: AssetImage("assets/loading.gif")),
+                errorWidget: (context, url, error) => Container(
+                  color: Colors.grey,
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.width,
+                  child: Center(
+                    child: Text(
+                      producto.titulo.substring(0, 3),
+                      style: TextStyle(
+                          fontSize: MediaQuery.of(context).size.width * 0.25),
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
+            FutureBuilder(
+              future:Global.getMarca(idMarca: producto.id_marca).getDataMarca(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  Marca marca = snapshot.data;
+                  return Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12.0),
+                    child: Chip(
+                      avatar: image.viewCircleImage(
+                                            url: marca.url_imagen,
+                                            texto: marca.titulo,
+                                            size: 16),
+                      label: Text(marca.titulo),
+                    ),
+                  );
+                } else {
+                  return Container();
+                }
+              },
+            ),
+          ],
         ),
       ),
     );
@@ -343,7 +431,6 @@ class WidgetUltimosPrecios extends StatelessWidget {
                                           radius: 24.0,
                                         ),
                                       ),
-                                dense: true,
                                 title: Text(
                                   Publicaciones.getFormatoPrecio(
                                       monto: listaPrecios[index].precio),
@@ -369,24 +456,16 @@ class WidgetUltimosPrecios extends StatelessWidget {
                                               ? Colors.white70
                                               : Colors.black54),
                                     ),
-                                    FutureBuilder(
-                                      future: getLocation(
-                                          latitude:
-                                              perfilNegocio.geopoint.latitude,
-                                          longitude:
-                                              perfilNegocio.geopoint.longitude),
-                                      builder: (context, snapshot) {
-                                        return snapshot.data.toString() == ""
-                                            ? Text("")
-                                            : Text(
-                                                "En " +
-                                                    snapshot.data.toString(),
-                                                style: TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              );
-                                      },
-                                    ),
+                                    listaPrecios[index].ciudad != ""
+                                        ? Text(
+                                            "En " +
+                                                listaPrecios[index]
+                                                    .ciudad
+                                                    .toString(),
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold),
+                                          )
+                                        : Text("Ubicación desconocido"),
                                   ],
                                 ),
                                 onTap: () {},
@@ -503,7 +582,8 @@ class ProductoItemHorizontal extends StatelessWidget {
                                           softWrap: false)
                                       : Container(),
                                   producto.precio_venta != 0.0
-                                      ? Text("${Publicaciones.getFormatoPrecio(monto: producto.precio_venta)}",
+                                      ? Text(
+                                          "${Publicaciones.getFormatoPrecio(monto: producto.precio_venta)}",
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 16.0,

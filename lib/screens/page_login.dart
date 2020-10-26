@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../services/services.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:liquid_swipe/liquid_swipe.dart';
 
-class LoginScreen extends StatefulWidget {
-  createState() => LoginScreenState();
+class PageLogin extends StatefulWidget {
+  createState() => PageLoginState();
 }
 
-class LoginScreenState extends State<LoginScreen> {
+class PageLoginState extends State<PageLogin> {
   /* Declarar variables */
   int page = 0; /* Posición de la página */
   bool enableSlideIcon =
@@ -18,11 +17,9 @@ class LoginScreenState extends State<LoginScreen> {
   Size screenSize;
   bool authState = false;
   bool loadAuth = false;
+
   @override
   void initState() {
-    if (FirebaseAuth.instance == null) {
-      Navigator.pushReplacementNamed(context, '/page_principal');
-    }
     super.initState();
   }
 
@@ -35,22 +32,7 @@ class LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     screenSize = MediaQuery.of(context).size;
 
-    //TODO: Verificar metodo de authenticacion
-    FirebaseAuth.instance.authStateChanges().listen((User user) {
-      if (user == null) {
-        setState(() {
-          authState = true;
-        });
-      } else {
-        Navigator.pushReplacementNamed(context, '/page_principal');
-      }
-    });
-
-    if (authState) {
-      return scaffold();
-    } else {
-      return Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
+    return scaffold();
   }
 
   Widget scaffold() {

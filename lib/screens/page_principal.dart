@@ -81,19 +81,24 @@ class PagePrincipal extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  Container(
-                    margin: const EdgeInsets.all(30.0),
-                    padding: const EdgeInsets.all(30.0),
-                    decoration: BoxDecoration(
-                        color: Colors.transparent,
-                        border: Border.all(width: 0.1, color: color),
-                        borderRadius: BorderRadius.all(Radius.circular(30.0))),
-                    child: Image(
-                        color: color,
-                        height: 200.0,
-                        width: 200.0,
-                        image: AssetImage('assets/barcode.png'),
-                        fit: BoxFit.contain),
+                  InkWell(
+                    borderRadius:  BorderRadius.all(Radius.circular(30.0)),
+                    splashColor: Theme.of(buildContext).primaryColor,
+                    onTap: ()=>scanBarcodeNormal(context: buildContext),
+                    child: Container(
+                      margin: const EdgeInsets.all(0.0),
+                      padding: const EdgeInsets.all(30.0),
+                      decoration: BoxDecoration(
+                          color: Colors.transparent,
+                          border: Border.all(width: 0.1, color: color),
+                          borderRadius:BorderRadius.all(Radius.circular(30.0))),
+                      child: Image(
+                          color: color,
+                          height: 200.0,
+                          width: 200.0,
+                          image: AssetImage('assets/barcode.png'),
+                          fit: BoxFit.contain),
+                    ),
                   ),
                   Container(
                     margin: EdgeInsets.symmetric(horizontal: 40.0),
@@ -106,16 +111,14 @@ class PagePrincipal extends StatelessWidget {
                         textAlign: TextAlign.center),
                   ),
                   RaisedButton(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+                    padding:EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
                     color: Theme.of(buildContext).primaryColor,
-                    child: Text("Escanear",
-                        style: TextStyle(fontSize: 24.0, color: Colors.white)),
+                    child: Text("Buscar",style: TextStyle(fontSize: 24.0, color: Colors.white)),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30.0),
                         side: BorderSide(color: Colors.transparent)),
                     onPressed: () {
-                      scanBarcodeNormal(context: buildContext);
+                      Navigator.of(buildContext).push(MaterialPageRoute(builder: (BuildContext context) => WidgetSeachProduct(),));
                     },
                   ),
                 ],
@@ -167,7 +170,8 @@ class PagePrincipal extends StatelessWidget {
                             ? perfilNegocio.nombre_negocio
                             : perfilNegocio.username,
                     style: TextStyle(
-                        color:Theme.of(buildContext).textTheme.bodyText1.color),
+                        color:
+                            Theme.of(buildContext).textTheme.bodyText1.color),
                     overflow: TextOverflow.fade,
                     softWrap: false),
                 Icon(Icons.keyboard_arrow_down)
@@ -255,9 +259,7 @@ class PagePrincipal extends StatelessWidget {
                 child: Icon(Icons.edit),
                 tooltip: 'Escribe el codigo del producto',
                 onPressed: () {
-                  Navigator.of(buildContext).push(MaterialPageRoute(
-                    builder: (BuildContext context) => WidgetSeachProduct(),
-                  ));
+                  Navigator.of(buildContext).push(MaterialPageRoute(builder: (BuildContext context) => WidgetSeachProduct(),));
                 })
           ],
           colorEndAnimation: Colors.grey,
@@ -286,12 +288,12 @@ class PagePrincipal extends StatelessWidget {
 
     if (Global.listProudctosNegocio.length != 0) {
       for (ProductoNegocio producto in Global.listProudctosNegocio) {
-            if (producto.codigo == barcodeScanRes) {
-              productoSelected = producto;
-              coincidencia = true;
-              break;
-            }
-          }
+        if (producto.codigo == barcodeScanRes) {
+          productoSelected = producto;
+          coincidencia = true;
+          break;
+        }
+      }
     }
 
     if (coincidencia) {
@@ -302,7 +304,8 @@ class PagePrincipal extends StatelessWidget {
       if (barcodeScanRes.toString() != "") {
         if (barcodeScanRes.toString() != "-1") {
           Navigator.of(context).push(MaterialPageRoute(
-          builder: (BuildContext context) =>WidgetSeachProduct(codigo: barcodeScanRes)));
+              builder: (BuildContext context) =>
+                  WidgetSeachProduct(codigo: barcodeScanRes)));
         }
       }
     }
@@ -381,7 +384,7 @@ class PagePrincipal extends StatelessWidget {
                                   .buttonListTileCrearCuenta(
                                       context: buildContext)
                               : Container(),
-                          Divider(endIndent: 12.0, indent: 12.0,height: 0.0),
+                          Divider(endIndent: 12.0, indent: 12.0, height: 0.0),
                           WidgetButtonListTile(buildContext: buildContext)
                               .buttonListTileCerrarSesion(
                                   buildContext: buildContext),
@@ -397,9 +400,20 @@ class PagePrincipal extends StatelessWidget {
                             return Column(
                               children: <Widget>[
                                 createCuentaEmpresa
-                                    ? WidgetButtonListTile(buildContext: buildContext).buttonListTileCrearCuenta(context: buildContext)
+                                    ? WidgetButtonListTile(
+                                            buildContext: buildContext)
+                                        .buttonListTileCrearCuenta(
+                                            context: buildContext)
                                     : Container(),
-                                WidgetButtonListTile(buildContext: buildContext).buttonListTileItemCuenta(buildContext: buildContext,perfilNegocio: Global.listAdminPerfilNegocio[index],adminPropietario: Global.listAdminPerfilNegocio[index].id==firebaseUser.uid),
+                                WidgetButtonListTile(buildContext: buildContext)
+                                    .buttonListTileItemCuenta(
+                                        buildContext: buildContext,
+                                        perfilNegocio: Global
+                                            .listAdminPerfilNegocio[index],
+                                        adminPropietario: Global
+                                                .listAdminPerfilNegocio[index]
+                                                .id ==
+                                            firebaseUser.uid),
                               ],
                             );
                           }
@@ -409,10 +423,15 @@ class PagePrincipal extends StatelessWidget {
                               children: <Widget>[
                                 WidgetButtonListTile(buildContext: buildContext)
                                     .buttonListTileItemCuenta(
-                                      adminPropietario:Global.listAdminPerfilNegocio[index].id==firebaseUser.uid ,
+                                        adminPropietario: Global
+                                                .listAdminPerfilNegocio[index]
+                                                .id ==
+                                            firebaseUser.uid,
                                         buildContext: buildContext,
-                                        perfilNegocio: Global.listAdminPerfilNegocio[index]),
-                                Divider(endIndent: 12.0, indent: 12.0,height: 0.0),
+                                        perfilNegocio: Global
+                                            .listAdminPerfilNegocio[index]),
+                                Divider(
+                                    endIndent: 12.0, indent: 12.0, height: 0.0),
                                 WidgetButtonListTile(buildContext: buildContext)
                                     .buttonListTileCerrarSesion(
                                         buildContext: buildContext),
@@ -424,9 +443,12 @@ class PagePrincipal extends StatelessWidget {
                               WidgetButtonListTile(buildContext: buildContext)
                                   .buttonListTileItemCuenta(
                                       buildContext: buildContext,
-                                      perfilNegocio:Global.listAdminPerfilNegocio[index],
-                                      adminPropietario: Global.listAdminPerfilNegocio[index].id==firebaseUser.uid
-                                      ),
+                                      perfilNegocio:
+                                          Global.listAdminPerfilNegocio[index],
+                                      adminPropietario: Global
+                                              .listAdminPerfilNegocio[index]
+                                              .id ==
+                                          firebaseUser.uid),
                             ],
                           );
                         },

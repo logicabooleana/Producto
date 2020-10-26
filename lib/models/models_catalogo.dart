@@ -6,12 +6,16 @@ class Precio{
   double precio=0.0;
   Timestamp timestamp;
   String moneda="";
+  String provincia="";
+   String ciudad="";
 
    Precio({ 
     this.id_negocio="", 
     this.precio=0.0, 
     this.timestamp, 
     this.moneda, 
+    this.provincia, 
+    this.ciudad, 
     });
 
   Precio.fromMap(Map data) {
@@ -19,12 +23,16 @@ class Precio{
     precio = data['precio'] ?? 0.0;
     timestamp = data['timestamp'];
     moneda = data['moneda'] ?? '';
+    provincia = data['provincia'] ?? '';
+    ciudad = data['ciudad'] ?? '';
   }
   Map<String, dynamic> toJson() => {
         "id_negocio": id_negocio,
         "precio": precio,
         "timestamp": timestamp,
         "moneda": moneda,
+        "provincia": provincia,
+        "ciudad": ciudad,
         
     };
 }
@@ -32,23 +40,25 @@ class Precio{
 class Categoria {
     String id="";
     String nombre="";
+    Map<String, dynamic> subcategorias = Map<String, dynamic>();
 
-  Categoria({ 
+  Categoria({
     this.id="", 
     this.nombre="",
+    this.subcategorias,
     });
   Map<String, dynamic> toJson() => {
         "id": id,
         "nombre": nombre,
-    };
-
+        "subcategorias": subcategorias ?? new Map<String, dynamic>(),
+  };
   factory Categoria.fromMap(Map data) {
     return Categoria(
       id: data['id'] ?? '',
       nombre: data['nombre'] ?? '',
+      subcategorias: data['subcategorias'] ?? new Map<String, dynamic>(),
     );
   }
-
 }
 
 class Marca {

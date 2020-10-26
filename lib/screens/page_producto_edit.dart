@@ -22,6 +22,8 @@ class ProductEdit extends StatefulWidget {
 }
 
 class _ProductEditState extends State<ProductEdit> {
+
+  // Controllers
   TextEditingController controllerTextEdit_titulo;
   TextEditingController controllerTextEdit_descripcion;
   MoneyMaskedTextController controllerTextEdit_precio_venta;
@@ -30,8 +32,10 @@ class _ProductEditState extends State<ProductEdit> {
 
   // Variables
   TextStyle textStyle = new TextStyle(fontSize: 24.0);
-  bool enCatalogo=false; // verifica si el producto se encuentra en el catalogo o no
-  bool editable=false; // TODO : Eliminar para produccion
+  TextStyle textStyle_disabled = new TextStyle(fontSize: 24.0,color: Colors.grey);
+  bool enCatalogo =
+      false; // verifica si el producto se encuentra en el catalogo o no
+  bool editable = false; // TODO : Eliminar para produccion
   Marca marca;
   Categoria categoria;
   Categoria subcategoria;
@@ -80,9 +84,7 @@ class _ProductEditState extends State<ProductEdit> {
     this.marca = null;
     if (producto != null) {
       if (producto.id_marca != "") {
-        Global.getMarca(idMarca: producto.id_marca)
-            .getDataMarca()
-            .then((value) {
+        Global.getMarca(idMarca: producto.id_marca).getDataMarca().then((value) {
           if (value != null) {
             setState(() {
               this.marca = value;
@@ -94,27 +96,20 @@ class _ProductEditState extends State<ProductEdit> {
   }
 
   void getCategoriaProducto() async {
-    Global.getDataCatalogoCategoria(
-            idNegocio: Global.oPerfilNegocio.id,
-            idCategoria: producto.categoria)
-        .getDataCategoria()
-        .then((value) {
+    // Obtenemos la identificacion de la categoria del producto
+    Global.getDataCatalogoCategoria(idNegocio: Global.oPerfilNegocio.id,idCategoria: producto.categoria).getDataCategoria().then((value) {
       this.categoria = value ?? Categoria();
-    });
-    if (producto.categoria != "") {
-      Global.getDataCatalogoSubcategoria(
-              idNegocio: Global.oPerfilNegocio.id,
-              idCategoria: producto.categoria,
-              idSubcategoria: producto.subcategoria)
-          .getDataCategoria()
-          .then((value) {
-        setState(() {
-          this.subcategoria = value ?? Categoria();
+      if (this.categoria.subcategorias != null) {
+        this.categoria.subcategorias.forEach((k, v) {
+          Categoria subcategoria =new Categoria(id: k.toString(), nombre: v.toString());
+          if (subcategoria.id == this.producto.subcategoria) {
+            setState(() {
+              this.subcategoria = subcategoria ?? Categoria();
+            });
+          }
         });
-      });
-    } else {
-      setState(() {});
-    }
+      }
+    });
   }
 
   @override
@@ -129,8 +124,10 @@ class _ProductEditState extends State<ProductEdit> {
 
   @override
   Widget build(BuildContext contextPrincipal) {
-    this.contextPrincipal = contextPrincipal;
 
+    textStyle_disabled = new TextStyle(fontSize: 24.0,color: Theme.of(context).hintColor);
+    this.contextPrincipal = contextPrincipal;
+    
     return Scaffold(
       body: Builder(builder: (contextBuilder) {
         return Scaffold(
@@ -172,21 +169,7 @@ class _ProductEditState extends State<ProductEdit> {
                   }),
             ],
           ),
-          body: FutureBuilder(
-            future: Global.getProductosPrecargado(idProducto: this.producto.id).getDataProductoGlobal(),
-            builder: (BuildContext context, AsyncSnapshot snapshot) {
-              if (snapshot.hasData) {
-                Producto productoGlobal = snapshot.data;
-                this.producto.urlimagen = productoGlobal.urlimagen;
-                this.producto.titulo = productoGlobal.titulo;
-                this.producto.descripcion = productoGlobal.descripcion;
-                this.producto.codigo=productoGlobal.codigo;
-                // TODO: Eliminar condicion para producción
-                if( editable==false ){
-                  this.producto.verificado = productoGlobal.verificado;
-                }
-
-                return SingleChildScrollView(
+          body: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -194,12 +177,7 @@ class _ProductEditState extends State<ProductEdit> {
                       widgetFormEditText(builderContext: context),
                     ],
                   ),
-                );
-              } else {
-                return Center(child: CircularProgressIndicator());
-              }
-            },
-          ),
+                ),
         );
       }),
     );
@@ -257,7 +235,8 @@ class _ProductEditState extends State<ProductEdit> {
                 ),
               )
             : _previewImage(),
-        producto.verificado==false?Row(
+        producto.verificado == false
+            ? Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
@@ -270,7 +249,8 @@ class _ProductEditState extends State<ProductEdit> {
                             borderRadius:
                                 BorderRadius.all(Radius.circular(5.0))),
                         onPressed: () {
-                          _onImageButtonPressed(ImageSource.gallery,context: context);
+                          _onImageButtonPressed(ImageSource.gallery,
+                              context: context);
                         },
                         icon: const Icon(Icons.photo_library,
                             color: Colors.white),
@@ -283,7 +263,8 @@ class _ProductEditState extends State<ProductEdit> {
                     child: MaterialButton(
                       elevation: 1.0,
                       color: Theme.of(context).accentColor,
-                      onPressed: () => _onImageButtonPressed(ImageSource.camera,context: context),
+                      onPressed: () => _onImageButtonPressed(ImageSource.camera,
+                          context: context),
                       child: Icon(Icons.camera_alt, color: Colors.white),
                       padding: EdgeInsets.all(14.0),
                       shape: RoundedRectangleBorder(
@@ -310,18 +291,19 @@ class _ProductEditState extends State<ProductEdit> {
               new Flexible(
                 child: InkWell(
                   child: TextField(
-                    controller: TextEditingController()..text =this.categoria != null ? this.categoria.nombre : "",
-                    enabled:false,
-                    enableInteractiveSelection:false,
+                    controller: TextEditingController()
+                      ..text =this.categoria != null ? this.categoria.nombre : "",
+                    enabled: false,
+                    enableInteractiveSelection: false,
                     decoration: InputDecoration(
-                        border: OutlineInputBorder(borderSide:BorderSide(color: Colors.green, width: 2)),
+                        border: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.green, width: 2)),
                         labelText: "Categoría"),
                     style: textStyle,
                   ),
                   onTap: () {
-                    if( producto.verificado==false){
-                      getCategoria(buildContext: builderContext);
-                    }
+                    getCategoria(buildContext: builderContext);
                   },
                 ),
               ),
@@ -336,8 +318,8 @@ class _ProductEditState extends State<ProductEdit> {
                       ..text = this.subcategoria != null
                           ? this.subcategoria.nombre
                           : "",
-                    enabled:false,
-                    enableInteractiveSelection:false,
+                    enabled: false,
+                    enableInteractiveSelection: false,
                     decoration: InputDecoration(
                         border: OutlineInputBorder(
                             borderSide:
@@ -346,13 +328,11 @@ class _ProductEditState extends State<ProductEdit> {
                     style: textStyle,
                   ),
                   onTap: () {
-                    if( producto.verificado==false){
-                      if (this.categoria != null) {
+                    if (this.categoria != null) {
                         getSubCategoria(
-                          buildContext: builderContext,
-                          idCategoria: this.categoria.id);
-                    }
-                    }
+                            buildContext: builderContext,
+                            categoria: this.categoria);
+                      }
                   },
                 ),
               ),
@@ -371,17 +351,17 @@ class _ProductEditState extends State<ProductEdit> {
               : Container(),
           this.marca == null
               ? TextField(
-                minLines: 1,
-            maxLines: 5,
-            keyboardType: TextInputType.multiline,
-                  enabled: producto.verificado==true?false:true,
+                  minLines: 1,
+                  maxLines: 5,
+                  keyboardType: TextInputType.multiline,
+                  enabled: producto.verificado == true ? false : true,
                   onChanged: (value) => producto.titulo = value,
                   decoration: InputDecoration(
                       border: OutlineInputBorder(
                           borderSide:
                               BorderSide(color: Colors.green, width: 2)),
                       labelText: "Titulo"),
-                  style: textStyle,
+                  style: producto.verificado?textStyle_disabled:textStyle,
                   controller: controllerTextEdit_titulo,
                 )
               : Container(),
@@ -394,17 +374,15 @@ class _ProductEditState extends State<ProductEdit> {
             onChanged: (value) => producto.descripcion = value,
             decoration: InputDecoration(
                 border: OutlineInputBorder(), labelText: "Descripción"),
-            style: textStyle,
+            style: producto.verificado?textStyle_disabled:textStyle,
             controller: controllerTextEdit_descripcion,
           ),
           SizedBox(height: 16.0),
           TextField(
             //inputFormatters: [DecimalTextInputFormatter(decimalRange: 2)],
             keyboardType: TextInputType.numberWithOptions(decimal: true),
-            onChanged: (value) => producto.precio_venta =
-                controllerTextEdit_precio_venta.numberValue,
-            decoration: InputDecoration(
-                border: OutlineInputBorder(), labelText: "Precio de venta"),
+            onChanged: (value) => producto.precio_venta = controllerTextEdit_precio_venta.numberValue,
+            decoration: InputDecoration(border: OutlineInputBorder(), labelText: "Precio de venta"),
             style: textStyle,
             controller: controllerTextEdit_precio_venta,
           ),
@@ -433,10 +411,16 @@ class _ProductEditState extends State<ProductEdit> {
           ),
           SizedBox(height: 25.0),
           enCatalogo
-              ? saveIndicador==false?widgetDeleteProducto(context: builderContext):Container()
+              ? saveIndicador == false
+                  ? widgetDeleteProducto(context: builderContext)
+                  : Container()
               : Container(),
-          saveIndicador==false?widgetSaveProductoOPTDeveloper(context: builderContext):Container(),
-          saveIndicador==false?widgetDeleteProductoOPTDeveloper(context: builderContext):Container(),
+          saveIndicador == false
+              ? widgetSaveProductoOPTDeveloper(context: builderContext)
+              : Container(),
+          saveIndicador == false
+              ? widgetDeleteProductoOPTDeveloper(context: builderContext)
+              : Container(),
         ],
       ),
     );
@@ -459,16 +443,16 @@ class _ProductEditState extends State<ProductEdit> {
                     borderSide: BorderSide(color: Colors.green, width: 2)),
                 labelText: "Marca",
               ),
-              style: textStyle,
+              style: producto.verificado?textStyle_disabled:textStyle,
             ),
             onTap: () {
-              if(producto.verificado==false){
+              if (producto.verificado == false) {
                 showModalSelectMarca(buildContext: contextPrincipal);
               }
             },
           ),
         ),
-        this.marca != null && producto.verificado==false
+        this.marca != null && producto.verificado == false
             ? Padding(
                 padding: EdgeInsets.only(left: 12.0),
                 child: IconButton(
@@ -542,7 +526,7 @@ class _ProductEditState extends State<ProductEdit> {
         if (controllerTextEdit_titulo.text != "") {
           if (controllerTextEdit_descripcion.text != "") {
             if (this.marca != null) {
-              if (controllerTextEdit_precio_venta.numberValue!= 0.0) {
+              if (controllerTextEdit_precio_venta.numberValue != 0.0) {
                 setState(() {
                   saveIndicador = true;
                 });
@@ -558,19 +542,23 @@ class _ProductEditState extends State<ProductEdit> {
                   StorageUploadTask uploadTask =
                       ref.putFile(File(_imageFile.path));
                   // obtenemos la url de la imagen guardada
-                  urlIamgen=await (await uploadTask.onComplete).ref.getDownloadURL();
+                  urlIamgen =
+                      await (await uploadTask.onComplete).ref.getDownloadURL();
                   // TODO: Por el momento los datos del producto se guarda junto a la referencia de la cuenta del negocio
                   producto.urlimagen = urlIamgen;
                 }
                 // Set ( values )
                 // TODO: Por defecto verificado es TRUE // Cambiar esto cuando se lanze a producción
                 producto.verificado = true;
-                producto.titulo=controllerTextEdit_titulo.text;
-                producto.descripcion=controllerTextEdit_descripcion.text;
-                producto.precio_venta=controllerTextEdit_precio_venta.numberValue;
-                producto.precio_compra=controllerTextEdit_compra.numberValue;
-                producto.precio_comparacion=controllerTextEdit_comparacion.numberValue;
-                producto.timestamp_actualizacion=Timestamp.fromDate(new DateTime.now());
+                producto.titulo = controllerTextEdit_titulo.text;
+                producto.descripcion = controllerTextEdit_descripcion.text;
+                producto.precio_venta =
+                    controllerTextEdit_precio_venta.numberValue;
+                producto.precio_compra = controllerTextEdit_compra.numberValue;
+                producto.precio_comparacion =
+                    controllerTextEdit_comparacion.numberValue;
+                producto.timestamp_actualizacion =
+                    Timestamp.fromDate(new DateTime.now());
                 producto.categoria = this.categoria.id;
                 producto.subcategoria = this.subcategoria.id;
                 producto.id_marca = this.marca.id;
@@ -607,14 +595,14 @@ class _ProductEditState extends State<ProductEdit> {
     }
   }
 
-  
-
   void updateProductoGlobal() async {
     // Valores para registrar el precio
     Precio precio = new Precio(
         id_negocio: Global.oPerfilNegocio.id,
         precio: producto.precio_venta,
         moneda: producto.signo_moneda,
+        provincia: Global.oPerfilNegocio.provincia,
+        ciudad: Global.oPerfilNegocio.ciudad,
         timestamp: Timestamp.fromDate(new DateTime.now()));
     // Firebase set
     await Global.getPreciosProducto(
@@ -635,7 +623,8 @@ class _ProductEditState extends State<ProductEdit> {
       };
     }
     // Firebase set
-    await Global.getProductosPrecargado(idProducto: producto.id).upSetPrecioProducto(timestampUpdatePrecio);
+    await Global.getProductosPrecargado(idProducto: producto.id)
+        .upSetPrecioProducto(timestampUpdatePrecio);
   }
 
   void _onImageButtonPressed(ImageSource source, {BuildContext context}) async {
@@ -656,7 +645,8 @@ class _ProductEditState extends State<ProductEdit> {
     }
   }
 
-  Widget _previewImage() {    if (_imageFile != null) {
+  Widget _previewImage() {
+    if (_imageFile != null) {
       return Image.file(File(_imageFile.path));
     } else if (_pickImageError != null) {
       return Text(
@@ -670,8 +660,6 @@ class _ProductEditState extends State<ProductEdit> {
       );
     }
   }
-
- 
 
   // VIEWS
   getCategoria({@required BuildContext buildContext}) {
@@ -720,7 +708,7 @@ class _ProductEditState extends State<ProductEdit> {
                                   Navigator.pop(ctx);
                                   getSubCategoria(
                                       buildContext: buildContext,
-                                      idCategoria: this.categoria.id);
+                                      categoria: this.categoria);
                                 });
                               },
                             ),
@@ -741,7 +729,8 @@ class _ProductEditState extends State<ProductEdit> {
         });
   }
 
-  getSubCategoria({@required BuildContext buildContext, @required String idCategoria}) {
+  getSubCategoria(
+      {@required BuildContext buildContext, @required Categoria categoria}) {
     showModalBottomSheet(
         shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
@@ -750,40 +739,38 @@ class _ProductEditState extends State<ProductEdit> {
         builder: (_) {
           return Scaffold(
             appBar: AppBar(title: Text("Subcategoria")),
-            body: FutureBuilder(
-              future: Global.getCatalogoSubcategorias(
-                      idNegocio: Global.oPerfilNegocio.id,
-                      idCategoria: idCategoria)
-                  .getDataCategoriaAll(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  Global.listCategoriasCatalogo = snapshot.data;
-                  if (Global.listCategoriasCatalogo.length != 0) {
-                    return ListView.builder(
-                      padding: EdgeInsets.symmetric(vertical: 15.0),
-                      shrinkWrap: true,
-                      itemCount: Global.listCategoriasCatalogo.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        Categoria categoriaSelect =
-                            Global.listCategoriasCatalogo[index];
+            body: categoria.subcategorias != null
+                ? ListView.builder(
+                    padding: EdgeInsets.symmetric(vertical: 15.0),
+                    shrinkWrap: true,
+                    itemCount: categoria.subcategorias.length,
+                    itemBuilder: (context, index) {
+                      Categoria subcategoria = new Categoria(
+                          id: categoria.subcategorias.keys
+                              .elementAt(index)
+                              .toString(),
+                          nombre: categoria.subcategorias.values
+                              .elementAt(index)
+                              .toString());
+
+                      if (categoria.subcategorias.length != 0) {
                         return Column(
                           children: <Widget>[
                             ListTile(
                               leading: CircleAvatar(
                                 backgroundColor: Colors.black26,
                                 radius: 24.0,
-                                child: Text(
-                                    categoriaSelect.nombre.substring(0, 1),
+                                child: Text(subcategoria.nombre.substring(0, 1),
                                     style: TextStyle(
                                         fontSize: 18.0,
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold)),
                               ),
                               dense: true,
-                              title: Text(categoriaSelect.nombre),
+                              title: Text(subcategoria.nombre),
                               onTap: () {
                                 setState(() {
-                                  this.subcategoria = categoriaSelect;
+                                  this.subcategoria = subcategoria;
                                   Navigator.pop(buildContext);
                                 });
                               },
@@ -791,16 +778,12 @@ class _ProductEditState extends State<ProductEdit> {
                             Divider(endIndent: 12.0, indent: 12.0),
                           ],
                         );
-                      },
-                    );
-                  } else {
-                    return Center(child: Text("Cargando..."));
-                  }
-                } else {
-                  return Center(child: Text("Cargando..."));
-                }
-              },
-            ),
+                      } else {
+                        return Center(child: Text("Sin subcategoria"));
+                      }
+                    },
+                  )
+                : Center(child: Text("Sin subcategoria")),
           );
         });
   }
@@ -948,19 +931,21 @@ class _ProductEditState extends State<ProductEdit> {
                 width: double.infinity,
                 child: RaisedButton.icon(
                   onPressed: () {
-                    if( editable ){
+                    if (editable) {
                       guardarDeveloper(buildContext: context);
-                    }else{
+                    } else {
                       setState(() {
-                        editable=true;
-                        producto.verificado=false;
+                        editable = true;
+                        producto.verificado = false;
                       });
                     }
                   },
-                  color: editable?Colors.green[400]:Colors.orange[400],
+                  color: editable ? Colors.green[400] : Colors.orange[400],
                   icon: Icon(Icons.security, color: Colors.white),
                   padding: EdgeInsets.all(12.0),
-                  label: Text(editable?"Actualizar producto Global":"Editar",style: TextStyle(fontSize: 18.0, color: Colors.white)),
+                  label: Text(
+                      editable ? "Actualizar producto Global" : "Editar",
+                      style: TextStyle(fontSize: 18.0, color: Colors.white)),
                 ),
               )
             : Container(),
@@ -968,6 +953,7 @@ class _ProductEditState extends State<ProductEdit> {
       ],
     );
   }
+
   Widget widgetDeleteProductoOPTDeveloper({@required BuildContext context}) {
     return Column(
       children: [
@@ -1054,7 +1040,7 @@ class _ProductEditState extends State<ProductEdit> {
         if (controllerTextEdit_titulo.text != "") {
           if (controllerTextEdit_descripcion.text != "") {
             if (this.marca != null) {
-              if (controllerTextEdit_precio_venta.numberValue!= 0.0) {
+              if (controllerTextEdit_precio_venta.numberValue != 0.0) {
                 setState(() {
                   saveIndicador = true;
                 });
@@ -1071,26 +1057,34 @@ class _ProductEditState extends State<ProductEdit> {
                   StorageUploadTask uploadTask =
                       ref.putFile(File(_imageFile.path));
                   // obtenemos la url de la imagen guardada
-                  urlIamgen =await (await uploadTask.onComplete).ref.getDownloadURL();
+                  urlIamgen =
+                      await (await uploadTask.onComplete).ref.getDownloadURL();
                   // TODO: Por el momento los datos del producto se guarda junto a la referencia de la cuenta del negocio
                   producto.urlimagen = urlIamgen;
                 }
 
                 // TODO: Por defecto verificado es TRUE // Cambiar esto cuando se lanze a producción
                 producto.verificado = true;
-                producto.titulo=controllerTextEdit_titulo.text;
-                producto.descripcion=controllerTextEdit_descripcion.text;
-                producto.precio_venta=controllerTextEdit_precio_venta.numberValue;
-                producto.precio_compra=controllerTextEdit_compra.numberValue;
-                producto.precio_comparacion=controllerTextEdit_comparacion.numberValue;
-                producto.timestamp_actualizacion=Timestamp.fromDate(new DateTime.now());
+
+                producto.titulo = controllerTextEdit_titulo.text;
+                producto.descripcion = controllerTextEdit_descripcion.text;
+                producto.precio_venta =
+                    controllerTextEdit_precio_venta.numberValue;
+                producto.precio_compra = controllerTextEdit_compra.numberValue;
+                producto.precio_comparacion =
+                    controllerTextEdit_comparacion.numberValue;
+                producto.timestamp_actualizacion =
+                    Timestamp.fromDate(new DateTime.now());
                 producto.categoria = this.categoria.id;
                 producto.subcategoria = this.subcategoria.id;
                 producto.id_marca = this.marca.id;
                 updateProductoGlobalDeveloper();
                 // Firebase set
-                if( Global.prefs.getIdNegocio!=""){
-                  await Global.getDataProductoNegocio(idNegocio: Global.prefs.getIdNegocio,idProducto: producto.id).upSetProducto(producto.toJson());
+                if (Global.prefs.getIdNegocio != "") {
+                  await Global.getDataProductoNegocio(
+                          idNegocio: Global.prefs.getIdNegocio,
+                          idProducto: producto.id)
+                      .upSetProducto(producto.toJson());
                 }
 
                 Navigator.pop(context);
@@ -1104,7 +1098,8 @@ class _ProductEditState extends State<ProductEdit> {
                   context: buildContext, message: 'Debe seleccionar una marca');
             }
           } else {
-            showSnackBar(context: buildContext, message: 'Debe elegir una descripción');
+            showSnackBar(
+                context: buildContext, message: 'Debe elegir una descripción');
           }
         } else {
           showSnackBar(context: buildContext, message: 'Debe elegir un titulo');
@@ -1132,7 +1127,7 @@ class _ProductEditState extends State<ProductEdit> {
             isoPAis: "ARG")
         .upSetPrecioProducto(precio.toJson());
     // set ( id del usuario que actualizo el producto )
-    producto.id_negocio=Global.oPerfilNegocio.id;
+    producto.id_negocio = Global.oPerfilNegocio.id;
     //producto.id_usuario=Global.us;
     // Firebase set
     await Global.getProductosPrecargado(idProducto: producto.id)

@@ -473,6 +473,8 @@ class _ProductNewState extends State<ProductNew> {
         id_negocio: Global.oPerfilNegocio.id,
         precio: producto.precio_venta,
         moneda: producto.signo_moneda,
+        provincia: Global.oPerfilNegocio.provincia,
+        ciudad: Global.oPerfilNegocio.ciudad,
         timestamp: Timestamp.fromDate(new DateTime.now()));
     // Firebase set
     await Global.getPreciosProducto(

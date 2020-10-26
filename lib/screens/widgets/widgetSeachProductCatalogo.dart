@@ -66,6 +66,7 @@ class _WidgetSeachProductState extends State<WidgetSeachProduct> {
           children: [
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Flexible(
                   child: TextField(
@@ -86,12 +87,13 @@ class _WidgetSeachProductState extends State<WidgetSeachProduct> {
                         suffixIcon: IconButton(
                           onPressed: (){
                             setState(() {
+                              
                               textEditingController.clear();
                               buttonAddProduct = false;
                               resultState = true;
                             });
                           },
-                          icon: Icon(Icons.clear,color: colorView),
+                          icon: textEditingController.text!=""?Icon(Icons.clear,color: colorView):Container(),
                         ),
                         enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: colorView)),
@@ -106,6 +108,7 @@ class _WidgetSeachProductState extends State<WidgetSeachProduct> {
                   ),
                 ),
                 IconButton(
+                  padding: EdgeInsets.all(12.0),
                   icon: Icon(Icons.content_copy),
                   onPressed: () {
                     FlutterClipboard.paste().then((value) {
@@ -130,7 +133,7 @@ class _WidgetSeachProductState extends State<WidgetSeachProduct> {
                         child: Container(
                         width: double.infinity,
                         child: RaisedButton.icon(
-                          color: colorView,
+                          color: Theme.of(context).primaryColor,
                           padding: EdgeInsets.all(16.0),
                           icon: Icon(Icons.search),
                           onPressed: () {
@@ -155,7 +158,7 @@ class _WidgetSeachProductState extends State<WidgetSeachProduct> {
                         child: Container(
                         width: double.infinity,
                         child: RaisedButton.icon(
-                            color: colorView,
+                          color: Theme.of(context).primaryColor,
                             padding: EdgeInsets.all(16.0),
                             icon: Image(
                                 color: Colors.white,

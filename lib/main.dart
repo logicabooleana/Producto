@@ -9,7 +9,8 @@ import 'screens/screens.dart';
 import 'package:producto/utils/dynamicTheme_lb.dart';
 import 'package:producto/services/preferencias_usuario.dart';
 import 'package:producto/screens/page_principal.dart';
-import 'package:producto/screens/profileCuenta.dart';
+import 'package:producto/screens/page_welcome.dart';
+import 'package:producto/screens/page_login.dart';
 // Import the firebase_core plugin
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -35,14 +36,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
 
     // Create the initilization Future outside of `build`:
-    final Future<FirebaseApp> _initialization = Firebase.initializeApp();
+    final Future<FirebaseApp> _initializationFirebase = Firebase.initializeApp();
 
     final prefs = new PreferenciasUsuario();
     Global.prefs = prefs;
 
     return FutureBuilder(
       // Initialize FlutterFire:
-      future: _initialization,
+      future: _initializationFirebase,
       builder: (context, snapshot) {
         
         // Check for errors
@@ -93,8 +94,9 @@ class WidgetMaterialApp extends StatelessWidget {
               ],
               // Named Routes
               routes: {
-                '/': (context) => LoginScreen(),
+                '/': (context) => SplashScreen(),
                 'init': (context) => MyApp(),
+                '/login': (context) => PageLogin(),
                 '/page_principal': (context) =>PagePrincipal(), // CatalogoNegocio(),
                 '/profile': (context) => ProfileScreen(),
                 '/about': (context) => AboutScreen(),
@@ -104,4 +106,7 @@ class WidgetMaterialApp extends StatelessWidget {
           );
         });
   }
+}
+
+class ScreenLogin {
 }
