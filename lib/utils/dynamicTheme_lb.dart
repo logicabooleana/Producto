@@ -94,8 +94,8 @@ class DynamicThemeState extends State<DynamicTheme> {
   Future<void> setBrightness(Brightness brightness) async {
     setState(() {
       _themeData = widget.data(brightness).copyWith(
-          primaryColor: _themeData.primaryColor,
-          accentColor: _themeData.accentColor,
+          primaryColor: _themeData!=null?_themeData.primaryColor:Colors.purple,
+          accentColor: _themeData!=null?_themeData.accentColor:Colors.deepPurpleAccent,
           scaffoldBackgroundColor:
               brightness == Brightness.dark ? colorBlack : colorLight,
           canvasColor: brightness == Brightness.dark ? colorBlack : colorLight);

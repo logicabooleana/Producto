@@ -1,4 +1,3 @@
-import 'dart:async';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import "package:producto/services/services.dart";
@@ -38,7 +37,7 @@ class _WidgetCatalogoGridListState extends State<WidgetCatalogoGridList> {
             status: providerCatalogo.statusCargaGridListCatalogo,
             loadingMsg: 'Cargando...',
             errorMsg: 'errorMsg',
-            finishMsg: providerCatalogo.listCatalogoFilter.length==1?providerCatalogo.listCatalogoFilter.length.toString()+"resultado":providerCatalogo.listCatalogoFilter.length.toString()+"resultados",
+            finishMsg: providerCatalogo.listCatalogoFilter.length==1?providerCatalogo.listCatalogoFilter.length.toString()+" resultado":providerCatalogo.listCatalogoFilter.length.toString()+"resultados",
             child: CustomScrollView(
               slivers: <Widget>[
                 SliverGrid(

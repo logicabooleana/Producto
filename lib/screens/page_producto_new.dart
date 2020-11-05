@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:producto/screens/page_marca_create.dart';
-import 'package:producto/screens/widgets/widgets_showModalBottomSheet.dart';
+import 'package:producto/screens/widgets/widgetsCategoriViews.dart';
 import 'package:flutter/services.dart';
 import 'package:producto/services/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -197,7 +197,7 @@ class _ProductNewState extends State<ProductNew> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Consumer<ProviderCatalogo>(
+          Global.prefs.getIdNegocio!=""?Consumer<ProviderCatalogo>(
             child: Text("Cargando categorías"),
             builder: (context, catalogo, child) {
 
@@ -280,7 +280,7 @@ class _ProductNewState extends State<ProductNew> {
                 ],
               );
             },
-          ),
+          ):Container(),
           SizedBox(
             height: 12.0,
             width: 12.0,
@@ -320,7 +320,9 @@ class _ProductNewState extends State<ProductNew> {
             style: textStyle,
             controller: controllerTextEdit_descripcion,
           ),
-          SizedBox(height: 16.0),
+          Global.prefs.getIdNegocio!=""?Column(
+            children: [
+              SizedBox(height: 16.0),
           TextField(
             //inputFormatters: [DecimalTextInputFormatter(decimalRange: 2)],
             keyboardType: TextInputType.numberWithOptions(decimal: true),
@@ -354,6 +356,9 @@ class _ProductNewState extends State<ProductNew> {
             style: textStyle,
             controller: controllerTextEdit_comparacion,
           ),
+            ],
+          ):Container(),
+          
           SizedBox(height: 25.0),
         ],
       ),
@@ -401,12 +406,12 @@ class _ProductNewState extends State<ProductNew> {
     );
   }
   void guardar({@required BuildContext buildContext}) async {
-    if (this.categoria != null) {
-      if (this.subcategoria != null) {
+    if (this.categoria != null || (this.categoria == null && Global.prefs.getIdNegocio=="") ) {
+      if (this.subcategoria != null || (this.categoria == null && Global.prefs.getIdNegocio=="") ) {
         if (producto.titulo != "") {
           if (producto.descripcion != "") {
             if (this.marca != null) {
-              if (producto.precio_venta != 0.0) {
+              if (producto.precio_venta != 0.0 || (producto.precio_venta == 0.0 && Global.prefs.getIdNegocio=="") ) {
                 setState(() {
                   saveIndicador = true;
                 });
@@ -432,17 +437,16 @@ class _ProductNewState extends State<ProductNew> {
                 // TODO: Por defecto verificado es TRUE // Cambiar esto cuando se lanze a producción
                 producto.verificado = true;
                 producto.timestamp_actualizacion=Timestamp.fromDate(new DateTime.now());
-                producto.timestamp_creation=Timestamp.fromDate(new DateTime.now());
-                producto.categoria = this.categoria.id;
-                producto.subcategoria = this.subcategoria.id;
-                producto.id_marca = this.marca.id;
+                  producto.timestamp_creation=Timestamp.fromDate(new DateTime.now());
+                producto.categoria = this.categoria==null?"":this.categoria.id;
+                producto.subcategoria = this.subcategoria==null?"":this.subcategoria.id;
+                producto.id_marca = this.marca==null?"":this.marca.id;
                 savevProductoGlobal();
                 // Firebase set
-                await Global.getDataProductoNegocio(
-                        idNegocio: Global.prefs.getIdNegocio,
-                        idProducto: producto.id)
-                    .upSetProducto(producto.toJson());
-
+                if( Global.prefs.getIdNegocio!="" ){
+                  await Global.getDataProductoNegocio(idNegocio: Global.prefs.getIdNegocio,idProducto: producto.id).upSetProducto(producto.toJson());
+                }
+                
                 Navigator.pop(context);
               } else {
                 showSnackBar(
@@ -469,7 +473,8 @@ class _ProductNewState extends State<ProductNew> {
 
   void savevProductoGlobal() async {
     // Valores para registrar el precio
-    Precio precio = new Precio(
+    if( Global.prefs.getIdNegocio!="" ){
+      Precio precio = new Precio(
         id_negocio: Global.oPerfilNegocio.id,
         precio: producto.precio_venta,
         moneda: producto.signo_moneda,
@@ -482,6 +487,8 @@ class _ProductNewState extends State<ProductNew> {
             idProducto: producto.id,
             isoPAis: "ARG")
         .upSetPrecioProducto(precio.toJson());
+    }
+    
     if (urlIamgen == "") {
       producto.timestamp_actualizacion=Timestamp.fromDate(new DateTime.now());
       producto.urlimagen="default";
@@ -597,6 +604,7 @@ class _ProductNewState extends State<ProductNew> {
                           setState(() {
                             this.marca = value;
                             this.producto.titulo=this.marca.titulo;
+                            Navigator.pop(buildContext);
                           });
                         }
                       });

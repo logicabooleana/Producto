@@ -48,6 +48,7 @@ class _ProfileCuentaState extends State<ProfileCuenta> {
   TextEditingController controllerTextEdit_ciudad;
   TextEditingController controllerTextEdit_provincia;
   TextEditingController controllerTextEdit_pais;
+  TextEditingController controllerTextEdit_signo_moneda;
 
   final FocusNode _focus_TextEdit_nombre = FocusNode();
   final FocusNode _focus_TextEdit_descripcion = FocusNode();
@@ -83,6 +84,7 @@ class _ProfileCuentaState extends State<ProfileCuenta> {
     controllerTextEdit_provincia =
         TextEditingController(text: perfilNegocio.provincia);
     controllerTextEdit_pais = TextEditingController(text: perfilNegocio.pais);
+    controllerTextEdit_signo_moneda = TextEditingController(text:"\$");
   }
 
   @override
@@ -95,6 +97,7 @@ class _ProfileCuentaState extends State<ProfileCuenta> {
     controllerTextEdit_sitio_web.dispose();
     controllerTextEdit_ciudad.dispose();
     controllerTextEdit_direccion.dispose();
+    controllerTextEdit_signo_moneda.dispose();
     super.dispose();
   }
 
@@ -338,6 +341,21 @@ class _ProfileCuentaState extends State<ProfileCuenta> {
             onSubmitted: (term) {
               _fieldFocusChange(context, _focus_TextEdit_sitio_web, _focus_TextEdit_direccion);
             },
+          ),
+          InkWell(
+            onTap: () => _buildBottomPicker(listItems: [
+              "\$",
+            ], 
+            textEditingController: controllerTextEdit_signo_moneda),
+            child: TextField(
+              minLines: 1,
+              maxLines: 5,
+              keyboardType: TextInputType.multiline,
+              enabled: false,
+              decoration: InputDecoration(labelText: "Signo de moneda"),
+              controller: controllerTextEdit_signo_moneda,
+              onChanged: (value) => perfilNegocio.signo_moneda = value,
+            ),
           ),
           SizedBox(
             height: 24.0,

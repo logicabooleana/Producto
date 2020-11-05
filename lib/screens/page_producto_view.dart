@@ -11,24 +11,80 @@ import 'package:geolocator/geolocator.dart';
 import 'package:flutter/services.dart';
 import 'package:producto/shared/widgets_image_circle.dart' as image;
 
-class ProductScreen extends StatelessWidget {
+class ProductScreen extends StatefulWidget {
   // Variables
 
-  Categoria categoria;
-  Categoria subcategoria;
-  BuildContext contextScaffold;
   String sSignoMoneda;
   ProductoNegocio producto;
-  bool productoEnCatalogo = false;
 
   ProductScreen({this.producto, this.sSignoMoneda});
+
+  @override
+  _ProductScreenState createState() => _ProductScreenState();
+}
+
+class _ProductScreenState extends State<ProductScreen> {
+  Categoria categoria;
+  Categoria subcategoria;
+  Marca marca;
+  BuildContext contextScaffold;
+  bool productoEnCatalogo = false;
+
+  @override
+  void initState() {
+    getMarca();
+    getCategoriaProducto();
+    super.initState();
+  }
+
+  void getMarca() async {
+    // Defaul values
+    this.marca = null;
+    if (widget.producto != null) {
+      if (widget.producto.id_marca != "") {
+        Global.getMarca(idMarca: widget.producto.id_marca)
+            .getDataMarca()
+            .then((value) {
+          if (value != null) {
+            setState(() {
+              this.marca = value;
+            });
+          }
+        });
+      }
+    }
+  }
+
+  void getCategoriaProducto() async {
+    // Obtenemos la identificacion de la categoria del producto
+    if( Global.oPerfilNegocio != null ){
+      Global.getDataCatalogoCategoria(
+            idNegocio: Global.oPerfilNegocio.id,
+            idCategoria: widget.producto.categoria)
+        .getDataCategoria()
+        .then((value) {
+      this.categoria = value ?? Categoria();
+      if (this.categoria.subcategorias != null) {
+        this.categoria.subcategorias.forEach((k, v) {
+          Categoria subcategoria =
+              new Categoria(id: k.toString(), nombre: v.toString());
+          if (subcategoria.id == widget.producto.subcategoria) {
+            this.subcategoria = subcategoria ?? Categoria();
+          }
+        });
+      }
+      setState(() {});
+    });
+    }
+    
+  }
 
   @override
   Widget build(BuildContext context) {
     if (Global.oPerfilNegocio != null) {
       for (ProductoNegocio item in Global.listProudctosNegocio) {
-        if (item.id == producto.id) {
-          producto = item;
+        if (item.id == widget.producto.id) {
+          widget.producto = item;
           productoEnCatalogo = true;
           break;
         }
@@ -45,7 +101,7 @@ class ProductScreen extends StatelessWidget {
         title: InkWell(
           onTap: () {
             if (contextScaffold != null) {
-              Clipboard.setData(new ClipboardData(text: producto.codigo))
+              Clipboard.setData(new ClipboardData(text: widget.producto.codigo))
                   .then((_) {
                 Scaffold.of(contextScaffold).showSnackBar(
                     SnackBar(content: Text("Código copiado en portapapeles")));
@@ -54,13 +110,13 @@ class ProductScreen extends StatelessWidget {
           },
           child: Row(
             children: <Widget>[
-              producto.verificado == true
+              widget.producto.verificado == true
                   ? Padding(
                       padding: EdgeInsets.only(right: 3.0),
                       child: new Image.asset('assets/icon_verificado.png',
-                          width: 16.0, height: 16.0))
+                          width: 20.0, height: 20.0))
                   : new Container(),
-              Text(this.producto.id,
+              Text(this.widget.producto.id,
                   style: TextStyle(
                       fontSize: 18.0,
                       color: Theme.of(context).textTheme.bodyText1.color)),
@@ -74,8 +130,8 @@ class ProductScreen extends StatelessWidget {
                   icon: Icon(productoEnCatalogo ? Icons.edit : Icons.add_box),
                   onPressed: () {
                     Navigator.of(context).pushReplacement(MaterialPageRoute(
-                      builder: (BuildContext context) => producto != null
-                          ? ProductEdit(producto: producto)
+                      builder: (BuildContext context) => widget.producto != null
+                          ? ProductEdit(producto: widget.producto)
                           : Scaffold(
                               body:
                                   Center(child: Text("Se produjo un Error!"))),
@@ -85,34 +141,96 @@ class ProductScreen extends StatelessWidget {
               : Container(),
         ],
       ),
-      body: Builder(builder: (contextBuilder) {
-        contextScaffold = contextBuilder;
-        return SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              WidgetImagen(producto: producto),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+      body: Stack(
+        children: [
+          Builder(builder: (contextBuilder) {
+            contextScaffold = contextBuilder;
+            return SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  WidgetImagen(producto: widget.producto, marca: this.marca),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        WidgetDescripcion(context),
+                        //WidgetUltimosPrecios(producto: widget.producto),
+                        productoEnCatalogo
+                            ? WidgetOtrosProductos(producto: widget.producto)
+                            : Container(),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 140.0,
+                    width: 140.0,
+                  ),
+                ],
+              ),
+            );
+          }),
+          DraggableScrollableSheet(
+
+            initialChildSize: 0.2,
+            minChildSize: 0.1,
+            maxChildSize: 0.85,
+            builder: (BuildContext context, myscrollController) {
+              return Container(
+                padding: EdgeInsets.symmetric(horizontal: 16.0,vertical:8.0),
+                decoration: BoxDecoration(
+                    color: Theme.of(context).cardColor,
+                    borderRadius: BorderRadius.all(Radius.circular(20.0))),
+                child: ListView(
+                  controller: myscrollController,
                   children: [
-                    WidgetDescripcion(context),
-                    WidgetUltimosPrecios(producto: producto),
                     productoEnCatalogo
-                        ? WidgetOtrosProductos(producto: producto)
+                        ? Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              widget.producto.precio_venta != null &&
+                                      widget.producto.precio_venta != 0.0
+                                  ? Text(
+                                      Publicaciones.getFormatoPrecio(
+                                          monto: widget.producto.precio_venta),
+                                      style: TextStyle(
+                                          height: 2,
+                                          fontSize: 30,
+                                          fontWeight: FontWeight.bold),
+                                      textAlign: TextAlign.end,
+                                    )
+                                  : Container(),
+                              widget.producto.timestamp_actualizacion != null
+                                  ? Text(
+                                      Publicaciones.getFechaPublicacion(
+                                              widget.producto
+                                                  .timestamp_actualizacion
+                                                  .toDate(),
+                                              new DateTime.now())
+                                          .toLowerCase(),
+                                      textAlign: TextAlign.end,
+                                      style: TextStyle(
+                                          fontStyle: FontStyle.normal,
+                                          color: Theme.of(context).brightness ==
+                                                  Brightness.dark
+                                              ? Colors.white70
+                                              : Colors.black54),
+                                    )
+                                  : Container(),
+                            ],
+                          )
                         : Container(),
+                    Icon(Icons.keyboard_arrow_up),
+                    WidgetUltimosPrecios(producto: widget.producto),
                   ],
                 ),
-              ),
-              const SizedBox(
-                height: 60.0,
-                width: 60.0,
-              ),
-            ],
+              );
+            },
           ),
-        );
-      }),
+        ],
+      ),
     );
   }
 
@@ -122,37 +240,25 @@ class ProductScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          FutureBuilder(
-            future: Global.getDataCatalogoCategoria(
-                    idNegocio: Global.oPerfilNegocio.id,
-                    idCategoria: producto.categoria)
-                .getDataCategoria(),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                this.categoria = snapshot.data ?? Categoria();
-                if (this.categoria.subcategorias != null) {
-                  this.categoria.subcategorias.forEach((k, v) {
-                    Categoria subcategoria =
-                        new Categoria(id: k.toString(), nombre: v.toString());
-                    if (subcategoria.id == this.producto.subcategoria) {
-                      this.subcategoria = subcategoria ?? Categoria();
-                    }
-                  });
-                }
-
-                return Row(
+          productoEnCatalogo
+              ? Row(
                   children: [
-                    Chip(
-                      avatar: CircleAvatar(
-                        backgroundColor: Colors.grey.shade800,
-                        child:Text(this.categoria.nombre.substring(0, 1) ?? "C"),
-                      ),
-                      label: Text(this.categoria.nombre),
-                    ),
-                    SizedBox(
-                      width: 3.0,
-                    ),
-                    this.subcategoria != null
+                    this.categoria != null && this.categoria.nombre != ""
+                        ? Chip(
+                            avatar: CircleAvatar(
+                              backgroundColor: Colors.grey.shade800,
+                              child: Text(
+                                  this.categoria.nombre.substring(0, 1) ?? "C"),
+                            ),
+                            label: Text(this.categoria.nombre),
+                          )
+                        : Container(),
+                    this.categoria != null
+                        ? SizedBox(
+                            width: 3.0,
+                          )
+                        : Container(),
+                    this.subcategoria != null && this.subcategoria.nombre != ""
                         ? Chip(
                             avatar: CircleAvatar(
                               backgroundColor: Colors.grey.shade800,
@@ -164,15 +270,11 @@ class ProductScreen extends StatelessWidget {
                           )
                         : Container(),
                   ],
-                );
-              } else {
-                return Container();
-              }
-            },
-          ),
-          producto.titulo != ""
+                )
+              : Container(),
+          widget.producto.titulo != ""
               ? Container(
-                  child: Text(producto.titulo,
+                  child: Text(widget.producto.titulo,
                       style: TextStyle(
                           height: 2, fontSize: 30, fontWeight: FontWeight.bold),
                       overflow: TextOverflow.fade,
@@ -183,40 +285,47 @@ class ProductScreen extends StatelessWidget {
             height: 8.0,
             width: 8.0,
           ),
-          producto.descripcion != ""
-              ? Text(producto.descripcion,
+          widget.producto.descripcion != ""
+              ? Text(widget.producto.descripcion,
                   style: TextStyle(
                       height: 1, fontSize: 16, fontWeight: FontWeight.normal))
               : Container(),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              producto.precio_venta != null && producto.precio_venta != 0.0
-                  ? Text(
-                      Publicaciones.getFormatoPrecio(
-                          monto: producto.precio_venta),
-                      style: TextStyle(
-                          height: 2, fontSize: 30, fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.end,
-                    )
-                  : Container(),
-              producto.timestamp_actualizacion != null
-                  ? Text(
-                      Publicaciones.getFechaPublicacion(
-                              producto.timestamp_actualizacion.toDate(),
-                              new DateTime.now())
-                          .toLowerCase(),
-                      textAlign: TextAlign.end,
-                      style: TextStyle(
-                          fontStyle: FontStyle.normal,
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? Colors.white70
-                              : Colors.black54),
-                    )
-                  : Container(),
-            ],
-          ),
+          /* productoEnCatalogo
+              ? Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    widget.producto.precio_venta != null &&
+                            widget.producto.precio_venta != 0.0
+                        ? Text(
+                            Publicaciones.getFormatoPrecio(
+                                monto: widget.producto.precio_venta),
+                            style: TextStyle(
+                                height: 2,
+                                fontSize: 30,
+                                fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.end,
+                          )
+                        : Container(),
+                    widget.producto.timestamp_actualizacion != null
+                        ? Text(
+                            Publicaciones.getFechaPublicacion(
+                                    widget.producto.timestamp_actualizacion
+                                        .toDate(),
+                                    new DateTime.now())
+                                .toLowerCase(),
+                            textAlign: TextAlign.end,
+                            style: TextStyle(
+                                fontStyle: FontStyle.normal,
+                                color: Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.white70
+                                    : Colors.black54),
+                          )
+                        : Container(),
+                  ],
+                )
+              : Container(), */
         ],
       ),
     );
@@ -243,12 +352,13 @@ class ProductScreen extends StatelessWidget {
 }
 
 class WidgetImagen extends StatelessWidget {
-
-  const WidgetImagen({@required this.producto,
+  const WidgetImagen({
+    @required this.producto,
+    @required this.marca,
   });
 
   final ProductoNegocio producto;
-  
+  final Marca marca;
 
   @override
   Widget build(BuildContext context) {
@@ -284,26 +394,16 @@ class WidgetImagen extends StatelessWidget {
                 ),
               ),
             ),
-            FutureBuilder(
-              future:Global.getMarca(idMarca: producto.id_marca).getDataMarca(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  Marca marca = snapshot.data;
-                  return Padding(
+            this.marca != null
+                ? Padding(
                     padding: EdgeInsets.symmetric(horizontal: 12.0),
                     child: Chip(
                       avatar: image.viewCircleImage(
-                                            url: marca.url_imagen,
-                                            texto: marca.titulo,
-                                            size: 16),
+                          url: marca.url_imagen, texto: marca.titulo, size: 20),
                       label: Text(marca.titulo),
                     ),
-                  );
-                } else {
-                  return Container();
-                }
-              },
-            ),
+                  )
+                : Container(),
           ],
         ),
       ),
@@ -369,29 +469,23 @@ class WidgetUltimosPrecios extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: Global.getListPreciosProducto(idProducto: producto.id)
-          .getDataPreciosProductosAll(),
+      future: Global.getListPreciosProducto(idProducto: producto.id).getDataPreciosProductosAll(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           List<Precio> listaPrecios = snapshot.data;
-
           return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              listaPrecios.length != 0
-                  ? Divider(endIndent: 12.0, indent: 12.0)
-                  : Container(),
-              listaPrecios.length != 0
-                  ? Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: Text("Ultimos precios registrados",
-                          style: TextStyle(fontSize: 16.0)),
-                    )
-                  : Container(),
+              Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8.0, horizontal: 12.0),
+                      child: Text(listaPrecios.length != 0?"Ultimos precios registrados":"No se registró ningún precio para este producto",
+                          style: TextStyle(fontSize: 20.0),textAlign: TextAlign.center,),
+                    ),
               ListView.builder(
                 //physics: const AlwaysScrollableScrollPhysics(),
                 physics: const NeverScrollableScrollPhysics(),
-                padding: EdgeInsets.symmetric(vertical: 0.0),
+                padding: EdgeInsets.symmetric(vertical: 0.16),
                 shrinkWrap: true,
                 itemCount: listaPrecios.length,
                 itemBuilder: (context, index) {
@@ -462,10 +556,9 @@ class WidgetUltimosPrecios extends StatelessWidget {
                                                 listaPrecios[index]
                                                     .ciudad
                                                     .toString(),
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold),
+                                            style: TextStyle(fontWeight: FontWeight.bold,fontSize: 12.0),
                                           )
-                                        : Text("Ubicación desconocido"),
+                                        : Text("Ubicación desconocido",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 12.0)),
                                   ],
                                 ),
                                 onTap: () {},
@@ -484,7 +577,12 @@ class WidgetUltimosPrecios extends StatelessWidget {
             ],
           );
         } else {
-          return Container();
+          return Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8.0, horizontal: 12.0),
+                      child: Text("No se registró ningún precio para este producto",
+                          style: TextStyle(fontSize: 20.0)),
+                    );
         }
       },
     );

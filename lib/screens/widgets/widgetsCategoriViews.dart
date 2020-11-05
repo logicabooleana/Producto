@@ -40,31 +40,18 @@ class _ViewCategoriaState extends State<ViewCategoria> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Categoria"),
+        actions: [
+          IconButton(
+              icon: Icon(Icons.add), onPressed: () => _showDialogSetCategoria())
+        ],
       ),
       body: FutureBuilder(
-        future:Global.getCatalogoCategorias(idNegocio: Global.oPerfilNegocio.id).getDataCategoriaAll(),
+        future:
+            Global.getCatalogoCategorias(idNegocio: Global.oPerfilNegocio.id)
+                .getDataCategoriaAll(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             Global.listCategoriasCatalogo = snapshot.data;
-            if (Global.listCategoriasCatalogo.length == 0) {
-              return crearCategoria == false
-                  ? ListTile(
-                      contentPadding:
-                          EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
-                      leading: CircleAvatar(
-                        radius: 24.0,
-                        child: Icon(Icons.add),
-                      ),
-                      dense: true,
-                      title: Text("Crear categoría"),
-                      onTap: () {
-                        setState(() {
-                          crearCategoria = true;
-                        });
-                      },
-                    )
-                  : widgetSetCategoria(buildContext: buildContext);
-            }
             return ListView.builder(
               padding: EdgeInsets.symmetric(vertical: 15.0),
               shrinkWrap: true,
@@ -74,29 +61,6 @@ class _ViewCategoriaState extends State<ViewCategoria> {
                 return index == 0
                     ? Column(
                         children: <Widget>[
-                          crearCategoria == false
-                              ? ListTile(
-                                  contentPadding: EdgeInsets.symmetric(
-                                      vertical: 8.0, horizontal: 12.0),
-                                  leading: CircleAvatar(
-                                    radius: 24.0,
-                                    child: Icon(Icons.add),
-                                  ),
-                                  dense: true,
-                                  title: Text("Crear categoría"),
-                                  onTap: () {
-                                    setState(() {
-                                      crearCategoria = true;
-                                    });
-                                  },
-                                )
-                              : widgetSetCategoria(
-                                  buildContext: buildContext,
-                                  categoria: categoriaSelected),
-                          Global.listCategoriasCatalogo != 0
-                              ? Divider(
-                                  endIndent: 12.0, indent: 12.0, height: 0.0)
-                              : Container(),
                           Global.listCategoriasCatalogo != 0
                               ? ListTile(
                                   contentPadding: EdgeInsets.symmetric(
@@ -175,11 +139,13 @@ class _ViewCategoriaState extends State<ViewCategoria> {
                             leading: CircleAvatar(
                               backgroundColor: Colors.black26,
                               radius: 24.0,
-                              child: categoria.nombre!=""?Text(categoria.nombre.substring(0, 1),
-                                  style: TextStyle(
-                                      fontSize: 18.0,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold)):Text("C"),
+                              child: categoria.nombre != ""
+                                  ? Text(categoria.nombre.substring(0, 1),
+                                      style: TextStyle(
+                                          fontSize: 18.0,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold))
+                                  : Text("C"),
                             ),
                             dense: true,
                             title: Text(categoria.nombre),
@@ -221,7 +187,7 @@ class _ViewCategoriaState extends State<ViewCategoria> {
     );
   }
 
-  Widget popupMenuItemCategoria({@required Categoria categoria}){
+  Widget popupMenuItemCategoria({@required Categoria categoria}) {
     return new PopupMenuButton(
       icon: Icon(Icons.more_vert),
       itemBuilder: (_) => <PopupMenuItem<String>>[
@@ -229,90 +195,111 @@ class _ViewCategoriaState extends State<ViewCategoria> {
         new PopupMenuItem<String>(
             child: const Text('Eliminar'), value: 'eliminar'),
       ],
-      onSelected: (value) async{
+      onSelected: (value) async {
         switch (value) {
           case "editar":
-            setState(() {
-              categoriaSelected = categoria;
-              crearCategoria = true;
-            });
+            _showDialogSetCategoria(categoria: categoria);
             break;
           case "eliminar":
-            await Global.getDataCatalogoCategoria(
-                    idNegocio: Global.oPerfilNegocio.id,
-                    idCategoria: categoria.id)
-                .deleteDoc();
-                setState(() {
-                  for (var i = 0; i < Global.listCategoriasCatalogo.length; i++) {
-                    if( Global.listCategoriasCatalogo[i].id==categoria.id){
-                      Global.listCategoriasCatalogo.remove(i);
-                    }
-                  }
-                });
+            await showDialog<String>(
+              context: context,
+              child: new AlertDialog(
+                contentPadding: const EdgeInsets.all(16.0),
+                content: new Row(
+                  children: <Widget>[
+                    new Expanded(
+                      child: new Text(
+                          "¿Desea continuar eliminando esta categoría?"),
+                    )
+                  ],
+                ),
+                actions: <Widget>[
+                  new FlatButton(
+                      child: const Text('CANCEL'),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      }),
+                  new FlatButton(
+                      child: loadSave == false
+                          ? Text("ELIMINAR")
+                          : CircularProgressIndicator(),
+                      onPressed: () async {
+                        await Global.getDataCatalogoCategoria(
+                                idNegocio: Global.oPerfilNegocio.id,
+                                idCategoria: categoria.id)
+                            .deleteDoc();
+                        setState(() {
+                          for (var i = 0;
+                              i < Global.listCategoriasCatalogo.length;
+                              i++) {
+                            if (Global.listCategoriasCatalogo[i].id ==
+                                categoria.id) {
+                              Global.listCategoriasCatalogo.remove(i);
+                            }
+                          }
+                        });
+                      })
+                ],
+              ),
+            );
             break;
         }
       },
     );
   }
 
-  Widget widgetSetCategoria({@required BuildContext buildContext, Categoria categoria}) {
-    bool newCategoria;
+  _showDialogSetCategoria({Categoria categoria}) async {
+    bool loadSave = false;
+    bool newProduct = false;
     if (categoria == null) {
+      newProduct = true;
       categoria = new Categoria();
-      newCategoria = true;
-    } else {
-      newCategoria = false;
-    }
-    if (categoria.id == "") {
       categoria.id = new DateTime.now().millisecondsSinceEpoch.toString();
     }
-    TextEditingController textEditingController =TextEditingController(text: categoria.nombre);
-    return ListTile(
-      title: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          CircleAvatar(
-            radius: 24.0,
-            child: Icon(Icons.border_color),
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: TextField(
-                controller:textEditingController,
-                onChanged: (value) => categoria.nombre = value,
-                decoration: InputDecoration(
-                    border: OutlineInputBorder(), labelText: "Categoria"),
-                // your TextField's Content
+    TextEditingController controller =
+        TextEditingController(text: categoria.nombre);
+
+    await showDialog<String>(
+      context: context,
+      child: new AlertDialog(
+        contentPadding: const EdgeInsets.all(16.0),
+        content: new Row(
+          children: <Widget>[
+            new Expanded(
+              child: new TextField(
+                controller: controller,
+                autofocus: true,
+                decoration: new InputDecoration(
+                    labelText: 'Categoria', hintText: 'Ej. golosinas'),
               ),
-            ),
-          ),
+            )
+          ],
+        ),
+        actions: <Widget>[
+          new FlatButton(
+              child: const Text('CANCEL'),
+              onPressed: () {
+                Navigator.pop(context);
+              }),
+          new FlatButton(
+              child: loadSave == false
+                  ? Text(newProduct ? 'GUARDAR' : "ACTUALIZAR")
+                  : CircularProgressIndicator(),
+              onPressed: () async {
+                if (controller.text != "") {
+                  setState(() {
+                    loadSave = true;
+                  });
+                  categoria.nombre = controller.text;
+                  await Global.getDataCatalogoCategoria(
+                          idNegocio: Global.oPerfilNegocio.id,
+                          idCategoria: categoria.id)
+                      .upSetCategoria(categoria.toJson());
+                  Navigator.pop(context);
+                } else {}
+              })
         ],
       ),
-      trailing: loadSave == false
-          ? IconButton(
-              icon: new Icon(Icons.check),
-              onPressed: () async {
-                if( textEditingController.text!=""){
-                  setState(() {
-                  loadSave = true;
-                });
-                // set ( values )
-                categoria.nombre=textEditingController.text;
-                await Global.getDataCatalogoCategoria(
-                        idNegocio: Global.oPerfilNegocio.id,
-                        idCategoria: categoria.id)
-                    .upSetCategoria(categoria.toJson());
-                setState(() {
-                  loadSave = false;
-                  crearCategoria = false;
-                });
-                }
-                
-              },
-            )
-          : CircularProgressIndicator(),
     );
   }
 }
@@ -354,37 +341,36 @@ class ViewSubCategoriaState extends State<ViewSubCategoria> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Subcategoria"),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () =>
+                _showDialogSetSubCategoria(categoria: this.paramCategoria),
+          )
+        ],
       ),
-      body: this.paramCategoria.subcategorias.length!=0?ListView.builder(
+      body: this.paramCategoria.subcategorias.length != 0
+          ? ListView.builder(
               padding: EdgeInsets.symmetric(vertical: 15.0),
               shrinkWrap: true,
               itemCount: this.paramCategoria.subcategorias.length,
               itemBuilder: (BuildContext context, int index) {
-                Categoria subcategoria = new Categoria(id: this.paramCategoria.subcategorias.keys.elementAt(index).toString(),nombre: this.paramCategoria.subcategorias.values.elementAt(index).toString());
-                return index==0
-                ?Column(
+                Categoria subcategoria = new Categoria(
+                    id: this
+                        .paramCategoria
+                        .subcategorias
+                        .keys
+                        .elementAt(index)
+                        .toString(),
+                    nombre: this
+                        .paramCategoria
+                        .subcategorias
+                        .values
+                        .elementAt(index)
+                        .toString());
+                return index == 0
+                    ? Column(
                         children: <Widget>[
-                          crearCategoria == false
-                              ? ListTile(
-                                  contentPadding: EdgeInsets.symmetric(
-                                      vertical: 8.0, horizontal: 12.0),
-                                  leading: CircleAvatar(
-                                    radius: 24.0,
-                                    child: Icon(Icons.add),
-                                  ),
-                                  dense: true,
-                                  title: Text("Crear subcategoría"),
-                                  onTap: () {
-                                    setState(() {
-                                      crearCategoria = true;
-                                    });
-                                  },
-                                )
-                              : widgetCrearSubcategoria(categoria: paramCategoria),
-                          this.paramCategoria.subcategorias.length != 0
-                              ? Divider(
-                                  endIndent: 12.0, indent: 12.0, height: 0.0)
-                              : Container(),
                           this.paramCategoria.subcategorias.length != 0
                               ? ListTile(
                                   contentPadding: EdgeInsets.symmetric(
@@ -419,14 +405,17 @@ class ViewSubCategoriaState extends State<ViewSubCategoria> {
                             title: Text(subcategoria.nombre),
                             onTap: () {
                               buildContextSubcategoria
-                                      .read<ProviderCatalogo>()
-                                      .setNombreFiltro =subcategoria.nombre;
+                                  .read<ProviderCatalogo>()
+                                  .setNombreFiltro = subcategoria.nombre;
                               buildContextSubcategoria
                                   .read<ProviderCatalogo>()
                                   .setSubategoria = subcategoria;
                               Navigator.pop(buildContextCategoria);
                               Navigator.pop(buildContextSubcategoria);
                             },
+                            trailing: popupMenuItemSubCategoria(
+                                categoria: paramCategoria,
+                                subcategoria: subcategoria),
                           ),
                           Divider(endIndent: 12.0, indent: 12.0, height: 0.0),
                         ],
@@ -449,114 +438,157 @@ class ViewSubCategoriaState extends State<ViewSubCategoria> {
                             title: Text(subcategoria.nombre),
                             onTap: () {
                               buildContextSubcategoria
-                                      .read<ProviderCatalogo>()
-                                      .setNombreFiltro =subcategoria.nombre;
+                                  .read<ProviderCatalogo>()
+                                  .setNombreFiltro = subcategoria.nombre;
                               buildContextSubcategoria
                                   .read<ProviderCatalogo>()
-                                  .setSubategoria =subcategoria;
+                                  .setSubategoria = subcategoria;
                               Navigator.pop(buildContextCategoria);
                               Navigator.pop(buildContextSubcategoria);
                             },
+                            trailing: popupMenuItemSubCategoria(
+                                categoria: paramCategoria,
+                                subcategoria: subcategoria),
                           ),
                           Divider(endIndent: 12.0, indent: 12.0, height: 0.0),
                         ],
                       );
               },
-            ):Column(
-                children: [
-                  crearCategoria == false
-                      ? ListTile(
-                          contentPadding: EdgeInsets.symmetric(
-                              vertical: 8.0, horizontal: 12.0),
-                          leading: CircleAvatar(
-                            radius: 24.0,
-                            child: Icon(Icons.add),
-                          ),
-                          dense: true,
-                          title: Text("Crear subcategoría"),
-                          onTap: () {
-                            setState(() {
-                              crearCategoria = true;
-                            });
-                          },
-                        )
-                      : widgetCrearSubcategoria(categoria: paramCategoria),
-                  ListTile(
-                    contentPadding:
-                        EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
-                    leading: CircleAvatar(
-                      radius: 24.0,
-                      child: Icon(Icons.all_inclusive),
-                    ),
-                    dense: true,
-                    title:
-                        Text("Mostrar todos", style: TextStyle(fontSize: 16.0)),
-                    onTap: () {
-                      Navigator.pop(buildContextCategoria);
-                      Navigator.pop(buildContextSubcategoria);
-                    },
-                  )
-                ],
+            )
+          : ListTile(
+              contentPadding:
+                  EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+              leading: CircleAvatar(
+                radius: 24.0,
+                child: Icon(Icons.all_inclusive),
               ),
+              dense: true,
+              title: Text("Mostrar todos", style: TextStyle(fontSize: 16.0)),
+              onTap: () {
+                Navigator.pop(buildContextCategoria);
+                Navigator.pop(buildContextSubcategoria);
+              },
+            ),
     );
   }
 
-  Widget widgetCrearSubcategoria({@required Categoria categoria }) {
-
-    Categoria subcategoria=new Categoria();
-    subcategoria.id = new DateTime.now().millisecondsSinceEpoch.toString();
-    TextEditingController textEditingController =TextEditingController();
-
-    return ListTile(
-      title: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          CircleAvatar(
-            radius: 24.0,
-            child: Icon(Icons.border_color),
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: TextField(
-                controller: textEditingController,
-                onChanged: (value) => subcategoria.nombre = value,
-                decoration: InputDecoration(
-                    border: OutlineInputBorder(), labelText: "Subcategoria"),
-                // your TextField's Content
+  Widget popupMenuItemSubCategoria(
+      {@required Categoria categoria, @required Categoria subcategoria}) {
+    return new PopupMenuButton(
+      icon: Icon(Icons.more_vert),
+      itemBuilder: (_) => <PopupMenuItem<String>>[
+        new PopupMenuItem<String>(child: const Text('Editar'), value: 'editar'),
+        new PopupMenuItem<String>(
+            child: const Text('Eliminar'), value: 'eliminar'),
+      ],
+      onSelected: (value) async {
+        switch (value) {
+          case "editar":
+            _showDialogSetSubCategoria(
+                categoria: categoria, subcategoria: subcategoria);
+            break;
+          case "eliminar":
+            await showDialog<String>(
+              context: context,
+              child: new AlertDialog(
+                contentPadding: const EdgeInsets.all(16.0),
+                content: new Row(
+                  children: <Widget>[
+                    new Expanded(
+                      child: new Text(
+                          "¿Desea continuar eliminando esta subcategoría?"),
+                    )
+                  ],
+                ),
+                actions: <Widget>[
+                  new FlatButton(
+                      child: const Text('CANCEL'),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      }),
+                  new FlatButton(
+                      child: loadSave == false
+                          ? Text("ELIMINAR")
+                          : CircularProgressIndicator(),
+                      onPressed: () async {
+                        categoria.subcategorias.remove(subcategoria.id);
+                        await Global.getDataCatalogoCategoria(
+                                idNegocio: Global.oPerfilNegocio.id,
+                                idCategoria: categoria.id)
+                            .upSetCategoria(categoria.toJson());
+                        setState(() {
+                          Navigator.pop(context);
+                        });
+                      })
+                ],
               ),
-            ),
-          ),
+            );
+            break;
+        }
+      },
+    );
+  }
+
+  _showDialogSetSubCategoria(
+      {@required Categoria categoria, Categoria subcategoria}) async {
+    bool newSubcategoria = false;
+    if (subcategoria == null) {
+      newSubcategoria = true;
+      subcategoria = new Categoria();
+      subcategoria.id = new DateTime.now().millisecondsSinceEpoch.toString();
+    }
+    bool loadSave = false;
+    TextEditingController controller =
+        TextEditingController(text: subcategoria.nombre);
+
+    await showDialog<String>(
+      context: context,
+      child: new AlertDialog(
+        contentPadding: const EdgeInsets.all(16.0),
+        content: new Row(
+          children: <Widget>[
+            new Expanded(
+              child: new TextField(
+                controller: controller,
+                autofocus: true,
+                decoration: new InputDecoration(
+                    labelText: 'Subcategoria', hintText: 'Ej. chocolates'),
+              ),
+            )
+          ],
+        ),
+        actions: <Widget>[
+          new FlatButton(
+              child: const Text('CANCEL'),
+              onPressed: () {
+                Navigator.pop(context);
+              }),
+          new FlatButton(
+              child: loadSave == false
+                  ? Text(newSubcategoria ? 'GUARDAR' : "ACTUALIZAR")
+                  : CircularProgressIndicator(),
+              onPressed: () async {
+                if (controller.text != "") {
+                  setState(() {
+                    loadSave = true;
+                  });
+                  subcategoria.nombre = controller.text;
+                  categoria.subcategorias[subcategoria.id] =
+                      subcategoria.nombre;
+                  await Global.getDataCatalogoCategoria(
+                          idNegocio: Global.oPerfilNegocio.id,
+                          idCategoria: categoria.id)
+                      .upSetCategoria(categoria.toJson());
+                  Navigator.pop(context);
+                } else {}
+              })
         ],
       ),
-      trailing: loadSave == false
-          ? IconButton(
-              icon: new Icon(Icons.check),
-              onPressed: () async {
-                if( subcategoria.id!="" && textEditingController.text !=""){
-                  setState(() {
-                  loadSave = true;
-                });
-                subcategoria.nombre = textEditingController.text;
-                categoria.subcategorias[subcategoria.id]=subcategoria.nombre;
-                await Global.getDataCatalogoCategoria(idNegocio: Global.oPerfilNegocio.id,idCategoria: categoria.id).upSetCategoria(categoria.toJson());
-                setState(() {
-                  loadSave = false;
-                  crearCategoria = false;
-                  textEditingController.clear();
-                });
-                }
-                
-              },
-            )
-          : CircularProgressIndicator(),
     );
   }
 }
 
-Future<void> showModalBottomSheetConfig(
-    {@required BuildContext buildContext}) async {
+Future<void> showModalBottomSheetConfig({@required BuildContext buildContext}) async {
   showModalBottomSheet(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
       backgroundColor: Theme.of(buildContext).canvasColor,

@@ -22,7 +22,6 @@ class ProductEdit extends StatefulWidget {
 }
 
 class _ProductEditState extends State<ProductEdit> {
-
   // Controllers
   TextEditingController controllerTextEdit_titulo;
   TextEditingController controllerTextEdit_descripcion;
@@ -32,7 +31,8 @@ class _ProductEditState extends State<ProductEdit> {
 
   // Variables
   TextStyle textStyle = new TextStyle(fontSize: 24.0);
-  TextStyle textStyle_disabled = new TextStyle(fontSize: 24.0,color: Colors.grey);
+  TextStyle textStyle_disabled =
+      new TextStyle(fontSize: 24.0, color: Colors.grey);
   bool enCatalogo =
       false; // verifica si el producto se encuentra en el catalogo o no
   bool editable = false; // TODO : Eliminar para produccion
@@ -84,7 +84,9 @@ class _ProductEditState extends State<ProductEdit> {
     this.marca = null;
     if (producto != null) {
       if (producto.id_marca != "") {
-        Global.getMarca(idMarca: producto.id_marca).getDataMarca().then((value) {
+        Global.getMarca(idMarca: producto.id_marca)
+            .getDataMarca()
+            .then((value) {
           if (value != null) {
             setState(() {
               this.marca = value;
@@ -97,11 +99,16 @@ class _ProductEditState extends State<ProductEdit> {
 
   void getCategoriaProducto() async {
     // Obtenemos la identificacion de la categoria del producto
-    Global.getDataCatalogoCategoria(idNegocio: Global.oPerfilNegocio.id,idCategoria: producto.categoria).getDataCategoria().then((value) {
+    Global.getDataCatalogoCategoria(
+            idNegocio: Global.oPerfilNegocio.id,
+            idCategoria: producto.categoria)
+        .getDataCategoria()
+        .then((value) {
       this.categoria = value ?? Categoria();
       if (this.categoria.subcategorias != null) {
         this.categoria.subcategorias.forEach((k, v) {
-          Categoria subcategoria =new Categoria(id: k.toString(), nombre: v.toString());
+          Categoria subcategoria =
+              new Categoria(id: k.toString(), nombre: v.toString());
           if (subcategoria.id == this.producto.subcategoria) {
             setState(() {
               this.subcategoria = subcategoria ?? Categoria();
@@ -124,10 +131,10 @@ class _ProductEditState extends State<ProductEdit> {
 
   @override
   Widget build(BuildContext contextPrincipal) {
-
-    textStyle_disabled = new TextStyle(fontSize: 24.0,color: Theme.of(context).hintColor);
+    textStyle_disabled =
+        new TextStyle(fontSize: 24.0, color: Theme.of(context).hintColor);
     this.contextPrincipal = contextPrincipal;
-    
+
     return Scaffold(
       body: Builder(builder: (contextBuilder) {
         return Scaffold(
@@ -170,14 +177,14 @@ class _ProductEditState extends State<ProductEdit> {
             ],
           ),
           body: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      widgetsImagen(),
-                      widgetFormEditText(builderContext: context),
-                    ],
-                  ),
-                ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                widgetsImagen(),
+                widgetFormEditText(builderContext: context),
+              ],
+            ),
+          ),
         );
       }),
     );
@@ -292,7 +299,8 @@ class _ProductEditState extends State<ProductEdit> {
                 child: InkWell(
                   child: TextField(
                     controller: TextEditingController()
-                      ..text =this.categoria != null ? this.categoria.nombre : "",
+                      ..text =
+                          this.categoria != null ? this.categoria.nombre : "",
                     enabled: false,
                     enableInteractiveSelection: false,
                     decoration: InputDecoration(
@@ -329,10 +337,10 @@ class _ProductEditState extends State<ProductEdit> {
                   ),
                   onTap: () {
                     if (this.categoria != null) {
-                        getSubCategoria(
-                            buildContext: builderContext,
-                            categoria: this.categoria);
-                      }
+                      getSubCategoria(
+                          buildContext: builderContext,
+                          categoria: this.categoria);
+                    }
                   },
                 ),
               ),
@@ -361,7 +369,7 @@ class _ProductEditState extends State<ProductEdit> {
                           borderSide:
                               BorderSide(color: Colors.green, width: 2)),
                       labelText: "Titulo"),
-                  style: producto.verificado?textStyle_disabled:textStyle,
+                  style: producto.verificado ? textStyle_disabled : textStyle,
                   controller: controllerTextEdit_titulo,
                 )
               : Container(),
@@ -374,15 +382,17 @@ class _ProductEditState extends State<ProductEdit> {
             onChanged: (value) => producto.descripcion = value,
             decoration: InputDecoration(
                 border: OutlineInputBorder(), labelText: "Descripción"),
-            style: producto.verificado?textStyle_disabled:textStyle,
+            style: producto.verificado ? textStyle_disabled : textStyle,
             controller: controllerTextEdit_descripcion,
           ),
           SizedBox(height: 16.0),
           TextField(
             //inputFormatters: [DecimalTextInputFormatter(decimalRange: 2)],
             keyboardType: TextInputType.numberWithOptions(decimal: true),
-            onChanged: (value) => producto.precio_venta = controllerTextEdit_precio_venta.numberValue,
-            decoration: InputDecoration(border: OutlineInputBorder(), labelText: "Precio de venta"),
+            onChanged: (value) => producto.precio_venta =
+                controllerTextEdit_precio_venta.numberValue,
+            decoration: InputDecoration(
+                border: OutlineInputBorder(), labelText: "Precio de venta"),
             style: textStyle,
             controller: controllerTextEdit_precio_venta,
           ),
@@ -443,7 +453,7 @@ class _ProductEditState extends State<ProductEdit> {
                     borderSide: BorderSide(color: Colors.green, width: 2)),
                 labelText: "Marca",
               ),
-              style: producto.verificado?textStyle_disabled:textStyle,
+              style: producto.verificado ? textStyle_disabled : textStyle,
             ),
             onTap: () {
               if (producto.verificado == false) {
@@ -670,7 +680,15 @@ class _ProductEditState extends State<ProductEdit> {
         context: buildContext,
         builder: (ctx) {
           return Scaffold(
-            appBar: AppBar(title: Text("Categoría")),
+            appBar: AppBar(
+              title: Text("Categoría"),
+              actions: [
+                IconButton(
+                  onPressed: () => _showDialogCreateCategoria(),
+                  icon: Icon(Icons.add),
+                ),
+              ],
+            ),
             body: FutureBuilder(
               future: Global.getCatalogoCategorias(
                       idNegocio: Global.oPerfilNegocio.id)
@@ -729,8 +747,108 @@ class _ProductEditState extends State<ProductEdit> {
         });
   }
 
-  getSubCategoria(
-      {@required BuildContext buildContext, @required Categoria categoria}) {
+  _showDialogCreateCategoria() async {
+    bool loadSave = false;
+    Categoria categoria = new Categoria();
+    categoria.id = new DateTime.now().millisecondsSinceEpoch.toString();
+    TextEditingController controller = TextEditingController();
+
+    await showDialog<String>(
+      context: context,
+      child: new AlertDialog(
+        contentPadding: const EdgeInsets.all(16.0),
+        content: new Row(
+          children: <Widget>[
+            new Expanded(
+              child: new TextField(
+                controller: controller,
+                autofocus: true,
+                decoration: new InputDecoration(
+                    labelText: 'Categoria', hintText: 'Ej. golosinas'),
+              ),
+            )
+          ],
+        ),
+        actions: <Widget>[
+          new FlatButton(
+              child: const Text('CANCEL'),
+              onPressed: () {
+                Navigator.pop(context);
+              }),
+          new FlatButton(
+              child: loadSave == false
+                  ? Text('GUARDAR')
+                  : CircularProgressIndicator(),
+              onPressed: () async {
+                if (controller.text != "") {
+                  setState(() {
+                    loadSave = true;
+                  });
+                  categoria.nombre = controller.text;
+                  await Global.getDataCatalogoCategoria(
+                          idNegocio: Global.oPerfilNegocio.id,
+                          idCategoria: categoria.id)
+                      .upSetCategoria(categoria.toJson());
+                  Navigator.pop(context);
+                } else {}
+              })
+        ],
+      ),
+    );
+  }
+
+  _showDialogCreateSubCategoria({@required Categoria categoria}) async {
+    Categoria subcategoria = new Categoria();
+    subcategoria.id = new DateTime.now().millisecondsSinceEpoch.toString();
+    bool loadSave = false;
+    TextEditingController controller = TextEditingController();
+
+    await showDialog<String>(
+      context: context,
+      child: new AlertDialog(
+        contentPadding: const EdgeInsets.all(16.0),
+        content: new Row(
+          children: <Widget>[
+            new Expanded(
+              child: new TextField(
+                controller: controller,
+                autofocus: true,
+                decoration: new InputDecoration(
+                    labelText: 'Subcategoria', hintText: 'Ej. chocolates'),
+              ),
+            )
+          ],
+        ),
+        actions: <Widget>[
+          new FlatButton(
+              child: const Text('CANCEL'),
+              onPressed: () {
+                Navigator.pop(context);
+              }),
+          new FlatButton(
+              child: loadSave == false
+                  ? Text('GUARDAR')
+                  : CircularProgressIndicator(),
+              onPressed: () async {
+                if (controller.text != "") {
+                  setState(() {
+                    loadSave = true;
+                  });
+                  subcategoria.nombre = controller.text;
+                  categoria.subcategorias[subcategoria.id]=subcategoria.nombre;
+                  await Global.getDataCatalogoCategoria(
+                          idNegocio: Global.oPerfilNegocio.id,
+                          idCategoria: categoria.id)
+                      .upSetCategoria(categoria.toJson());
+                  Navigator.pop(context);
+                } else {}
+              })
+        ],
+      ),
+    );
+  }
+
+  getSubCategoria({@required BuildContext buildContext, @required Categoria categoria}) {
     showModalBottomSheet(
         shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
@@ -738,7 +856,14 @@ class _ProductEditState extends State<ProductEdit> {
         context: buildContext,
         builder: (_) {
           return Scaffold(
-            appBar: AppBar(title: Text("Subcategoria")),
+            appBar: AppBar(
+              title: Text("Subcategoria"),
+              actions: [
+                IconButton(
+                  onPressed: () => _showDialogCreateSubCategoria(categoria: categoria),
+                  icon: Icon(Icons.add),
+                ),
+              ],),
             body: categoria.subcategorias != null
                 ? ListView.builder(
                     padding: EdgeInsets.symmetric(vertical: 15.0),

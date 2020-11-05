@@ -25,7 +25,7 @@ import 'package:producto/screens/page_buscadorProductos.dart';
 import 'package:producto/models/models_profile.dart';
 import 'package:producto/services/globals.dart';
 import 'package:producto/models/models_catalogo.dart';
-import 'package:producto/screens/widgets/widgets_showModalBottomSheet.dart';
+import 'package:producto/screens/widgets/widgetsCategoriViews.dart';
 import 'package:producto/utils/dynamicTheme_lb.dart';
 /*  DESCRIPCIÓN */
 /*  Pantalla principal de la aplicación Catalogo app  */
@@ -44,7 +44,7 @@ class PagePrincipal extends StatelessWidget {
 
     Color color = Theme.of(buildContext).brightness == Brightness.dark
         ? Colors.white54
-        : Colors.black26;
+        : Colors.black38;
 
     return Global.prefs.getIdNegocio == ""
         ? Scaffold(
@@ -90,7 +90,7 @@ class PagePrincipal extends StatelessWidget {
                       padding: const EdgeInsets.all(30.0),
                       decoration: BoxDecoration(
                           color: Colors.transparent,
-                          border: Border.all(width: 0.1, color: color),
+                          border: Border.all(width: 0.2, color: color),
                           borderRadius:BorderRadius.all(Radius.circular(30.0))),
                       child: Image(
                           color: color,
@@ -518,8 +518,7 @@ class PagePrincipal extends StatelessWidget {
                   : Colors.black,
               onTap: (value) {
                 showModalBottomSheet(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.0)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
                     backgroundColor: Theme.of(buildContext).canvasColor,
                     context: buildContext,
                     builder: (ctx) {
