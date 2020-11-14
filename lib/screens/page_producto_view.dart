@@ -175,7 +175,6 @@ class _ProductScreenState extends State<ProductScreen> {
 
             initialChildSize: 0.2,
             minChildSize: 0.1,
-            maxChildSize: 0.85,
             builder: (BuildContext context, myscrollController) {
               return Container(
                 padding: EdgeInsets.symmetric(horizontal: 16.0,vertical:8.0),
@@ -499,6 +498,7 @@ class WidgetUltimosPrecios extends StatelessWidget {
                           return Column(
                             children: <Widget>[
                               ListTile(
+                                contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
                                 leading: listaPrecios[index].id_negocio == "" ||
                                         perfilNegocio.imagen_perfil == "default"
                                     ? CircleAvatar(
@@ -529,7 +529,7 @@ class WidgetUltimosPrecios extends StatelessWidget {
                                   Publicaciones.getFormatoPrecio(
                                       monto: listaPrecios[index].precio),
                                   style: TextStyle(
-                                      fontSize: 25.0,
+                                      fontSize: 24.0,
                                       fontWeight: FontWeight.bold),
                                 ),
                                 trailing: Column(
@@ -556,7 +556,7 @@ class WidgetUltimosPrecios extends StatelessWidget {
                                                 listaPrecios[index]
                                                     .ciudad
                                                     .toString(),
-                                            style: TextStyle(fontWeight: FontWeight.bold,fontSize: 12.0),
+                                            style: TextStyle(fontWeight: FontWeight.bold),
                                           )
                                         : Text("Ubicación desconocido",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 12.0)),
                                   ],
@@ -580,8 +580,8 @@ class WidgetUltimosPrecios extends StatelessWidget {
           return Padding(
                       padding: const EdgeInsets.symmetric(
                           vertical: 8.0, horizontal: 12.0),
-                      child: Text("No se registró ningún precio para este producto",
-                          style: TextStyle(fontSize: 20.0)),
+                      child: Text("Cargando ultimos precios registrados",
+                          style: TextStyle(fontSize: 20.0),textAlign: TextAlign.center,),
                     );
         }
       },

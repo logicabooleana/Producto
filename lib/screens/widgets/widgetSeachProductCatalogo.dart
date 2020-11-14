@@ -48,7 +48,7 @@ class _WidgetSeachProductState extends State<WidgetSeachProduct> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: colorView,
-        title: Text(resultState ? "Buscar" : "No se encontro coincidencia"),
+        title: Text(resultState ? "Buscar" : "Sin resultados"),
       ),
       body: _body(),
     );
@@ -58,11 +58,9 @@ class _WidgetSeachProductState extends State<WidgetSeachProduct> {
     final screenSize = MediaQuery.of(context).size;
 
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(30.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+      child: ListView(
+          padding: const EdgeInsets.all(30.0),
+          shrinkWrap: true,
           children: [
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -85,15 +83,16 @@ class _WidgetSeachProductState extends State<WidgetSeachProduct> {
                     },
                     decoration: InputDecoration(
                         suffixIcon: IconButton(
-                          onPressed: (){
+                          onPressed: () {
                             setState(() {
-                              
                               textEditingController.clear();
                               buttonAddProduct = false;
                               resultState = true;
                             });
                           },
-                          icon: textEditingController.text!=""?Icon(Icons.clear,color: colorView):Container(),
+                          icon: textEditingController.text != ""
+                              ? Icon(Icons.clear, color: colorView)
+                              : Container(),
                         ),
                         enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: colorView)),
@@ -124,58 +123,55 @@ class _WidgetSeachProductState extends State<WidgetSeachProduct> {
                 ),
               ],
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                !buscando
-                    ? FadeInRight(
-                        child: Container(
-                        width: double.infinity,
-                        child: RaisedButton.icon(
-                          color: Theme.of(context).primaryColor,
-                          padding: EdgeInsets.all(16.0),
-                          icon: Icon(Icons.search),
-                          onPressed: () {
-                            if (textEditingController.text != "") {
-                              setState(() {
-                                getIdProducto(id: codigoBar ?? "");
-                              });
-                            }
-                          },
-                          label: Text("Buscar"),
-                          textColor: Colors.white,
-                        ),
-                      ))
-                    : SizedBox(
-                        child: CircularProgressIndicator(),
-                        height: screenSize.width / 2,
-                        width: screenSize.width / 2,
-                      ),
-                !buscando ? SizedBox(width: 12.0, height: 12.0) : Container(),
-                !buscando
-                    ? FadeInLeft(
-                        child: Container(
-                        width: double.infinity,
-                        child: RaisedButton.icon(
-                          color: Theme.of(context).primaryColor,
-                            padding: EdgeInsets.all(16.0),
-                            icon: Image(
-                                color: Colors.white,
-                                height: 20.0,
-                                width: 20.0,
-                                image: AssetImage('assets/barcode.png'),
-                                fit: BoxFit.contain),
-                            label: Text('Escanea el código',
-                                style: TextStyle(color: Colors.white)),
-                            textColor: Colors.white,
-                            onPressed: () {
-                              scanBarcodeNormal(context: context);
-                            }),
-                      ))
-                    : Container(),
-              ],
-            ),
+            SizedBox(height:12.0),
+            !buscando
+                ? FadeInRight(
+                    child: Container(
+                    width: double.infinity,
+                    child: RaisedButton.icon(
+                      color: Theme.of(context).primaryColor,
+                      padding: EdgeInsets.all(16.0),
+                      icon: Icon(Icons.search),
+                      onPressed: () {
+                        if (textEditingController.text != "") {
+                          setState(() {
+                            getIdProducto(id: codigoBar ?? "");
+                          });
+                        }
+                      },
+                      label: Text("Buscar"),
+                      textColor: Colors.white,
+                    ),
+                  ))
+                : SizedBox(
+                    child: CircularProgressIndicator(),
+                    height: 200,
+                    width: 200,
+                  ),
+            
+            !buscando ? SizedBox(width: 12.0, height: 12.0) : Container(),
+            !buscando
+                ? FadeInLeft(
+                    child: Container(
+                    width: double.infinity,
+                    child: RaisedButton.icon(
+                        color: Theme.of(context).primaryColor,
+                        padding: EdgeInsets.all(16.0),
+                        icon: Image(
+                            color: Colors.white,
+                            height: 20.0,
+                            width: 20.0,
+                            image: AssetImage('assets/barcode.png'),
+                            fit: BoxFit.contain),
+                        label: Text('Escanea el código',
+                            style: TextStyle(color: Colors.white)),
+                        textColor: Colors.white,
+                        onPressed: () {
+                          scanBarcodeNormal(context: context);
+                        }),
+                  ))
+                : Container(),
+            buttonAddProduct ? SizedBox(width: 12.0, height: 60.0) : Container(),
             buttonAddProduct
                 ? Container(
                     width: double.infinity,
@@ -197,9 +193,8 @@ class _WidgetSeachProductState extends State<WidgetSeachProduct> {
                     ),
                   )
                 : Container(),
-          ],
-        ),
-      ),
+          ] //your list view content here
+          ),
     );
   }
 

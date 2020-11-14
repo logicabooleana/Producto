@@ -75,7 +75,7 @@ class _ViewCategoriaState extends State<ViewCategoria> {
                                   onTap: () {
                                     buildContext
                                         .read<ProviderCatalogo>()
-                                        .setNombreFiltro = "Mostrar todos";
+                                        .setNombreFiltro = "Todos";
                                     buildContext
                                         .read<ProviderCatalogo>()
                                         .setCategoria = null;

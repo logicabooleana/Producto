@@ -227,8 +227,7 @@ class PagePrincipal extends StatelessWidget {
         ],
       ),
       body: new StreamBuilder(
-        stream: Global.getCatalogoNegocio(idNegocio: perfilNegocio.id ?? "")
-            .streamDataProductoAll(),
+        stream: Global.getCatalogoNegocio(idNegocio: perfilNegocio.id ?? "").streamDataProductoAll(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             Global.listProudctosNegocio = snapshot.data;
@@ -400,16 +399,12 @@ class PagePrincipal extends StatelessWidget {
                             return Column(
                               children: <Widget>[
                                 createCuentaEmpresa
-                                    ? WidgetButtonListTile(
-                                            buildContext: buildContext)
-                                        .buttonListTileCrearCuenta(
-                                            context: buildContext)
+                                    ? WidgetButtonListTile(buildContext: buildContext).buttonListTileCrearCuenta(context: buildContext)
                                     : Container(),
                                 WidgetButtonListTile(buildContext: buildContext)
                                     .buttonListTileItemCuenta(
                                         buildContext: buildContext,
-                                        perfilNegocio: Global
-                                            .listAdminPerfilNegocio[index],
+                                        perfilNegocio: Global.listAdminPerfilNegocio[index],
                                         adminPropietario: Global
                                                 .listAdminPerfilNegocio[index]
                                                 .id ==
@@ -531,9 +526,9 @@ class PagePrincipal extends StatelessWidget {
               },
               tabs: [
                 Consumer<ProviderCatalogo>(
-                  child: Tab(text: "Todos"),
+                  child: Tab(text: "Todos (${Global.listProudctosNegocio.length.toString()})"),
                   builder: (context, catalogo, child) {
-                    return Tab(text: catalogo.sNombreFiltro);
+                    return Tab(text: catalogo.sNombreFiltro +" (${Global.listProudctosNegocio.length.toString()})");
                   },
                 ),
               ],

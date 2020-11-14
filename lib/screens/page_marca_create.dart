@@ -60,9 +60,8 @@ class _PageCreateMarcaState extends State<PageCreateMarca> {
   }
 
   Widget body({@required BuildContext buildContext}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.start,
+    return ListView(
+      padding: const EdgeInsets.all(30.0),
       children: [
         _imageFile == null
             ? Container(

@@ -264,8 +264,7 @@ class WidgetButtonListTile extends StatelessWidget {
       return Container();
     }
     return FutureBuilder(
-      future:
-          Global.getNegocio(idNegocio: perfilNegocio.id).getDataPerfilNegocio(),
+      future:Global.getNegocio(idNegocio: perfilNegocio.id).getDataPerfilNegocio(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           PerfilNegocio perfilNegocio = snapshot.data;
@@ -277,7 +276,7 @@ class WidgetButtonListTile extends StatelessWidget {
                         child: CachedNetworkImage(
                           fadeInDuration: Duration(milliseconds: 200),
                           fit: BoxFit.cover,
-                          imageUrl: perfilNegocio.imagen_perfil,
+                          imageUrl: perfilNegocio.imagen_perfil==""?"http://www.default.com":perfilNegocio.imagen_perfil,
                           placeholder: (context, url) => CircleAvatar(
                 backgroundColor: Colors.black26,
                 radius: 24.0,
