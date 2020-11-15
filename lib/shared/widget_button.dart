@@ -276,7 +276,7 @@ class WidgetButtonListTile extends StatelessWidget {
                         child: CachedNetworkImage(
                           fadeInDuration: Duration(milliseconds: 200),
                           fit: BoxFit.cover,
-                          imageUrl: perfilNegocio.imagen_perfil==""?"http://www.default.com":perfilNegocio.imagen_perfil,
+                          imageUrl: perfilNegocio.imagen_perfil==""||perfilNegocio.imagen_perfil==null?"http://www.default.com":perfilNegocio.imagen_perfil,
                           placeholder: (context, url) => CircleAvatar(
                 backgroundColor: Colors.black26,
                 radius: 24.0,

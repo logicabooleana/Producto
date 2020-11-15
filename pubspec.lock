@@ -155,6 +155,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.2.5"
+  expandable_bottom_sheet:
+    dependency: "direct main"
+    description:
+      name: expandable_bottom_sheet
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.1+1"
   fake_async:
     dependency: transitive
     description:
@@ -457,13 +464,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.8"
-  modal_bottom_sheet:
-    dependency: "direct main"
-    description:
-      name: modal_bottom_sheet
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.0+1"
   nested:
     dependency: transitive
     description:
@@ -734,7 +734,7 @@ packages:
       name: win32
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.7.3"
+    version: "1.7.4"
   xdg_directories:
     dependency: transitive
     description:

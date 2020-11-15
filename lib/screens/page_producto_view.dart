@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:producto/models/models_catalogo.dart';
 import 'package:producto/models/models_profile.dart';
@@ -10,6 +11,11 @@ import 'package:producto/services/globals.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/services.dart';
 import 'package:producto/shared/widgets_image_circle.dart' as image;
+import 'package:expandable_bottom_sheet/expandable_bottom_sheet.dart';
+
+Color colorShowder = Colors
+    .black54; //Theme.of(context).brightness==Brightness.dark?Colors.grey[850]:Colors.black;
+Color colorText = Colors.white;
 
 class ProductScreen extends StatefulWidget {
   // Variables
@@ -57,26 +63,25 @@ class _ProductScreenState extends State<ProductScreen> {
 
   void getCategoriaProducto() async {
     // Obtenemos la identificacion de la categoria del producto
-    if( Global.oPerfilNegocio != null ){
+    if (Global.oPerfilNegocio != null) {
       Global.getDataCatalogoCategoria(
-            idNegocio: Global.oPerfilNegocio.id,
-            idCategoria: widget.producto.categoria)
-        .getDataCategoria()
-        .then((value) {
-      this.categoria = value ?? Categoria();
-      if (this.categoria.subcategorias != null) {
-        this.categoria.subcategorias.forEach((k, v) {
-          Categoria subcategoria =
-              new Categoria(id: k.toString(), nombre: v.toString());
-          if (subcategoria.id == widget.producto.subcategoria) {
-            this.subcategoria = subcategoria ?? Categoria();
-          }
-        });
-      }
-      setState(() {});
-    });
+              idNegocio: Global.oPerfilNegocio.id,
+              idCategoria: widget.producto.categoria)
+          .getDataCategoria()
+          .then((value) {
+        this.categoria = value ?? Categoria();
+        if (this.categoria.subcategorias != null) {
+          this.categoria.subcategorias.forEach((k, v) {
+            Categoria subcategoria =
+                new Categoria(id: k.toString(), nombre: v.toString());
+            if (subcategoria.id == widget.producto.subcategoria) {
+              this.subcategoria = subcategoria ?? Categoria();
+            }
+          });
+        }
+        setState(() {});
+      });
     }
-    
   }
 
   @override
@@ -141,94 +146,120 @@ class _ProductScreenState extends State<ProductScreen> {
               : Container(),
         ],
       ),
-      body: Stack(
-        children: [
-          Builder(builder: (contextBuilder) {
-            contextScaffold = contextBuilder;
-            return SingleChildScrollView(
+      body: ExpandableBottomSheet(
+        background: Builder(builder: (contextBuilder) {
+          contextScaffold = contextBuilder;
+          return SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                WidgetImagen(producto: widget.producto, marca: this.marca),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      WidgetDescripcion(context),
+                      //WidgetUltimosPrecios(producto: widget.producto),
+                      productoEnCatalogo
+                          ? WidgetOtrosProductos(producto: widget.producto)
+                          : Container(),
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  height: 140.0,
+                  width: 140.0,
+                ),
+              ],
+            ),
+          );
+        }),
+        persistentHeader: ClipRRect(
+          borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+          child: Container(
+            color: colorShowder,
+            padding: EdgeInsets.all(12.0),
+            child: Center(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  WidgetImagen(producto: widget.producto, marca: this.marca),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        WidgetDescripcion(context),
-                        //WidgetUltimosPrecios(producto: widget.producto),
-                        productoEnCatalogo
-                            ? WidgetOtrosProductos(producto: widget.producto)
-                            : Container(),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 140.0,
-                    width: 140.0,
-                  ),
-                ],
-              ),
-            );
-          }),
-          DraggableScrollableSheet(
-
-            initialChildSize: 0.2,
-            minChildSize: 0.1,
-            builder: (BuildContext context, myscrollController) {
-              return Container(
-                padding: EdgeInsets.symmetric(horizontal: 16.0,vertical:8.0),
-                decoration: BoxDecoration(
-                    color: Theme.of(context).cardColor,
-                    borderRadius: BorderRadius.all(Radius.circular(20.0))),
-                child: ListView(
-                  controller: myscrollController,
-                  children: [
-                    productoEnCatalogo
-                        ? Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              widget.producto.precio_venta != null &&
-                                      widget.producto.precio_venta != 0.0
-                                  ? Text(
+                  productoEnCatalogo
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          textDirection: TextDirection.ltr,
+                          children: [
+                            widget.producto.precio_venta != null &&
+                                    widget.producto.precio_venta != 0.0
+                                ? Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
                                       Publicaciones.getFormatoPrecio(
-                                          monto: widget.producto.precio_venta),
+                                          monto:
+                                              widget.producto.precio_venta),
                                       style: TextStyle(
-                                          height: 2,
+                                          color: colorText,
                                           fontSize: 30,
                                           fontWeight: FontWeight.bold),
                                       textAlign: TextAlign.end,
-                                    )
-                                  : Container(),
-                              widget.producto.timestamp_actualizacion != null
-                                  ? Text(
+                                    ),
+                                  )
+                                : Container(),
+                            widget.producto.precio_comparacion != null &&
+                                    widget.producto.precio_comparacion !=
+                                        0.0
+                                ? Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      Publicaciones.getFormatoPrecio(
+                                          monto: widget
+                                              .producto.precio_comparacion),
+                                      style: TextStyle(
+                                          color: colorText,
+                                          decoration:
+                                              TextDecoration.lineThrough,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold),
+                                      textAlign: TextAlign.end,
+                                    ),
+                                  )
+                                : Container(),
+                            widget.producto.timestamp_actualizacion != null
+                                ? Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
                                       Publicaciones.getFechaPublicacion(
                                               widget.producto
                                                   .timestamp_actualizacion
                                                   .toDate(),
                                               new DateTime.now())
                                           .toLowerCase(),
-                                      textAlign: TextAlign.end,
                                       style: TextStyle(
                                           fontStyle: FontStyle.normal,
-                                          color: Theme.of(context).brightness ==
-                                                  Brightness.dark
-                                              ? Colors.white70
-                                              : Colors.black54),
-                                    )
-                                  : Container(),
-                            ],
-                          )
-                        : Container(),
-                    Icon(Icons.keyboard_arrow_up),
-                    WidgetUltimosPrecios(producto: widget.producto),
-                  ],
-                ),
-              );
-            },
+                                          color: colorText),
+                                    ),
+                                  )
+                                : Container(),
+                          ],
+                        )
+                      : Container(),
+                  Text(
+                    'Ultimos precios registrados',
+                    style: TextStyle(color: colorText),
+                  ),
+                  Icon(Icons.keyboard_arrow_down, color: colorText),
+                ],
+              ),
+            ),
           ),
-        ],
+        ),
+        expandableContent: Container(
+          color: colorShowder,
+          padding: EdgeInsets.all(12.0),
+          child: WidgetUltimosPrecios(producto: widget.producto),
+        ),
       ),
     );
   }
@@ -289,42 +320,6 @@ class _ProductScreenState extends State<ProductScreen> {
                   style: TextStyle(
                       height: 1, fontSize: 16, fontWeight: FontWeight.normal))
               : Container(),
-          /* productoEnCatalogo
-              ? Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    widget.producto.precio_venta != null &&
-                            widget.producto.precio_venta != 0.0
-                        ? Text(
-                            Publicaciones.getFormatoPrecio(
-                                monto: widget.producto.precio_venta),
-                            style: TextStyle(
-                                height: 2,
-                                fontSize: 30,
-                                fontWeight: FontWeight.bold),
-                            textAlign: TextAlign.end,
-                          )
-                        : Container(),
-                    widget.producto.timestamp_actualizacion != null
-                        ? Text(
-                            Publicaciones.getFechaPublicacion(
-                                    widget.producto.timestamp_actualizacion
-                                        .toDate(),
-                                    new DateTime.now())
-                                .toLowerCase(),
-                            textAlign: TextAlign.end,
-                            style: TextStyle(
-                                fontStyle: FontStyle.normal,
-                                color: Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? Colors.white70
-                                    : Colors.black54),
-                          )
-                        : Container(),
-                  ],
-                )
-              : Container(), */
         ],
       ),
     );
@@ -467,20 +462,30 @@ class WidgetUltimosPrecios extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return expandableBottomSheet_1();
+  }
+
+  Widget expandableBottomSheet_1() {
     return FutureBuilder(
-      future: Global.getListPreciosProducto(idProducto: producto.id).getDataPreciosProductosAll(),
+      future: Global.getListPreciosProducto(idProducto: producto.id)
+          .getDataPreciosProductosAll(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           List<Precio> listaPrecios = snapshot.data;
           return Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              Padding(
+              listaPrecios.length == 0
+                  ? Padding(
                       padding: const EdgeInsets.symmetric(
                           vertical: 8.0, horizontal: 12.0),
-                      child: Text(listaPrecios.length != 0?"Ultimos precios registrados":"No se registró ningún precio para este producto",
-                          style: TextStyle(fontSize: 20.0),textAlign: TextAlign.center,),
-                    ),
+                      child: Text(
+                        "No se registró ningún precio para este producto",
+                        style: TextStyle(fontSize: 20.0, color: colorText),
+                        textAlign: TextAlign.center,
+                      ),
+                    )
+                  : Container(),
               ListView.builder(
                 //physics: const AlwaysScrollableScrollPhysics(),
                 physics: const NeverScrollableScrollPhysics(),
@@ -498,7 +503,8 @@ class WidgetUltimosPrecios extends StatelessWidget {
                           return Column(
                             children: <Widget>[
                               ListTile(
-                                contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
+                                contentPadding:
+                                    EdgeInsets.symmetric(horizontal: 0.0),
                                 leading: listaPrecios[index].id_negocio == "" ||
                                         perfilNegocio.imagen_perfil == "default"
                                     ? CircleAvatar(
@@ -509,7 +515,7 @@ class WidgetUltimosPrecios extends StatelessWidget {
                                                 .substring(0, 1),
                                             style: TextStyle(
                                                 fontSize: 18.0,
-                                                color: Colors.white,
+                                                color: colorText,
                                                 fontWeight: FontWeight.bold)),
                                       )
                                     : CachedNetworkImage(
@@ -529,6 +535,7 @@ class WidgetUltimosPrecios extends StatelessWidget {
                                   Publicaciones.getFormatoPrecio(
                                       monto: listaPrecios[index].precio),
                                   style: TextStyle(
+                                      color: colorText,
                                       fontSize: 24.0,
                                       fontWeight: FontWeight.bold),
                                 ),
@@ -545,10 +552,7 @@ class WidgetUltimosPrecios extends StatelessWidget {
                                       textAlign: TextAlign.end,
                                       style: TextStyle(
                                           fontStyle: FontStyle.normal,
-                                          color: Theme.of(context).brightness ==
-                                                  Brightness.dark
-                                              ? Colors.white70
-                                              : Colors.black54),
+                                          color: colorText),
                                     ),
                                     listaPrecios[index].ciudad != ""
                                         ? Text(
@@ -556,15 +560,21 @@ class WidgetUltimosPrecios extends StatelessWidget {
                                                 listaPrecios[index]
                                                     .ciudad
                                                     .toString(),
-                                            style: TextStyle(fontWeight: FontWeight.bold),
+                                            style: TextStyle(
+                                                color: colorText,
+                                                fontWeight: FontWeight.bold),
                                           )
-                                        : Text("Ubicación desconocido",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 12.0)),
+                                        : Text("Ubicación desconocido",
+                                            style: TextStyle(
+                                                color: colorText,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 12.0)),
                                   ],
                                 ),
                                 onTap: () {},
                               ),
                               SizedBox(
-                                height: 7.0,
+                                height: 5.0,
                               )
                             ],
                           );
@@ -578,11 +588,14 @@ class WidgetUltimosPrecios extends StatelessWidget {
           );
         } else {
           return Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 8.0, horizontal: 12.0),
-                      child: Text("Cargando ultimos precios registrados",
-                          style: TextStyle(fontSize: 20.0),textAlign: TextAlign.center,),
-                    );
+            padding:
+                const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+            child: Text(
+              "Cargando ultimos precios registrados",
+              style: TextStyle(fontSize: 20.0),
+              textAlign: TextAlign.center,
+            ),
+          );
         }
       },
     );
