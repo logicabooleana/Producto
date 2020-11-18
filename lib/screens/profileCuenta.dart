@@ -69,14 +69,6 @@ class _ProfileCuentaState extends State<ProfileCuenta> {
         TextEditingController(text: perfilNegocio.nombre_negocio);
     controllerTextEdit_descripcion =
         TextEditingController(text: perfilNegocio.descripcion);
-    controllerTextEdit_username =
-        TextEditingController(text: perfilNegocio.username);
-    controllerTextEdit_categoria_nombre =
-        TextEditingController(text: perfilNegocio.categoria_nombre);
-    controllerTextEdit_telefono =
-        TextEditingController(text: perfilNegocio.telefono);
-    controllerTextEdit_sitio_web =
-        TextEditingController(text: perfilNegocio.sitio_web);
     controllerTextEdit_ciudad =
         TextEditingController(text: perfilNegocio.ciudad);
     controllerTextEdit_direccion =
@@ -290,58 +282,6 @@ class _ProfileCuentaState extends State<ProfileCuenta> {
               _fieldFocusChange(context, _focus_TextEdit_descripcion, _focus_TextEdit_username);
             },
           ),
-          TextField(
-            enabled: !saveIndicador,
-            onChanged: (value) => perfilNegocio.username = value,
-            decoration: InputDecoration(
-              labelText: "username",
-            ),
-            controller: controllerTextEdit_username,
-            textInputAction: TextInputAction.next,
-            focusNode: _focus_TextEdit_username,
-            onSubmitted: (term) {
-              _fieldFocusChange(context, _focus_TextEdit_username, _focus_TextEdit_categoria_nombre);
-            },
-          ),
-          TextField(
-            enabled: !saveIndicador,
-            onChanged: (value) => perfilNegocio.categoria_nombre = value,
-            decoration: InputDecoration(
-              labelText: "Categoria",
-            ),
-            controller: controllerTextEdit_categoria_nombre,
-            textInputAction: TextInputAction.next,
-            focusNode: _focus_TextEdit_categoria_nombre,
-            onSubmitted: (term) {
-              _fieldFocusChange(context, _focus_TextEdit_categoria_nombre, _focus_TextEdit_telefono);
-            },
-          ),
-          TextField(
-            enabled: !saveIndicador,
-            onChanged: (value) => perfilNegocio.telefono = value,
-            decoration: InputDecoration(
-              labelText: "Telefono (ocional)",
-            ),
-            controller: controllerTextEdit_telefono,
-            textInputAction: TextInputAction.next,
-            focusNode: _focus_TextEdit_telefono,
-            onSubmitted: (term) {
-              _fieldFocusChange(context, _focus_TextEdit_telefono, _focus_TextEdit_sitio_web);
-            },
-          ),
-          TextField(
-            enabled: !saveIndicador,
-            onChanged: (value) => perfilNegocio.sitio_web = value,
-            decoration: InputDecoration(
-              labelText: "Sitio web (ocional)",
-            ),
-            controller: controllerTextEdit_sitio_web,
-            textInputAction: TextInputAction.next,
-            focusNode: _focus_TextEdit_sitio_web,
-            onSubmitted: (term) {
-              _fieldFocusChange(context, _focus_TextEdit_sitio_web, _focus_TextEdit_direccion);
-            },
-          ),
           InkWell(
             onTap: () => _buildBottomPicker(listItems: [
               "\$",
@@ -494,10 +434,11 @@ class _ProfileCuentaState extends State<ProfileCuenta> {
     perfilNegocio.pais=controllerTextEdit_pais.text;
     if (perfilNegocio.id != "") {
       if (perfilNegocio.nombre_negocio != "") {
-        if (perfilNegocio.username != "") {
+        if (true) {
           if (perfilNegocio.ciudad != "") {
             if (perfilNegocio.provincia!= "") {
               if (perfilNegocio.pais != "") {
+                perfilNegocio.direccion=controllerTextEdit_direccion.text;
                 setState(() {
                   saveIndicador = true;
                 });

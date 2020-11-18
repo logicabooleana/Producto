@@ -178,14 +178,6 @@ Widget descripcion({@required BuildContext buildContext}) {
                       fontSize: 14.0,
                       color: Theme.of(buildContext).textTheme.bodyText2.color))
               : Container(),
-          // Sitio web
-          Global.oPerfilNegocio.sitio_web != ""
-              ? Text(Global.oPerfilNegocio.sitio_web,
-                  style: new TextStyle(
-                      fontSize: 14.0,
-                      color: Colors.blue,
-                      decoration: TextDecoration.underline))
-              : Container(),
         ],
       ),
     );

@@ -90,9 +90,9 @@ class _PageProfileState extends State<PageProfile> {
                               Text(
                                   Global.oPerfilNegocio == null
                                       ? "Default"
-                                      : Global.oPerfilNegocio.username == ""
-                                          ? Global.oPerfilNegocio.nombre_negocio
-                                          : Global.oPerfilNegocio.username,
+                                      : Global.oPerfilNegocio.nombre_negocio == ""
+                                          ? "Mi negocio"
+                                          : Global.oPerfilNegocio.nombre_negocio,
                                   style: TextStyle( color: Theme.of(context).textTheme.bodyText1 .color)),
                               Icon(Icons.keyboard_arrow_down),
                             ],
@@ -908,14 +908,6 @@ class _PageProfileState extends State<PageProfile> {
                     style: new TextStyle(
                         fontSize: 14.0,
                         color: Theme.of(context).textTheme.bodyText2.color))
-                : Container(),
-            // Sitio web
-            Global.oPerfilNegocio.sitio_web != ""
-                ? Text(Global.oPerfilNegocio.sitio_web,
-                    style: new TextStyle(
-                        fontSize: 14.0,
-                        color: Colors.blue,
-                        decoration: TextDecoration.underline))
                 : Container(),
           ],
         ),

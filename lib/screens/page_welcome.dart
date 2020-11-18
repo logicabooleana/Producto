@@ -1,22 +1,23 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:producto/shared/loader.dart';
+import 'package:shimmer/shimmer.dart';
 
 class SplashScreen extends StatefulWidget {
   createState() => SplashScreenState();
 }
 
 class SplashScreenState extends State<SplashScreen> {
-navigateUser() {
+  navigateUser() {
     //TODO: Verificar metodo de authenticacion
     FirebaseAuth.instance.authStateChanges().listen((User user) {
       if (user == null) {
-        Timer(Duration(seconds: 2),() => Navigator.pushReplacementNamed(context, "/login"));
+        Timer(Duration(seconds: 2),
+            () => Navigator.pushReplacementNamed(context, "/login"));
       } else {
-        Timer(
-          Duration(seconds: 2),
-          () => Navigator.pushReplacementNamed(context, '/page_principal')
-        );
+        Timer(Duration(seconds: 2),
+            () => Navigator.pushReplacementNamed(context, '/page_principal'));
       }
     });
   }
@@ -34,12 +35,10 @@ navigateUser() {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-        body: Center(
-          child: Text(". . ."),
-        ),
-      );
-    
+      body: Center(
+        child: LoadingInit(),
+      ),
+    );
   }
 }

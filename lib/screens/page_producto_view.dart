@@ -13,8 +13,7 @@ import 'package:flutter/services.dart';
 import 'package:producto/shared/widgets_image_circle.dart' as image;
 import 'package:expandable_bottom_sheet/expandable_bottom_sheet.dart';
 
-Color colorShowder = Colors
-    .black54; //Theme.of(context).brightness==Brightness.dark?Colors.grey[850]:Colors.black;
+Color colorShowder = Colors.grey[850]; //Theme.of(context).brightness==Brightness.dark?Colors.grey[850]:Colors.black;
 Color colorText = Colors.white;
 
 class ProductScreen extends StatefulWidget {
@@ -147,7 +146,14 @@ class _ProductScreenState extends State<ProductScreen> {
         ],
       ),
       body: ExpandableBottomSheet(
-        background: Builder(builder: (contextBuilder) {
+        background:background(),
+        persistentHeader: persistentHeader(),
+        expandableContent: expandableContent(),
+      ),
+    );
+  }
+  Widget background(){
+    return  Builder(builder: (contextBuilder) {
           contextScaffold = contextBuilder;
           return SingleChildScrollView(
             child: Column(
@@ -174,8 +180,10 @@ class _ProductScreenState extends State<ProductScreen> {
               ],
             ),
           );
-        }),
-        persistentHeader: ClipRRect(
+        });
+  }
+  Widget persistentHeader(){
+    return ClipRRect(
           borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
           child: Container(
             color: colorShowder,
@@ -195,15 +203,17 @@ class _ProductScreenState extends State<ProductScreen> {
                                     widget.producto.precio_venta != 0.0
                                 ? Padding(
                                     padding: const EdgeInsets.all(8.0),
-                                    child: Text(
-                                      Publicaciones.getFormatoPrecio(
-                                          monto:
-                                              widget.producto.precio_venta),
-                                      style: TextStyle(
-                                          color: colorText,
-                                          fontSize: 30,
-                                          fontWeight: FontWeight.bold),
-                                      textAlign: TextAlign.end,
+                                    child: Column(
+                                      children: [
+                                        Text(Publicaciones.getFormatoPrecio(monto:widget.producto.precio_venta),style: TextStyle(color: colorText,fontSize: 30,fontWeight: FontWeight.bold),textAlign: TextAlign.end),
+                                        Row(
+                                          children: [
+                                            widget.producto.precio_compra!=0.0?Text(sProcentaje(precioCompra:  widget.producto.precio_compra,precioVenta:  widget.producto.precio_venta),style: TextStyle(color: Colors.green,fontSize: 12.0,fontWeight: FontWeight.bold)):Container(),
+                                            widget.producto.precio_compra!=0.0?Text(" > ",style: TextStyle(color: Colors.green,fontSize:12.0)):Container(),
+                                            widget.producto.precio_compra!=0.0?Text(sGanancia(precioCompra:  widget.producto.precio_compra,precioVenta:  widget.producto.precio_venta),style: TextStyle(color: Colors.green,fontSize: 12.0,fontWeight: FontWeight.bold)):Container(),
+                                          ],
+                                        ),
+                                      ],
                                     ),
                                   )
                                 : Container(),
@@ -214,8 +224,7 @@ class _ProductScreenState extends State<ProductScreen> {
                                     padding: const EdgeInsets.all(8.0),
                                     child: Text(
                                       Publicaciones.getFormatoPrecio(
-                                          monto: widget
-                                              .producto.precio_comparacion),
+                                          monto: widget.producto.precio_comparacion),
                                       style: TextStyle(
                                           color: colorText,
                                           decoration:
@@ -254,16 +263,33 @@ class _ProductScreenState extends State<ProductScreen> {
               ),
             ),
           ),
-        ),
-        expandableContent: Container(
-          color: colorShowder,
-          padding: EdgeInsets.all(12.0),
-          child: WidgetUltimosPrecios(producto: widget.producto),
-        ),
-      ),
-    );
+        );
   }
-
+  String sGanancia({double precioCompra,double precioVenta}){
+    double ganancia=0.0;
+    if( precioCompra != 0.0){
+      ganancia=precioVenta-precioCompra;
+    }
+    return Publicaciones.getFormatoPrecio(monto:ganancia);
+  }
+  String sProcentaje({double precioCompra,double precioVenta}){
+    double porcentaje=0.0;
+    double ganancia=0.0;
+    if( precioCompra != 0.0){
+      ganancia=precioVenta-precioCompra;
+    }
+    porcentaje=ganancia/precioCompra*100;
+    return "%${porcentaje.round()}";
+  }
+  Widget expandableContent(){
+    return ClipRRect(
+          borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)),
+                  child: Container(
+            color: colorShowder,
+            padding: EdgeInsets.all(12.0),
+            child: WidgetUltimosPrecios(producto: widget.producto),
+          ));
+  }
   Padding WidgetDescripcion(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),

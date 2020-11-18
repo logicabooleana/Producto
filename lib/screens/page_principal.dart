@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
+import 'package:producto/shared/loader.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -141,8 +142,7 @@ class PagePrincipal extends StatelessWidget {
                   }),
                 );
               } else {
-                return Scaffold(
-                    body: Center(child: CircularProgressIndicator()));
+                return LoadingInit();
               }
             },
           );
@@ -164,11 +164,9 @@ class PagePrincipal extends StatelessWidget {
             child: Row(
               children: <Widget>[
                 Text(
-                    perfilNegocio == null
-                        ? "Seleccionar cuenta"
-                        : perfilNegocio.username == ""
+                    perfilNegocio == null? "Seleccionar cuenta": perfilNegocio.nombre_negocio != ""
                             ? perfilNegocio.nombre_negocio
-                            : perfilNegocio.username,
+                            : "Mi perfil",
                     style: TextStyle(
                         color:
                             Theme.of(buildContext).textTheme.bodyText1.color),
@@ -234,7 +232,7 @@ class PagePrincipal extends StatelessWidget {
             buildContext.read<ProviderCatalogo>().setCatalogo = snapshot.data;
             return defaultTabController(buildContext: buildContext);
           } else {
-            return Center(child: CircularProgressIndicator());
+            return LoadingInit(appbar: false);
           }
         },
       ),

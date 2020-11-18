@@ -1,7 +1,6 @@
 import 'package:producto/screens/app_preferences/page_theme_preference.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_analytics/observer.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:producto/shared/loader.dart';
 
 import 'package:provider/provider.dart';
 import 'services/services.dart';
@@ -12,6 +11,8 @@ import 'package:producto/screens/page_principal.dart';
 import 'package:producto/screens/page_welcome.dart';
 import 'package:producto/screens/page_login.dart';
 // Import the firebase_core plugin
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -35,12 +36,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    // Create the initilization Future outside of `build`:
-    final Future<FirebaseApp> _initializationFirebase = Firebase.initializeApp();
-
     final prefs = new PreferenciasUsuario();
     Global.prefs = prefs;
 
+    // Create the initilization Future outside of `build`:
+    final Future<FirebaseApp> _initializationFirebase = Firebase.initializeApp();
     return FutureBuilder(
       // Initialize FlutterFire:
       future: _initializationFirebase,
@@ -55,7 +55,7 @@ class MyApp extends StatelessWidget {
           return WidgetMaterialApp();
         }
         // Otherwise, show something whilst waiting for initialization to complete
-        return Center(child: Text("Producto",textDirection: TextDirection.rtl));
+        return MaterialApp(home:LoadingInit(appbar: false) ,);//LoadingInit(appbar: false);
       },
     );
   }
@@ -106,7 +106,4 @@ class WidgetMaterialApp extends StatelessWidget {
           );
         });
   }
-}
-
-class ScreenLogin {
 }
