@@ -55,7 +55,7 @@ class MyApp extends StatelessWidget {
           return WidgetMaterialApp();
         }
         // Otherwise, show something whilst waiting for initialization to complete
-        return MaterialApp(home:LoadingInit(appbar: false) ,);//LoadingInit(appbar: false);
+        return MaterialApp(debugShowCheckedModeBanner:false,home:LoadingInit(appbar: false) ,);//LoadingInit(appbar: false);
       },
     );
   }

@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:clipboard/clipboard.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:producto/shared/progress_bar.dart';
 
 class WidgetSeachProduct extends StatefulWidget {
   String codigo;
@@ -49,6 +50,7 @@ class _WidgetSeachProductState extends State<WidgetSeachProduct> {
       appBar: AppBar(
         backgroundColor: colorView,
         title: Text(resultState ? "Buscar" : "Sin resultados"),
+        bottom: buscando ? linearProgressBarApp() : null,
       ),
       body: _body(),
     );
@@ -143,11 +145,8 @@ class _WidgetSeachProductState extends State<WidgetSeachProduct> {
                       textColor: Colors.white,
                     ),
                   ))
-                : SizedBox(
-                    child: CircularProgressIndicator(),
-                    height: 200,
-                    width: 200,
-                  ),
+                :Container(),
+                
             
             !buscando ? SizedBox(width: 12.0, height: 12.0) : Container(),
             !buscando

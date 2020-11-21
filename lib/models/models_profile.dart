@@ -4,6 +4,7 @@ class PerfilNegocio {
   
   // Informacion del negocios
     String id="";
+    String username="";
     String imagen_perfil="";
     String nombre_negocio="";
     String descripcion="";
@@ -29,6 +30,7 @@ class PerfilNegocio {
   PerfilNegocio({
     // Informacion del negocios
     this.id="",
+    this.username="",
     this.imagen_perfil="",
     this.nombre_negocio="",
     this.descripcion="",
@@ -50,6 +52,7 @@ class PerfilNegocio {
     });
   PerfilNegocio.fromMap(Map data) {
     id = data['id'];
+    username=data['username'];
     imagen_perfil = data['imagen_perfil'] ?? '';
     nombre_negocio = data['nombre_negocio'];
     descripcion = data['descripcion'];
@@ -68,6 +71,7 @@ class PerfilNegocio {
   }
   Map<String, dynamic> toJson() => {
         "id": id,
+        "username":username,
         "imagen_perfil": imagen_perfil,
         "nombre_negocio": nombre_negocio,
         "descripcion": descripcion,
@@ -82,6 +86,7 @@ class PerfilNegocio {
         "pais": pais,
         "provincia": provincia,
         "ciudad": ciudad,
+        "direccion": direccion,
         
     };
 }

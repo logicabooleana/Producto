@@ -16,7 +16,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:producto/shared/widget_button.dart';
 import 'package:producto/shared/widgets_image_circle.dart' as image;
 import 'package:producto/services/preferencias_usuario.dart';
-import 'package:producto/screens/widgets/widgetSeachProductCatalogo.dart';
+import 'package:producto/screens/page_BuscarProductGlobal.dart';
 import 'package:producto/screens/page_producto_view.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:producto/screens/widgets/widget_CatalogoGridList.dart';

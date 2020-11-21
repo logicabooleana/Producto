@@ -13,6 +13,7 @@ import 'package:provider/provider.dart';
 import 'package:producto/screens/widgets/widgetSeachMarcaProducto.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
 import 'package:producto/screens/widgets/widgets_notify.dart';
+import 'package:producto/shared/progress_bar.dart';
 
 class ProductNew extends StatefulWidget {
   final String id;
@@ -102,26 +103,18 @@ class _ProductNewState extends State<ProductNew> {
             backgroundColor: Theme.of(contextPrincipal).canvasColor,
             iconTheme: Theme.of(contextPrincipal).iconTheme.copyWith(
                 color: Theme.of(contextPrincipal).textTheme.bodyText1.color),
-            title: Text(this.producto.id,
-                style: TextStyle(
-                    fontSize: 18.0,
-                    color:
-                        Theme.of(contextPrincipal).textTheme.bodyText1.color)),
+            title: saveIndicador ?Text("Guardando...",style: TextStyle(fontSize: 18.0,color:Theme.of(contextPrincipal).textTheme.bodyText1.color)):Text(this.producto.id,
+                style: TextStyle(fontSize: 18.0,color:Theme.of(contextPrincipal).textTheme.bodyText1.color)),
             actions: <Widget>[
               IconButton(
                   icon: saveIndicador == false
                       ? Icon(Icons.check)
-                      : Container(
-                          width: 24.0,
-                          height: 24.0,
-                          child: CircularProgressIndicator(
-                            backgroundColor: Colors.white,
-                          ),
-                        ),
+                      : Container( ),
                   onPressed: () {
                     guardar(buildContext: contextBuilder);
                   }),
             ],
+            bottom: saveIndicador ? linearProgressBarApp() : null,
           ),
           body: SingleChildScrollView(
             child: Column(
@@ -437,10 +430,11 @@ class _ProductNewState extends State<ProductNew> {
                 // TODO: Por defecto verificado es TRUE // Cambiar esto cuando se lanze a producción
                 producto.verificado = true;
                 producto.timestamp_actualizacion=Timestamp.fromDate(new DateTime.now());
-                  producto.timestamp_creation=Timestamp.fromDate(new DateTime.now());
+                producto.timestamp_creation=Timestamp.fromDate(new DateTime.now());
                 producto.categoria = this.categoria==null?"":this.categoria.id;
                 producto.subcategoria = this.subcategoria==null?"":this.subcategoria.id;
                 producto.id_marca = this.marca==null?"":this.marca.id;
+                producto.codigo=producto.id;
                 savevProductoGlobal();
                 // Firebase set
                 if( Global.prefs.getIdNegocio!="" ){
@@ -612,6 +606,7 @@ class _ProductNewState extends State<ProductNew> {
                   },
                 ),
               ],
+              bottom: saveIndicador ? linearProgressBarApp() : null,
             ),
             body: FutureBuilder(
               future: Global.getMarcasAll().getDataMarca(),

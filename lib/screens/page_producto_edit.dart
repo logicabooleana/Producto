@@ -12,6 +12,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:producto/screens/widgets/widgetSeachMarcaProducto.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
 import 'package:producto/screens/widgets/widgets_notify.dart';
+import 'package:producto/shared/progress_bar.dart';
 
 class ProductEdit extends StatefulWidget {
   final ProductoNegocio producto;
@@ -31,10 +32,8 @@ class _ProductEditState extends State<ProductEdit> {
 
   // Variables
   TextStyle textStyle = new TextStyle(fontSize: 24.0);
-  TextStyle textStyle_disabled =
-      new TextStyle(fontSize: 24.0, color: Colors.grey);
-  bool enCatalogo =
-      false; // verifica si el producto se encuentra en el catalogo o no
+  TextStyle textStyle_disabled =new TextStyle(fontSize: 24.0, color: Colors.grey);
+  bool enCatalogo =false; // verifica si el producto se encuentra en el catalogo o no
   bool editable = false; // TODO : Eliminar para produccion
   Marca marca;
   Categoria categoria;
@@ -43,6 +42,8 @@ class _ProductEditState extends State<ProductEdit> {
   bool deleteIndicador = false;
   ProductoNegocio producto;
   BuildContext contextPrincipal;
+  Color colorCargando=Colors.orangeAccent;
+  Color colorSaveOk=Colors.green;
   _ProductEditState(this.producto);
 
   @override
@@ -140,10 +141,10 @@ class _ProductEditState extends State<ProductEdit> {
         return Scaffold(
           appBar: AppBar(
             elevation: 0.0,
-            backgroundColor: Theme.of(contextPrincipal).canvasColor,
+            backgroundColor: Theme.of(context).canvasColor ,
             iconTheme: Theme.of(contextPrincipal).iconTheme.copyWith(
                 color: Theme.of(contextPrincipal).textTheme.bodyText1.color),
-            title: Row(
+            title: saveIndicador ?Text("Actualizando...",style: TextStyle(fontSize: 18.0,color:Theme.of(contextPrincipal).textTheme.bodyText1.color)):Row(
               children: <Widget>[
                 producto.verificado == true
                     ? Padding(
@@ -164,17 +165,12 @@ class _ProductEditState extends State<ProductEdit> {
               IconButton(
                   icon: saveIndicador == false
                       ? Icon(Icons.check)
-                      : Container(
-                          width: 24.0,
-                          height: 24.0,
-                          child: CircularProgressIndicator(
-                            backgroundColor: Colors.white,
-                          ),
-                        ),
+                      : Container(),
                   onPressed: () {
                     guardar(buildContext: contextBuilder);
                   }),
             ],
+            bottom: saveIndicador ? linearProgressBarApp() : null,
           ),
           body: SingleChildScrollView(
             child: Column(
@@ -1203,6 +1199,7 @@ class _ProductEditState extends State<ProductEdit> {
                 producto.categoria = this.categoria.id;
                 producto.subcategoria = this.subcategoria.id;
                 producto.id_marca = this.marca.id;
+                producto.codigo=producto.id;
                 updateProductoGlobalDeveloper();
                 // Firebase set
                 if (Global.prefs.getIdNegocio != "") {

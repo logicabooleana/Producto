@@ -40,11 +40,8 @@ class _ProfileCuentaState extends State<ProfileCuenta> {
   PerfilNegocio perfilNegocio;
   TextEditingController controllerTextEdit_nombre;
   TextEditingController controllerTextEdit_descripcion;
-  TextEditingController controllerTextEdit_username;
   TextEditingController controllerTextEdit_categoria_nombre;
-  TextEditingController controllerTextEdit_telefono;
   TextEditingController controllerTextEdit_direccion;
-  TextEditingController controllerTextEdit_sitio_web;
   TextEditingController controllerTextEdit_ciudad;
   TextEditingController controllerTextEdit_provincia;
   TextEditingController controllerTextEdit_pais;
@@ -52,11 +49,8 @@ class _ProfileCuentaState extends State<ProfileCuenta> {
 
   final FocusNode _focus_TextEdit_nombre = FocusNode();
   final FocusNode _focus_TextEdit_descripcion = FocusNode();
-  final FocusNode _focus_TextEdit_username = FocusNode();
   final FocusNode _focus_TextEdit_categoria_nombre = FocusNode();
-  final FocusNode _focus_TextEdit_telefono = FocusNode();
   final FocusNode _focus_TextEdit_direccion = FocusNode();
-  final FocusNode _focus_TextEdit_sitio_web = FocusNode();
   final FocusNode _focus_TextEdit_ciudad = FocusNode();
   final FocusNode _focus_TextEdit_provincia = FocusNode();
   final FocusNode _focus_TextEdit_pais = FocusNode();
@@ -81,16 +75,15 @@ class _ProfileCuentaState extends State<ProfileCuenta> {
 
   @override
   void dispose() {
+    super.dispose();
     controllerTextEdit_nombre.dispose();
     controllerTextEdit_descripcion.dispose();
-    controllerTextEdit_username.dispose();
     controllerTextEdit_categoria_nombre.dispose();
-    controllerTextEdit_telefono.dispose();
-    controllerTextEdit_sitio_web.dispose();
     controllerTextEdit_ciudad.dispose();
     controllerTextEdit_direccion.dispose();
     controllerTextEdit_signo_moneda.dispose();
-    super.dispose();
+    controllerTextEdit_pais.dispose();
+    controllerTextEdit_provincia.dispose();
   }
 
   @override
@@ -121,31 +114,29 @@ class _ProfileCuentaState extends State<ProfileCuenta> {
             ],
             bottom: saveIndicador ? linearProgressBarApp() : null,
           ),
-          body: Container(
+          body: ListView(
             padding: EdgeInsets.all(12.0),
-            child: ListView(
-              children: [
-                Column(
-                  children: <Widget>[
-                    widgetsImagen(),
-                    SizedBox(
-                      height: 24.0,
+            children: [
+              Column(
+                children: <Widget>[
+                  widgetsImagen(),
+                  SizedBox(
+                    height: 24.0,
+                  ),
+                  FlatButton(
+                    onPressed: () {
+                      if (saveIndicador == false) {
+                        _showModalBottomSheetCambiarImagen(context: context);
+                      }
+                    },
+                    child: Text(
+                      "Cambiar imagen",
                     ),
-                    FlatButton(
-                      onPressed: () {
-                        if (saveIndicador == false) {
-                          _showModalBottomSheetCambiarImagen(context: context);
-                        }
-                      },
-                      child: Text(
-                        "Cambiar imagen",
-                      ),
-                    ),
-                    widgetFormEditText(),
-                  ],
-                ),
-              ],
-            ),
+                  ),
+                  widgetFormEditText(),
+                ],
+              ),
+            ],
           ),
         );
       }
@@ -279,7 +270,7 @@ class _ProfileCuentaState extends State<ProfileCuenta> {
             textInputAction: TextInputAction.next,
             focusNode: _focus_TextEdit_descripcion,
             onSubmitted: (term) {
-              _fieldFocusChange(context, _focus_TextEdit_descripcion, _focus_TextEdit_username);
+              _fieldFocusChange(context, _focus_TextEdit_descripcion, _focus_TextEdit_direccion);
             },
           ),
           InkWell(

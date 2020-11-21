@@ -59,7 +59,7 @@ PreferredSize linearProgressBarApp() {
      return PreferredSize(
   preferredSize: Size.fromHeight(0.0),
   child: LinearProgressIndicator(
-    minHeight: 3.0,
+    minHeight: 6.0,
     backgroundColor: Colors.white.withOpacity(0.3),
     valueColor:new AlwaysStoppedAnimation<Color>(Colors.purple[800])
     ));

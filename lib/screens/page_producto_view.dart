@@ -13,15 +13,16 @@ import 'package:flutter/services.dart';
 import 'package:producto/shared/widgets_image_circle.dart' as image;
 import 'package:expandable_bottom_sheet/expandable_bottom_sheet.dart';
 
-Color colorShowder = Colors.grey[850]; //Theme.of(context).brightness==Brightness.dark?Colors.grey[850]:Colors.black;
+Color colorShowder = Colors.grey[
+    850]; //Theme.of(context).brightness==Brightness.dark?Colors.grey[850]:Colors.black;
 Color colorText = Colors.white;
+Marca marca;
 
 class ProductScreen extends StatefulWidget {
   // Variables
 
   String sSignoMoneda;
   ProductoNegocio producto;
-
   ProductScreen({this.producto, this.sSignoMoneda});
 
   @override
@@ -31,7 +32,7 @@ class ProductScreen extends StatefulWidget {
 class _ProductScreenState extends State<ProductScreen> {
   Categoria categoria;
   Categoria subcategoria;
-  Marca marca;
+  
   BuildContext contextScaffold;
   bool productoEnCatalogo = false;
 
@@ -44,7 +45,7 @@ class _ProductScreenState extends State<ProductScreen> {
 
   void getMarca() async {
     // Defaul values
-    this.marca = null;
+    marca = null;
     if (widget.producto != null) {
       if (widget.producto.id_marca != "") {
         Global.getMarca(idMarca: widget.producto.id_marca)
@@ -52,7 +53,7 @@ class _ProductScreenState extends State<ProductScreen> {
             .then((value) {
           if (value != null) {
             setState(() {
-              this.marca = value;
+              marca= value;
             });
           }
         });
@@ -107,8 +108,9 @@ class _ProductScreenState extends State<ProductScreen> {
             if (contextScaffold != null) {
               Clipboard.setData(new ClipboardData(text: widget.producto.codigo))
                   .then((_) {
-                Scaffold.of(contextScaffold).showSnackBar(
-                    SnackBar(content: Text("Código copiado en portapapeles")));
+                Scaffold.of(contextScaffold).showSnackBar(SnackBar(
+                    content: Text("Código copiado en portapapeles: " +
+                        widget.producto.id)));
               });
             }
           },
@@ -146,150 +148,194 @@ class _ProductScreenState extends State<ProductScreen> {
         ],
       ),
       body: ExpandableBottomSheet(
-        background:background(),
+        background: background(),
         persistentHeader: persistentHeader(),
         expandableContent: expandableContent(),
       ),
     );
   }
-  Widget background(){
-    return  Builder(builder: (contextBuilder) {
-          contextScaffold = contextBuilder;
-          return SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                WidgetImagen(producto: widget.producto, marca: this.marca),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      WidgetDescripcion(context),
-                      //WidgetUltimosPrecios(producto: widget.producto),
-                      productoEnCatalogo
-                          ? WidgetOtrosProductos(producto: widget.producto)
-                          : Container(),
-                    ],
-                  ),
-                ),
-                const SizedBox(
-                  height: 140.0,
-                  width: 140.0,
-                ),
-              ],
-            ),
-          );
-        });
-  }
-  Widget persistentHeader(){
-    return ClipRRect(
-          borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
-          child: Container(
-            color: colorShowder,
-            padding: EdgeInsets.all(12.0),
-            child: Center(
+
+  Widget background() {
+    return Builder(builder: (contextBuilder) {
+      contextScaffold = contextBuilder;
+      return SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            WidgetImagen(producto: widget.producto, marca: marca),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  WidgetDescripcion(context),
                   productoEnCatalogo
-                      ? Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          textDirection: TextDirection.ltr,
-                          children: [
-                            widget.producto.precio_venta != null &&
-                                    widget.producto.precio_venta != 0.0
-                                ? Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Column(
-                                      children: [
-                                        Text(Publicaciones.getFormatoPrecio(monto:widget.producto.precio_venta),style: TextStyle(color: colorText,fontSize: 30,fontWeight: FontWeight.bold),textAlign: TextAlign.end),
-                                        Row(
-                                          children: [
-                                            widget.producto.precio_compra!=0.0?Text(sProcentaje(precioCompra:  widget.producto.precio_compra,precioVenta:  widget.producto.precio_venta),style: TextStyle(color: Colors.green,fontSize: 12.0,fontWeight: FontWeight.bold)):Container(),
-                                            widget.producto.precio_compra!=0.0?Text(" > ",style: TextStyle(color: Colors.green,fontSize:12.0)):Container(),
-                                            widget.producto.precio_compra!=0.0?Text(sGanancia(precioCompra:  widget.producto.precio_compra,precioVenta:  widget.producto.precio_venta),style: TextStyle(color: Colors.green,fontSize: 12.0,fontWeight: FontWeight.bold)):Container(),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                : Container(),
-                            widget.producto.precio_comparacion != null &&
-                                    widget.producto.precio_comparacion !=
-                                        0.0
-                                ? Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(
-                                      Publicaciones.getFormatoPrecio(
-                                          monto: widget.producto.precio_comparacion),
-                                      style: TextStyle(
-                                          color: colorText,
-                                          decoration:
-                                              TextDecoration.lineThrough,
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold),
-                                      textAlign: TextAlign.end,
-                                    ),
-                                  )
-                                : Container(),
-                            widget.producto.timestamp_actualizacion != null
-                                ? Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(
-                                      Publicaciones.getFechaPublicacion(
-                                              widget.producto
-                                                  .timestamp_actualizacion
-                                                  .toDate(),
-                                              new DateTime.now())
-                                          .toLowerCase(),
-                                      style: TextStyle(
-                                          fontStyle: FontStyle.normal,
-                                          color: colorText),
-                                    ),
-                                  )
-                                : Container(),
-                          ],
-                        )
+                      ? WidgetOtrosProductos(producto: widget.producto)
                       : Container(),
-                  Text(
-                    'Ultimos precios registrados',
-                    style: TextStyle(color: colorText),
-                  ),
-                  Icon(Icons.keyboard_arrow_down, color: colorText),
+                  WidgetOtrosProductosGlobal(producto: widget.producto),
                 ],
               ),
             ),
+            const SizedBox(
+              height: 140.0,
+              width: 140.0,
+            ),
+          ],
+        ),
+      );
+    });
+  }
+
+  Widget persistentHeader() {
+    return ClipRRect(
+      borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+      child: Container(
+        color: colorShowder,
+        padding: EdgeInsets.all(12.0),
+        child: Center(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              productoEnCatalogo
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      textDirection: TextDirection.ltr,
+                      children: [
+                        widget.producto.precio_venta != null &&
+                                widget.producto.precio_venta != 0.0
+                            ? Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  children: [
+                                    Text(
+                                        Publicaciones.getFormatoPrecio(
+                                            monto:
+                                                widget.producto.precio_venta),
+                                        style: TextStyle(
+                                            color: colorText,
+                                            fontSize: 30,
+                                            fontWeight: FontWeight.bold),
+                                        textAlign: TextAlign.end),
+                                    Row(
+                                      children: [
+                                        widget.producto.precio_compra != 0.0
+                                            ? Text(
+                                                sProcentaje(
+                                                    precioCompra: widget
+                                                        .producto.precio_compra,
+                                                    precioVenta: widget
+                                                        .producto.precio_venta),
+                                                style: TextStyle(
+                                                    color: Colors.green,
+                                                    fontSize: 12.0,
+                                                    fontWeight:
+                                                        FontWeight.bold))
+                                            : Container(),
+                                        widget.producto.precio_compra != 0.0
+                                            ? Text(" > ",
+                                                style: TextStyle(
+                                                    color: Colors.green,
+                                                    fontSize: 12.0))
+                                            : Container(),
+                                        widget.producto.precio_compra != 0.0
+                                            ? Text(
+                                                sGanancia(
+                                                    precioCompra: widget
+                                                        .producto.precio_compra,
+                                                    precioVenta: widget
+                                                        .producto.precio_venta),
+                                                style: TextStyle(
+                                                    color: Colors.green,
+                                                    fontSize: 12.0,
+                                                    fontWeight:
+                                                        FontWeight.bold))
+                                            : Container(),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : Container(),
+                        widget.producto.precio_comparacion != null &&
+                                widget.producto.precio_comparacion != 0.0
+                            ? Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  Publicaciones.getFormatoPrecio(
+                                      monto:
+                                          widget.producto.precio_comparacion),
+                                  style: TextStyle(
+                                      color: colorText,
+                                      decoration: TextDecoration.lineThrough,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold),
+                                  textAlign: TextAlign.end,
+                                ),
+                              )
+                            : Container(),
+                        widget.producto.timestamp_actualizacion != null
+                            ? Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  Publicaciones.getFechaPublicacion(
+                                          widget
+                                              .producto.timestamp_actualizacion
+                                              .toDate(),
+                                          new DateTime.now())
+                                      .toLowerCase(),
+                                  style: TextStyle(
+                                      fontStyle: FontStyle.normal,
+                                      color: colorText),
+                                ),
+                              )
+                            : Container(),
+                      ],
+                    )
+                  : Container(),
+              Text(
+                'Ultimos precios registrados',
+                style: TextStyle(color: colorText),
+              ),
+              Icon(Icons.keyboard_arrow_down, color: colorText),
+            ],
           ),
-        );
+        ),
+      ),
+    );
   }
-  String sGanancia({double precioCompra,double precioVenta}){
-    double ganancia=0.0;
-    if( precioCompra != 0.0){
-      ganancia=precioVenta-precioCompra;
+
+  String sGanancia({double precioCompra, double precioVenta}) {
+    double ganancia = 0.0;
+    if (precioCompra != 0.0) {
+      ganancia = precioVenta - precioCompra;
     }
-    return Publicaciones.getFormatoPrecio(monto:ganancia);
+    return Publicaciones.getFormatoPrecio(monto: ganancia);
   }
-  String sProcentaje({double precioCompra,double precioVenta}){
-    double porcentaje=0.0;
-    double ganancia=0.0;
-    if( precioCompra != 0.0){
-      ganancia=precioVenta-precioCompra;
+
+  String sProcentaje({double precioCompra, double precioVenta}) {
+    double porcentaje = 0.0;
+    double ganancia = 0.0;
+    if (precioCompra != 0.0) {
+      ganancia = precioVenta - precioCompra;
     }
-    porcentaje=ganancia/precioCompra*100;
+    porcentaje = ganancia / precioCompra * 100;
     return "%${porcentaje.round()}";
   }
-  Widget expandableContent(){
+
+  Widget expandableContent() {
     return ClipRRect(
-          borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)),
-                  child: Container(
-            color: colorShowder,
-            padding: EdgeInsets.all(12.0),
-            child: WidgetUltimosPrecios(producto: widget.producto),
-          ));
+        borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)),
+        child: Container(
+          color: colorShowder,
+          padding: EdgeInsets.all(12.0),
+          child: WidgetUltimosPrecios(producto: widget.producto),
+        ));
   }
+
   Padding WidgetDescripcion(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -446,7 +492,7 @@ class WidgetOtrosProductos extends StatelessWidget {
       children: <Widget>[
         Divider(endIndent: 12.0, indent: 12.0),
         Padding(
-          child: Text("Otros productos", style: TextStyle(fontSize: 16.0)),
+          child: Text("Mi catalogo", style: TextStyle(fontSize: 16.0)),
           padding: const EdgeInsets.symmetric(vertical: 8.0),
         ),
         SizedBox(
@@ -469,6 +515,83 @@ class WidgetOtrosProductos extends StatelessWidget {
               }
             },
           ),
+        ),
+        SizedBox(
+          height: 20.0,
+        ),
+      ],
+    );
+  }
+}
+
+class WidgetOtrosProductosGlobal extends StatelessWidget {
+  const WidgetOtrosProductosGlobal({
+    Key key,
+    @required this.producto,
+  }) : super(key: key);
+
+  final ProductoNegocio producto;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Divider(endIndent: 12.0, indent: 12.0),
+        Padding(
+          child: Row(
+            children: [
+              Text("Otros productos", style: TextStyle(fontSize: 16.0)),
+              marca!= null
+                              ? Padding(
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: 12.0),
+                                  child: Chip(
+                                    avatar: image.viewCircleImage(
+                                        url: marca.url_imagen,
+                                        texto: marca.titulo,
+                                        size: 20),
+                                    label: Text(marca.titulo),
+                                  ),
+                                )
+                              : Container(),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+        ),
+        FutureBuilder(
+          future: Global.getProductosPrecargadoAll()
+              .getDataProductoAll(idMarca: this.producto.id_marca),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              List<Producto> listProductos = snapshot.data;
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: 150,
+                    width: double.infinity,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: listProductos.length,
+                      itemBuilder: (context, index) {
+                        return Container(
+                            width: 150.0,
+                            height: 150.0,
+                            child: ProductoItemHorizontal(
+                              producto:
+                                  listProductos[index].convertProductoNegocio(),
+                            ));
+                      },
+                    ),
+                  ),
+                ],
+              );
+            } else {
+              return Container();
+            }
+          },
         ),
         SizedBox(
           height: 20.0,

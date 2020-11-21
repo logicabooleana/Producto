@@ -155,9 +155,10 @@ class Collection<T> {
     return ref.snapshots().map((list) => list.docs.map((doc) => Global.modelsSeguidor[T](doc.data()) as T) );
   }
   // Model Producto
-  Future<List<T>> getDataProductoAll() async {
-    var snapshots = await ref.get();
-    return snapshots.docs.map((doc) => Global.modelsProducto[T](doc.data()) as T ).toList();
+  Future<List<T>> getDataProductoAll({String idMarca}) async {
+   
+    var snapshots = idMarca==null? await ref.get(): await ref.where("id_marca", isEqualTo: idMarca).get();
+    return snapshots.docs.map((doc) => Global.modelsProductoGlobal[T](doc.data()) as T ).toList();
   }
   Stream<List<T>> streamDataProductoAll() {
     return ref.orderBy('timestamp_actualizacion', descending: true).snapshots().map( (list) => list.docs.map((doc) => Global.modelsProducto[T](doc.data()) as T).toList() );
