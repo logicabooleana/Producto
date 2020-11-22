@@ -264,7 +264,8 @@ class WidgetButtonListTile extends StatelessWidget {
       return Container();
     }
     return FutureBuilder(
-      future:Global.getNegocio(idNegocio: perfilNegocio.id).getDataPerfilNegocio(),
+      future:
+          Global.getNegocio(idNegocio: perfilNegocio.id).getDataPerfilNegocio(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           PerfilNegocio perfilNegocio = snapshot.data;
@@ -272,50 +273,58 @@ class WidgetButtonListTile extends StatelessWidget {
             children: <Widget>[
               ListTile(
                 leading: ClipRRect(
-                        borderRadius: BorderRadius.circular(10000.0),
-                        child: CachedNetworkImage(
-                          fadeInDuration: Duration(milliseconds: 200),
-                          fit: BoxFit.cover,
-                          imageUrl: perfilNegocio.imagen_perfil==""||perfilNegocio.imagen_perfil==null?"http://www.default.com":perfilNegocio.imagen_perfil,
-                          placeholder: (context, url) => CircleAvatar(
-                backgroundColor: Colors.black26,
-                radius: 24.0,
-                child: Text(
-                    perfilNegocio.nombre_negocio.substring(0, 1),
-                    style: TextStyle(
-                        fontSize: 18.0,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold)),
-                          ),
-                          imageBuilder: (context, image) => CircleAvatar(
-                backgroundImage: image,
-                radius: 24.0,
-                          ),
-                          errorWidget: (context, url, error) => CircleAvatar(
-                backgroundColor: Colors.black26,
-                radius: 24.0,
-                child: Text(
-                    perfilNegocio.nombre_negocio.substring(0, 1),
-                    style: TextStyle(
-                        fontSize: 18.0,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold)),
-                          ),
-                        ),
-                      ),
+                  borderRadius: BorderRadius.circular(10000.0),
+                  child: perfilNegocio.imagen_perfil != null || perfilNegocio.imagen_perfil.isNotEmpty?CachedNetworkImage(
+                    fadeInDuration: Duration(milliseconds: 200),
+                    fit: BoxFit.cover,
+                    imageUrl: perfilNegocio.imagen_perfil.contains('https://')?perfilNegocio.imagen_perfil:"https://"+perfilNegocio.imagen_perfil,
+                    placeholder: (context, url) => CircleAvatar(
+                      backgroundColor: Colors.black26,
+                      radius: 24.0,
+                      child: Text(perfilNegocio.nombre_negocio.substring(0, 1),
+                          style: TextStyle(
+                              fontSize: 18.0,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold)),
+                    ),
+                    imageBuilder: (context, image) => CircleAvatar(
+                      backgroundImage: image,
+                      radius: 24.0,
+                    ),
+                    errorWidget: (context, url, error) => CircleAvatar(
+                      backgroundColor: Colors.black26,
+                      radius: 24.0,
+                      child: Text(perfilNegocio.nombre_negocio.substring(0, 1),
+                          style: TextStyle(
+                              fontSize: 18.0,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold)),
+                    ),
+                  ):CircleAvatar(
+                      backgroundColor: Colors.black26,
+                      radius: 24.0,
+                      child: Text(perfilNegocio.nombre_negocio.substring(0, 1),
+                          style: TextStyle(
+                              fontSize: 18.0,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold)),
+                    ),
+                ),
                 dense: true,
                 title: Text(perfilNegocio.nombre_negocio),
-                subtitle: !adminPropietario?_getAdminUserData(idNegocio: perfilNegocio.id):Row(
-                children: [
-                  Icon(
-                    Icons.security,
-                    size: 12.0,
-                    color: Theme.of(context).hintColor,
-                  ),
-                  SizedBox(width: 2.0),
-                  Text("Mi cuenta")
-                ],
-              ),
+                subtitle: !adminPropietario
+                    ? _getAdminUserData(idNegocio: perfilNegocio.id)
+                    : Row(
+                        children: [
+                          Icon(
+                            Icons.security,
+                            size: 12.0,
+                            color: Theme.of(context).hintColor,
+                          ),
+                          SizedBox(width: 2.0),
+                          Text("Mi cuenta")
+                        ],
+                      ),
                 trailing: Radio(
                   activeColor: Theme.of(context).primaryColor,
                   value: Global.oPerfilNegocio != null

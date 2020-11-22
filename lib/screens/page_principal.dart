@@ -113,8 +113,8 @@ class PagePrincipal extends StatelessWidget {
                   ),
                   RaisedButton(
                     padding:EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
-                    color: Theme.of(buildContext).primaryColor,
-                    child: Text("Buscar",style: TextStyle(fontSize: 24.0, color: Colors.white)),
+                    color: Colors.deepPurple[200],
+                    child: Text("Buscar",style: TextStyle(fontSize: 24.0, color: Colors.deepPurple )),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30.0),
                         side: BorderSide(color: Colors.transparent)),

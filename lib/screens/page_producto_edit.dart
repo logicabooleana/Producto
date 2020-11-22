@@ -24,7 +24,6 @@ class ProductEdit extends StatefulWidget {
 
 class _ProductEditState extends State<ProductEdit> {
   // Controllers
-  TextEditingController controllerTextEdit_titulo;
   TextEditingController controllerTextEdit_descripcion;
   MoneyMaskedTextController controllerTextEdit_precio_venta;
   MoneyMaskedTextController controllerTextEdit_compra;
@@ -51,7 +50,6 @@ class _ProductEditState extends State<ProductEdit> {
     checkCatalogo();
     getMarca();
     getCategoriaProducto();
-    controllerTextEdit_titulo = TextEditingController(text: producto.titulo);
     controllerTextEdit_descripcion =
         TextEditingController(text: producto.descripcion);
     controllerTextEdit_precio_venta = MoneyMaskedTextController(
@@ -122,7 +120,6 @@ class _ProductEditState extends State<ProductEdit> {
 
   @override
   void dispose() {
-    controllerTextEdit_titulo.dispose();
     controllerTextEdit_descripcion.dispose();
     controllerTextEdit_precio_venta.dispose();
     controllerTextEdit_compra.dispose();
@@ -302,7 +299,7 @@ class _ProductEditState extends State<ProductEdit> {
                     decoration: InputDecoration(
                         border: OutlineInputBorder(
                             borderSide:
-                                BorderSide(color: Colors.green, width: 2)),
+                                BorderSide(color: Colors.grey, width: 2)),
                         labelText: "Categoría"),
                     style: textStyle,
                   ),
@@ -325,9 +322,7 @@ class _ProductEditState extends State<ProductEdit> {
                     enabled: false,
                     enableInteractiveSelection: false,
                     decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: Colors.green, width: 2)),
+                        border: OutlineInputBorder(borderSide:BorderSide(color: Colors.grey, width: 2)),
                         labelText: "Subcategoría"),
                     style: textStyle,
                   ),
@@ -343,33 +338,14 @@ class _ProductEditState extends State<ProductEdit> {
             ],
           ),
           SizedBox(
-            height: 12.0,
-            width: 12.0,
+            height: 16.0,
+            width: 16.0,
           ),
           widgetTextFieldMarca(),
-          this.marca == null
-              ? SizedBox(
-                  height: 12.0,
-                  width: 12.0,
-                )
-              : Container(),
-          this.marca == null
-              ? TextField(
-                  minLines: 1,
-                  maxLines: 5,
-                  keyboardType: TextInputType.multiline,
-                  enabled: producto.verificado == true ? false : true,
-                  onChanged: (value) => producto.titulo = value,
-                  decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                          borderSide:
-                              BorderSide(color: Colors.green, width: 2)),
-                      labelText: "Titulo"),
-                  style: producto.verificado ? textStyle_disabled : textStyle,
-                  controller: controllerTextEdit_titulo,
-                )
-              : Container(),
-          SizedBox(height: 16.0),
+          SizedBox(
+                  height: 16.0,
+                  width: 16.0,
+                ),
           TextField(
             minLines: 1,
             maxLines: 5,
@@ -377,7 +353,9 @@ class _ProductEditState extends State<ProductEdit> {
             enabled: !producto.verificado,
             onChanged: (value) => producto.descripcion = value,
             decoration: InputDecoration(
-                border: OutlineInputBorder(), labelText: "Descripción"),
+                border: OutlineInputBorder(),
+                disabledBorder: OutlineInputBorder(borderSide:BorderSide(color:editable? Colors.grey: Colors.transparent ,width: 2)),
+                labelText: "Descripción"),
             style: producto.verificado ? textStyle_disabled : textStyle,
             controller: controllerTextEdit_descripcion,
           ),
@@ -445,10 +423,11 @@ class _ProductEditState extends State<ProductEdit> {
               enabled: false,
               enableInteractiveSelection: false,
               decoration: InputDecoration(
-                border: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.green, width: 2)),
+                border: OutlineInputBorder(),
+                disabledBorder: OutlineInputBorder(borderSide:BorderSide(color:editable? Colors.grey: Colors.transparent )),
                 labelText: "Marca",
               ),
+              
               style: producto.verificado ? textStyle_disabled : textStyle,
             ),
             onTap: () {
@@ -529,7 +508,6 @@ class _ProductEditState extends State<ProductEdit> {
   void guardar({@required BuildContext buildContext}) async {
     if (this.categoria != null) {
       if (this.subcategoria != null) {
-        if (controllerTextEdit_titulo.text != "") {
           if (controllerTextEdit_descripcion.text != "") {
             if (this.marca != null) {
               if (controllerTextEdit_precio_venta.numberValue != 0.0) {
@@ -556,7 +534,7 @@ class _ProductEditState extends State<ProductEdit> {
                 // Set ( values )
                 // TODO: Por defecto verificado es TRUE // Cambiar esto cuando se lanze a producción
                 producto.verificado = true;
-                producto.titulo = controllerTextEdit_titulo.text;
+                producto.titulo = this.marca.titulo;
                 producto.descripcion = controllerTextEdit_descripcion.text;
                 producto.precio_venta =
                     controllerTextEdit_precio_venta.numberValue;
@@ -589,9 +567,6 @@ class _ProductEditState extends State<ProductEdit> {
             showSnackBar(
                 context: buildContext, message: 'Debe elegir una descripción');
           }
-        } else {
-          showSnackBar(context: buildContext, message: 'Debe elegir un titulo');
-        }
       } else {
         showSnackBar(
             context: buildContext, message: 'Debe elegir una subcategoría');
@@ -1158,7 +1133,6 @@ class _ProductEditState extends State<ProductEdit> {
   void guardarDeveloper({@required BuildContext buildContext}) async {
     if (this.categoria != null) {
       if (this.subcategoria != null) {
-        if (controllerTextEdit_titulo.text != "") {
           if (controllerTextEdit_descripcion.text != "") {
             if (this.marca != null) {
               if (controllerTextEdit_precio_venta.numberValue != 0.0) {
@@ -1187,7 +1161,7 @@ class _ProductEditState extends State<ProductEdit> {
                 // TODO: Por defecto verificado es TRUE // Cambiar esto cuando se lanze a producción
                 producto.verificado = true;
 
-                producto.titulo = controllerTextEdit_titulo.text;
+                producto.titulo = this.marca.titulo;
                 producto.descripcion = controllerTextEdit_descripcion.text;
                 producto.precio_venta =
                     controllerTextEdit_precio_venta.numberValue;
@@ -1223,9 +1197,6 @@ class _ProductEditState extends State<ProductEdit> {
             showSnackBar(
                 context: buildContext, message: 'Debe elegir una descripción');
           }
-        } else {
-          showSnackBar(context: buildContext, message: 'Debe elegir un titulo');
-        }
       } else {
         showSnackBar(
             context: buildContext, message: 'Debe elegir una subcategoría');

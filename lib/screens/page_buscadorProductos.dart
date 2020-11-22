@@ -16,8 +16,8 @@ class DataSearch extends SearchDelegate {
  ThemeData appBarTheme(BuildContext context) {
    final ThemeData theme = Theme.of(context);
    return ThemeData(
-     primaryColor: Colors.grey[800],
-     brightness: theme.brightness
+     primaryColor:theme.primaryColor,
+     brightness: theme.brightness,
    );
  }
 

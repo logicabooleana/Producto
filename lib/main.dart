@@ -74,11 +74,11 @@ class WidgetMaterialApp extends StatelessWidget {
         // Este paquete gestiona el cambio de su tema durante el tiempo de ejecución y su persistencia.
         defaultBrightness:Global.prefs.getThemeIsDart ? Brightness.dark : Brightness.light,
         data: (brightness) => new ThemeData(
-              primarySwatch: Colors.purple,
-              primaryColorDark: Colors.purple,
-              primaryColor: Colors.purple,
+              primarySwatch: Colors.deepPurple,
+              primaryColorDark: Colors.deepPurple,
+              primaryColor: Colors.deepPurple,
               brightness: brightness,
-              accentColor: Colors.purple,
+              accentColor: Colors.deepPurple,
             ),
         themedWidgetBuilder: (context, theme) {
           return MultiProvider(

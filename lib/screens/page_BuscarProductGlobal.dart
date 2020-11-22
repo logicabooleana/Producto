@@ -110,7 +110,7 @@ class _WidgetSeachProductState extends State<WidgetSeachProduct> {
                 ),
                 IconButton(
                   padding: EdgeInsets.all(12.0),
-                  icon: Icon(Icons.content_copy),
+                  icon: Icon(Icons.content_copy,color: Theme.of(context).primaryColorLight),
                   onPressed: () {
                     FlutterClipboard.paste().then((value) {
                       // Do what ever you want with the value.
@@ -133,7 +133,7 @@ class _WidgetSeachProductState extends State<WidgetSeachProduct> {
                     child: RaisedButton.icon(
                       color: Theme.of(context).primaryColor,
                       padding: EdgeInsets.all(16.0),
-                      icon: Icon(Icons.search),
+                      icon: Icon(Icons.search,color: Theme.of(context).primaryColorLight,),
                       onPressed: () {
                         if (textEditingController.text != "") {
                           setState(() {
@@ -141,8 +141,8 @@ class _WidgetSeachProductState extends State<WidgetSeachProduct> {
                           });
                         }
                       },
-                      label: Text("Buscar"),
-                      textColor: Colors.white,
+                      label: Text("Buscar",style: TextStyle(color:Theme.of(context).primaryColorLight)),
+                      textColor: Theme.of(context).primaryColorLight,
                     ),
                   ))
                 :Container(),
@@ -157,14 +157,14 @@ class _WidgetSeachProductState extends State<WidgetSeachProduct> {
                         color: Theme.of(context).primaryColor,
                         padding: EdgeInsets.all(16.0),
                         icon: Image(
-                            color: Colors.white,
+                            color: Theme.of(context).primaryColorLight,
                             height: 20.0,
                             width: 20.0,
                             image: AssetImage('assets/barcode.png'),
                             fit: BoxFit.contain),
                         label: Text('Escanea el código',
-                            style: TextStyle(color: Colors.white)),
-                        textColor: Colors.white,
+                            style: TextStyle(color: Theme.of(context).primaryColorLight)),
+                        textColor: Theme.of(context).primaryColorLight,
                         onPressed: () {
                           scanBarcodeNormal(context: context);
                         }),
@@ -182,13 +182,13 @@ class _WidgetSeachProductState extends State<WidgetSeachProduct> {
                           ),
                         ));
                       },
-                      color: Theme.of(context).primaryColor,
+                      color: Theme.of(context).primaryColorLight,
                       padding: EdgeInsets.all(12.0),
                       label: Text("Agregar nuevo producto",
                           style:
-                              TextStyle(fontSize: 18.0, color: Colors.white)),
-                      icon: Icon(Icons.add),
-                      textColor: Colors.white,
+                              TextStyle(fontSize: 18.0, color: Theme.of(context).primaryColor)),
+                      icon: Icon(Icons.add,color: Theme.of(context).primaryColor,),
+                      textColor:Theme.of(context).primaryColor,
                     ),
                   )
                 : Container(),

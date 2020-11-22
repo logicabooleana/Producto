@@ -65,6 +65,8 @@ class _ProfileCuentaState extends State<ProfileCuenta> {
         TextEditingController(text: perfilNegocio.descripcion);
     controllerTextEdit_ciudad =
         TextEditingController(text: perfilNegocio.ciudad);
+    controllerTextEdit_categoria_nombre =
+        TextEditingController();
     controllerTextEdit_direccion =
         TextEditingController(text: perfilNegocio.direccion);
     controllerTextEdit_provincia =

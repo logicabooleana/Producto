@@ -13,8 +13,7 @@ import 'package:flutter/services.dart';
 import 'package:producto/shared/widgets_image_circle.dart' as image;
 import 'package:expandable_bottom_sheet/expandable_bottom_sheet.dart';
 
-Color colorShowder = Colors.grey[
-    850]; //Theme.of(context).brightness==Brightness.dark?Colors.grey[850]:Colors.black;
+Color colorShowder = Colors.grey[900];//Colors.grey[850]; //Theme.of(context).brightness==Brightness.dark?Colors.grey[850]:Colors.black;
 Color colorText = Colors.white;
 Marca marca;
 
@@ -32,7 +31,7 @@ class ProductScreen extends StatefulWidget {
 class _ProductScreenState extends State<ProductScreen> {
   Categoria categoria;
   Categoria subcategoria;
-  
+
   BuildContext contextScaffold;
   bool productoEnCatalogo = false;
 
@@ -53,7 +52,7 @@ class _ProductScreenState extends State<ProductScreen> {
             .then((value) {
           if (value != null) {
             setState(() {
-              marca= value;
+              marca = value;
             });
           }
         });
@@ -343,36 +342,44 @@ class _ProductScreenState extends State<ProductScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           productoEnCatalogo
-              ? Row(
-                  children: [
-                    this.categoria != null && this.categoria.nombre != ""
+              ? Wrap(
+                      spacing: 8.0, // gap between adjacent chips
+                      runSpacing: 4.0, // gap between lines
+                      direction: Axis.horizontal, // main axis (rows or columns)
+                      children: <Widget>[
+                        this.categoria != null && this.categoria.nombre != ""
                         ? Chip(
+                            materialTapTargetSize:
+                                MaterialTapTargetSize.shrinkWrap,
                             avatar: CircleAvatar(
                               backgroundColor: Colors.grey.shade800,
                               child: Text(
                                   this.categoria.nombre.substring(0, 1) ?? "C"),
                             ),
-                            label: Text(this.categoria.nombre),
-                          )
-                        : Container(),
-                    this.categoria != null
-                        ? SizedBox(
-                            width: 3.0,
+                            label: Text(
+                              this.categoria.nombre,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           )
                         : Container(),
                     this.subcategoria != null && this.subcategoria.nombre != ""
                         ? Chip(
+                            materialTapTargetSize:
+                                MaterialTapTargetSize.shrinkWrap,
                             avatar: CircleAvatar(
                               backgroundColor: Colors.grey.shade800,
                               child: Text(
                                   this.subcategoria.nombre.substring(0, 1) ??
                                       "C"),
                             ),
-                            label: Text(this.subcategoria.nombre),
+                            label: Text(
+                              this.subcategoria.nombre,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           )
                         : Container(),
-                  ],
-                )
+                      ],
+                    )
               : Container(),
           widget.producto.titulo != ""
               ? Container(
@@ -444,8 +451,10 @@ class WidgetImagen extends StatelessWidget {
                 fit: BoxFit.cover,
                 imageUrl: producto.urlimagen ?? "default",
                 placeholder: (context, url) => FadeInImage(
-                    image: AssetImage("assets/loading.gif"),
-                    placeholder: AssetImage("assets/loading.gif")),
+                  image: AssetImage("assets/loading.gif"),
+                  placeholder: AssetImage("assets/loading.gif"),
+                  fit: BoxFit.cover,
+                ),
                 errorWidget: (context, url, error) => Container(
                   color: Colors.grey,
                   width: MediaQuery.of(context).size.width,
@@ -534,69 +543,63 @@ class WidgetOtrosProductosGlobal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Divider(endIndent: 12.0, indent: 12.0),
-        Padding(
-          child: Row(
-            children: [
-              Text("Otros productos", style: TextStyle(fontSize: 16.0)),
-              marca!= null
-                              ? Padding(
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 12.0),
-                                  child: Chip(
-                                    avatar: image.viewCircleImage(
-                                        url: marca.url_imagen,
-                                        texto: marca.titulo,
-                                        size: 20),
-                                    label: Text(marca.titulo),
-                                  ),
-                                )
-                              : Container(),
-            ],
-          ),
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-        ),
-        FutureBuilder(
-          future: Global.getProductosPrecargadoAll()
-              .getDataProductoAll(idMarca: this.producto.id_marca),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              List<Producto> listProductos = snapshot.data;
+    return FutureBuilder(
+      future: Global.getProductosPrecargadoAll()
+          .getDataProductoAll(idMarca: this.producto.id_marca),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          List<Producto> listProductos = snapshot.data;
 
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    height: 150,
-                    width: double.infinity,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: listProductos.length,
-                      itemBuilder: (context, index) {
-                        return Container(
-                            width: 150.0,
-                            height: 150.0,
-                            child: ProductoItemHorizontal(
-                              producto:
-                                  listProductos[index].convertProductoNegocio(),
-                            ));
-                      },
-                    ),
-                  ),
-                ],
-              );
-            } else {
-              return Container();
-            }
-          },
-        ),
-        SizedBox(
-          height: 20.0,
-        ),
-      ],
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Divider(endIndent: 12.0, indent: 12.0),
+              Padding(
+                child: Row(
+                  children: [
+                    Text("Otros productos", style: TextStyle(fontSize: 16.0)),
+                    marca != null
+                        ? Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 12.0),
+                            child: Chip(
+                              avatar: image.viewCircleImage(
+                                  url: marca.url_imagen,
+                                  texto: marca.titulo,
+                                  size: 20),
+                              label: Text(marca.titulo),
+                            ),
+                          )
+                        : Container(),
+                  ],
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+              ),
+              SizedBox(
+                height: 150,
+                width: double.infinity,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: listProductos.length,
+                  itemBuilder: (context, index) {
+                    return Container(
+                        width: 150.0,
+                        height: 150.0,
+                        child: ProductoItemHorizontal(
+                          producto:
+                              listProductos[index].convertProductoNegocio(),
+                        ));
+                  },
+                ),
+              ),
+              SizedBox(
+                height: 20.0,
+              ),
+            ],
+          );
+        } else {
+          return Container();
+        }
+      },
     );
   }
 }
