@@ -149,13 +149,8 @@ class PageLoginState extends State<PageLogin> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Image.asset('assets/ic_launcher_commer.png',
-                    width: 30.0, height: 30.0),
-                SizedBox(
-                  width: 8.0,
-                ),
                 Text(
-                  "Commer",
+                  "Lógica Booleana",
                   style: TextStyle(fontSize: 18.0, color: colorPrimary),
                 ),
               ],
@@ -240,13 +235,8 @@ class PageLoginState extends State<PageLogin> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Image.asset('assets/ic_launcher_commer.png',
-                    width: 30.0, height: 30.0),
-                SizedBox(
-                  width: 8.0,
-                ),
                 Text(
-                  "Commer",
+                  "Lógica Booleana",
                   style: TextStyle(fontSize: 18.0, color: colorPrimary),
                 ),
               ],

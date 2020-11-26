@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:producto/models/models_catalogo.dart';
@@ -12,10 +13,16 @@ import 'package:geolocator/geolocator.dart';
 import 'package:flutter/services.dart';
 import 'package:producto/shared/widgets_image_circle.dart' as image;
 import 'package:expandable_bottom_sheet/expandable_bottom_sheet.dart';
+import 'package:screenshot/screenshot.dart';
+import 'package:share/share.dart';
 
-Color colorShowder = Colors.grey[900];//Colors.grey[850]; //Theme.of(context).brightness==Brightness.dark?Colors.grey[850]:Colors.black;
+Color colorShowder = Colors.grey[
+    900]; //Colors.grey[850]; //Theme.of(context).brightness==Brightness.dark?Colors.grey[850]:Colors.black;
 Color colorText = Colors.white;
 Marca marca;
+
+//Create an instance of ScreenshotController
+ScreenshotController screenshotController = ScreenshotController();
 
 class ProductScreen extends StatefulWidget {
   // Variables
@@ -129,6 +136,18 @@ class _ProductScreenState extends State<ProductScreen> {
           ),
         ),
         actions: [
+          IconButton(
+            padding: EdgeInsets.all(12.0),
+            icon: Icon(Icons.pages),
+            onPressed: () {
+              screenshotController.capture().then((File image) {
+                //share 
+                Share.shareFiles(['${image.path}']);
+              }).catchError((onError) {
+                print(onError);
+              });
+            },
+          ),
           Global.oPerfilNegocio != null
               ? IconButton(
                   padding: EdgeInsets.all(12.0),
@@ -146,10 +165,13 @@ class _ProductScreenState extends State<ProductScreen> {
               : Container(),
         ],
       ),
-      body: ExpandableBottomSheet(
-        background: background(),
-        persistentHeader: persistentHeader(),
-        expandableContent: expandableContent(),
+      body: Screenshot(
+        controller: screenshotController,
+        child: ExpandableBottomSheet(
+          background: background(),
+          persistentHeader: persistentHeader(),
+          expandableContent: expandableContent(),
+        ),
       ),
     );
   }
@@ -169,7 +191,9 @@ class _ProductScreenState extends State<ProductScreen> {
                 children: [
                   WidgetDescripcion(context),
                   productoEnCatalogo
-                      ? WidgetOtrosProductos(producto: widget.producto)
+                      ? WidgetOtrosProductos(
+                          producto: widget.producto,
+                          subcategoria: this.subcategoria)
                       : Container(),
                   WidgetOtrosProductosGlobal(producto: widget.producto),
                 ],
@@ -247,7 +271,12 @@ class _ProductScreenState extends State<ProductScreen> {
                                                     precioVenta: widget
                                                         .producto.precio_venta),
                                                 style: TextStyle(
-                                                    color: Colors.green,
+                                                    color: widget.producto
+                                                                .precio_compra <
+                                                            widget.producto
+                                                                .precio_venta
+                                                        ? Colors.green
+                                                        : Colors.red,
                                                     fontSize: 12.0,
                                                     fontWeight:
                                                         FontWeight.bold))
@@ -343,11 +372,11 @@ class _ProductScreenState extends State<ProductScreen> {
         children: <Widget>[
           productoEnCatalogo
               ? Wrap(
-                      spacing: 8.0, // gap between adjacent chips
-                      runSpacing: 4.0, // gap between lines
-                      direction: Axis.horizontal, // main axis (rows or columns)
-                      children: <Widget>[
-                        this.categoria != null && this.categoria.nombre != ""
+                  spacing: 8.0, // gap between adjacent chips
+                  runSpacing: 4.0, // gap between lines
+                  direction: Axis.horizontal, // main axis (rows or columns)
+                  children: <Widget>[
+                    this.categoria != null && this.categoria.nombre != ""
                         ? Chip(
                             materialTapTargetSize:
                                 MaterialTapTargetSize.shrinkWrap,
@@ -378,8 +407,8 @@ class _ProductScreenState extends State<ProductScreen> {
                             ),
                           )
                         : Container(),
-                      ],
-                    )
+                  ],
+                )
               : Container(),
           widget.producto.titulo != ""
               ? Container(
@@ -490,9 +519,11 @@ class WidgetOtrosProductos extends StatelessWidget {
   const WidgetOtrosProductos({
     Key key,
     @required this.producto,
+    this.subcategoria,
   }) : super(key: key);
 
   final ProductoNegocio producto;
+  final Categoria subcategoria;
 
   @override
   Widget build(BuildContext context) {
@@ -501,7 +532,19 @@ class WidgetOtrosProductos extends StatelessWidget {
       children: <Widget>[
         Divider(endIndent: 12.0, indent: 12.0),
         Padding(
-          child: Text("Mi catalogo", style: TextStyle(fontSize: 16.0)),
+          child: Row(
+            children: [
+              Text("Mi catalogo", style: TextStyle(fontSize: 16.0)),
+              this.subcategoria != null
+                  ? Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 12.0),
+                      child: Chip(
+                        label: Text(this.subcategoria.nombre),
+                      ),
+                    )
+                  : Container(),
+            ],
+          ),
           padding: const EdgeInsets.symmetric(vertical: 8.0),
         ),
         SizedBox(

@@ -33,89 +33,82 @@ class _PageCreateMarcaState extends State<PageCreateMarca> {
     screenSize = MediaQuery.of(context).size;
 
     return Builder(
-      builder:(context) {
+      builder: (context) {
         return Scaffold(
-      appBar: AppBar(
-        title: Text("Crear marca"),
-        actions: <Widget>[
-          IconButton(
-              icon: saveIndicador == false
-                  ? Icon(Icons.check)
-                  : Container(
-                      width: 24.0,
-                      height: 24.0,
-                      child: CircularProgressIndicator(
-                        backgroundColor: Colors.white,
-                      ),
-                    ),
-              onPressed: () {
-                save(buildContext: context);
-              }),
-        ],
-      ),
-      body: body(buildContext: context),
-    );
+          appBar: AppBar(
+            title: Text("Crear marca"),
+            actions: <Widget>[
+              IconButton(
+                  icon: saveIndicador == false
+                      ? Icon(Icons.check)
+                      : Container(
+                          width: 24.0,
+                          height: 24.0,
+                          child: CircularProgressIndicator(
+                            backgroundColor: Colors.white,
+                          ),
+                        ),
+                  onPressed: () {
+                    save(buildContext: context);
+                  }),
+            ],
+          ),
+          body: body(buildContext: context),
+        );
       },
     );
   }
 
   Widget body({@required BuildContext buildContext}) {
-    return ListView(
-      padding: const EdgeInsets.all(30.0),
-      children: [
-        _imageFile == null
-            ? Container(
-                height: MediaQuery.of(context).size.width,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(0.0),
-                  color: Colors.grey,
-                ),
-                child: Center(
-                  child: Icon(
-                    Icons.image,
-                    color: Colors.white,
-                  ),
-                ),
-              )
-            : _previewImage(),
-        SizedBox(height: 12.0, width: 12.0),
-        Expanded(
-          child: RaisedButton.icon(
-              color: Theme.of(context).accentColor,
-              padding: const EdgeInsets.all(14.0),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(5.0))),
-              onPressed: () {
-                _onImageButtonPressed(ImageSource.gallery, context: context);
-              },
-              icon: const Icon(Icons.photo_library, color: Colors.white),
-              label: Text("Galeria",
-                  style: TextStyle(fontSize: 18.0, color: Colors.white))),
-        ),
-        SizedBox(height: 12.0, width: 12.0),
-        TextField(
-          onChanged: (value) => marca.titulo = value,
-          decoration: InputDecoration(
-              border: OutlineInputBorder(), labelText: "Titulo"),
-          style: textStyle,
-        ),
-        SizedBox(height: 12.0, width: 12.0),
-        TextField(
-          onChanged: (value) => marca.descripcion = value,
-          decoration: InputDecoration(
-              border: OutlineInputBorder(), labelText: "Descripción"),
-          style: textStyle,
-        ),
-        SizedBox(height: 12.0, width: 12.0),
-        TextField(
-          onChanged: (value) => marca.codigo_empresa = value,
-          decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: "Código de empresa ( opcional )"),
-          style: textStyle,
-        ),
-        SizedBox(height: 12.0, width: 12.0),
-      ],
+    return Container(
+      padding: EdgeInsets.all(12.0),
+      child: Column(
+        children: [
+          _imageFile == null
+              ? CircleAvatar(
+                  child: Icon(Icons.image),
+                  backgroundColor: Colors.grey,
+                  radius: 100.0,
+                )
+              : _previewImage(),
+          SizedBox(height: 20.0, width: 20.0),
+          RaisedButton.icon(
+          
+                color: Theme.of(context).accentColor,
+                padding: const EdgeInsets.all(14.0),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5.0))),
+                onPressed: () {
+                  _onImageButtonPressed(ImageSource.gallery, context: context);
+                },
+                icon: const Icon(Icons.photo_library, color: Colors.white),
+                label: Text("Cargar imagen",
+                    style: TextStyle(fontSize: 18.0, color: Colors.white))),
+          SizedBox(height: 12.0, width: 12.0),
+          TextField(
+            onChanged: (value) => marca.titulo = value,
+            decoration: InputDecoration(
+                border: OutlineInputBorder(), labelText: "Titulo"),
+            style: textStyle,
+          ),
+          SizedBox(height: 12.0, width: 12.0),
+          TextField(
+            onChanged: (value) => marca.descripcion = value,
+            decoration: InputDecoration(
+                border: OutlineInputBorder(), labelText: "Descripción (opcional)"),
+            style: textStyle,
+          ),
+          SizedBox(height: 12.0, width: 12.0),
+          TextField(
+            onChanged: (value) => marca.codigo_empresa = value,
+            decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: "Código de empresa (opcional)"),
+            style: textStyle,
+          ),
+          SizedBox(height: 12.0, width: 12.0),
+        ],
+      ),
     );
   }
 
@@ -177,7 +170,11 @@ class _PageCreateMarcaState extends State<PageCreateMarca> {
       return retrieveError;
     }
     if (_imageFile != null) {
-      return Image.file(File(_imageFile.path));
+      return CircleAvatar(
+                  radius: 100.0,
+                  backgroundColor: Colors.transparent,
+                  backgroundImage: FileImage(File(_imageFile.path)),
+                );
     } else if (_pickImageError != null) {
       return Text(
         'Pick image error: $_pickImageError',

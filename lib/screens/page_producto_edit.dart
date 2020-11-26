@@ -13,6 +13,7 @@ import 'package:producto/screens/widgets/widgetSeachMarcaProducto.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
 import 'package:producto/screens/widgets/widgets_notify.dart';
 import 'package:producto/shared/progress_bar.dart';
+import 'package:producto/shared/widgets_image_circle.dart';
 
 class ProductEdit extends StatefulWidget {
   final ProductoNegocio producto;
@@ -164,7 +165,7 @@ class _ProductEditState extends State<ProductEdit> {
                       ? Icon(Icons.check)
                       : Container(),
                   onPressed: () {
-                    guardar(buildContext: contextBuilder);
+                    editable?guardarDeveloper(buildContext: context):guardar(buildContext: contextBuilder);
                   }),
             ],
             bottom: saveIndicador ? linearProgressBarApp() : null,
@@ -377,7 +378,7 @@ class _ProductEditState extends State<ProductEdit> {
             onChanged: (value) => producto.precio_compra =
                 controllerTextEdit_precio_venta.numberValue,
             decoration: InputDecoration(
-                border: OutlineInputBorder(), labelText: "Precio de compra"),
+                border: OutlineInputBorder(), labelText: "Precio de compra (opcional)"),
             style: textStyle,
             controller: controllerTextEdit_compra,
           ),
@@ -389,18 +390,16 @@ class _ProductEditState extends State<ProductEdit> {
                 controllerTextEdit_precio_venta.numberValue,
             decoration: InputDecoration(
                 border: OutlineInputBorder(),
-                labelText: "Precio de comparación"),
+                labelText: "Precio de comparación (opcional)"),
             style: textStyle,
             controller: controllerTextEdit_comparacion,
           ),
           SizedBox(height: 25.0),
+          widgetSaveProductoOPTDeveloper(context: builderContext),
           enCatalogo
               ? saveIndicador == false
                   ? widgetDeleteProducto(context: builderContext)
                   : Container()
-              : Container(),
-          saveIndicador == false
-              ? widgetSaveProductoOPTDeveloper(context: builderContext)
               : Container(),
           saveIndicador == false
               ? widgetDeleteProductoOPTDeveloper(context: builderContext)
@@ -467,7 +466,7 @@ class _ProductEditState extends State<ProductEdit> {
                   color: Colors.red[400],
                   icon: Icon(Icons.delete, color: Colors.white),
                   padding: EdgeInsets.all(12.0),
-                  label: Text("Quitar producto de mi catalogo",
+                  label: Text("Quitar de mi catalogo",
                       style: TextStyle(fontSize: 18.0, color: Colors.white)),
                 ),
               )
@@ -536,13 +535,10 @@ class _ProductEditState extends State<ProductEdit> {
                 producto.verificado = true;
                 producto.titulo = this.marca.titulo;
                 producto.descripcion = controllerTextEdit_descripcion.text;
-                producto.precio_venta =
-                    controllerTextEdit_precio_venta.numberValue;
+                producto.precio_venta =controllerTextEdit_precio_venta.numberValue;
                 producto.precio_compra = controllerTextEdit_compra.numberValue;
-                producto.precio_comparacion =
-                    controllerTextEdit_comparacion.numberValue;
-                producto.timestamp_actualizacion =
-                    Timestamp.fromDate(new DateTime.now());
+                producto.precio_comparacion =controllerTextEdit_comparacion.numberValue;
+                producto.timestamp_actualizacion =Timestamp.fromDate(new DateTime.now());
                 producto.categoria = this.categoria.id;
                 producto.subcategoria = this.subcategoria.id;
                 producto.id_marca = this.marca.id;
@@ -586,11 +582,7 @@ class _ProductEditState extends State<ProductEdit> {
         ciudad: Global.oPerfilNegocio.ciudad,
         timestamp: Timestamp.fromDate(new DateTime.now()));
     // Firebase set
-    await Global.getPreciosProducto(
-            idNegocio: Global.oPerfilNegocio.id,
-            idProducto: producto.id,
-            isoPAis: "ARG")
-        .upSetPrecioProducto(precio.toJson());
+    await Global.getPreciosProducto(idNegocio: Global.oPerfilNegocio.id,idProducto: producto.id,isoPAis: "ARG").upSetPrecioProducto(precio.toJson());
 
     Map timestampUpdatePrecio;
     if (urlIamgen == "") {
@@ -604,8 +596,7 @@ class _ProductEditState extends State<ProductEdit> {
       };
     }
     // Firebase set
-    await Global.getProductosPrecargado(idProducto: producto.id)
-        .upSetPrecioProducto(timestampUpdatePrecio);
+    await Global.getProductosPrecargado(idProducto: producto.id).upSetPrecioProducto(timestampUpdatePrecio);
   }
 
   void _onImageButtonPressed(ImageSource source, {BuildContext context}) async {
@@ -951,15 +942,7 @@ class _ProductEditState extends State<ProductEdit> {
                         return Column(
                           children: <Widget>[
                             ListTile(
-                              leading: CircleAvatar(
-                                backgroundColor: Colors.black26,
-                                radius: 24.0,
-                                child: Text(marcaSelect.titulo.substring(0, 1),
-                                    style: TextStyle(
-                                        fontSize: 18.0,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold)),
-                              ),
+                              leading: viewCircleImage(texto:marcaSelect.titulo,url: marcaSelect.url_imagen,size:50.0 ),
                               dense: true,
                               title: Text(marcaSelect.titulo),
                               onTap: () {
@@ -1020,34 +1003,29 @@ class _ProductEditState extends State<ProductEdit> {
 
   // TODO: OPCIONES PARA EL DESARROLLADOR ( Eliminar para producción )
   Widget widgetSaveProductoOPTDeveloper({@required BuildContext context}) {
-    return Column(
+    return editable==false?Column(
       children: [
         deleteIndicador == false
             ? SizedBox(
                 width: double.infinity,
                 child: RaisedButton.icon(
                   onPressed: () {
-                    if (editable) {
-                      guardarDeveloper(buildContext: context);
-                    } else {
-                      setState(() {
+                    setState(() {
                         editable = true;
                         producto.verificado = false;
                       });
-                    }
                   },
                   color: editable ? Colors.green[400] : Colors.orange[400],
                   icon: Icon(Icons.security, color: Colors.white),
                   padding: EdgeInsets.all(12.0),
-                  label: Text(
-                      editable ? "Actualizar producto Global" : "Editar",
+                  label: Text("Editar",
                       style: TextStyle(fontSize: 18.0, color: Colors.white)),
                 ),
               )
             : Container(),
         SizedBox(height: 25.0),
       ],
-    );
+    ):Container();
   }
 
   Widget widgetDeleteProductoOPTDeveloper({@required BuildContext context}) {
@@ -1063,7 +1041,7 @@ class _ProductEditState extends State<ProductEdit> {
                   color: Colors.red[400],
                   icon: Icon(Icons.security, color: Colors.white),
                   padding: EdgeInsets.all(12.0),
-                  label: Text("Borrar producto",
+                  label: Text("Borrar producto (Moderador)",
                       style: TextStyle(fontSize: 18.0, color: Colors.white)),
                 ),
               )
@@ -1136,54 +1114,10 @@ class _ProductEditState extends State<ProductEdit> {
           if (controllerTextEdit_descripcion.text != "") {
             if (this.marca != null) {
               if (controllerTextEdit_precio_venta.numberValue != 0.0) {
-                setState(() {
-                  saveIndicador = true;
-                });
-                urlIamgen = "";
 
-                // Si la "PickedFile" es distinto nulo procede a guardar la imagen en la base de dato de almacenamiento
-                if (_imageFile != null) {
-                  StorageReference ref = FirebaseStorage.instance
-                      .ref()
-                      .child("APP")
-                      .child("ARG")
-                      .child("PRODUCTOS")
-                      .child(producto.id);
-                  StorageUploadTask uploadTask =
-                      ref.putFile(File(_imageFile.path));
-                  // obtenemos la url de la imagen guardada
-                  urlIamgen =
-                      await (await uploadTask.onComplete).ref.getDownloadURL();
-                  // TODO: Por el momento los datos del producto se guarda junto a la referencia de la cuenta del negocio
-                  producto.urlimagen = urlIamgen;
-                }
-
-                // TODO: Por defecto verificado es TRUE // Cambiar esto cuando se lanze a producción
-                producto.verificado = true;
-
-                producto.titulo = this.marca.titulo;
-                producto.descripcion = controllerTextEdit_descripcion.text;
-                producto.precio_venta =
-                    controllerTextEdit_precio_venta.numberValue;
-                producto.precio_compra = controllerTextEdit_compra.numberValue;
-                producto.precio_comparacion =
-                    controllerTextEdit_comparacion.numberValue;
-                producto.timestamp_actualizacion =
-                    Timestamp.fromDate(new DateTime.now());
-                producto.categoria = this.categoria.id;
-                producto.subcategoria = this.subcategoria.id;
-                producto.id_marca = this.marca.id;
-                producto.codigo=producto.id;
-                updateProductoGlobalDeveloper();
                 // Firebase set
-                if (Global.prefs.getIdNegocio != "") {
-                  await Global.getDataProductoNegocio(
-                          idNegocio: Global.prefs.getIdNegocio,
-                          idProducto: producto.id)
-                      .upSetProducto(producto.toJson());
-                }
-
-                Navigator.pop(context);
+                updateProductoGlobalDeveloper();
+                guardar(buildContext: buildContext);
               } else {
                 showSnackBar(
                     context: buildContext,
@@ -1207,21 +1141,9 @@ class _ProductEditState extends State<ProductEdit> {
   }
 
   void updateProductoGlobalDeveloper() async {
-    // Valores para registrar el precio
-    Precio precio = new Precio(
-        id_negocio: Global.oPerfilNegocio.id,
-        precio: producto.precio_venta,
-        moneda: producto.signo_moneda,
-        timestamp: Timestamp.fromDate(new DateTime.now()));
-    // Firebase set
-    await Global.getPreciosProducto(
-            idNegocio: Global.oPerfilNegocio.id,
-            idProducto: producto.id,
-            isoPAis: "ARG")
-        .upSetPrecioProducto(precio.toJson());
     // set ( id del usuario que actualizo el producto )
     producto.id_negocio = Global.oPerfilNegocio.id;
-    //producto.id_usuario=Global.us;
+    producto.timestamp_actualizacion =Timestamp.fromDate(new DateTime.now());
     // Firebase set
     await Global.getProductosPrecargado(idProducto: producto.id)
         .upSetPrecioProducto(producto.convertProductoDefault().toJson());
