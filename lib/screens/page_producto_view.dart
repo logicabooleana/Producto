@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:async';
 import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:producto/models/models_catalogo.dart';
@@ -20,6 +21,7 @@ Color colorShowder = Colors.grey[
     900]; //Colors.grey[850]; //Theme.of(context).brightness==Brightness.dark?Colors.grey[850]:Colors.black;
 Color colorText = Colors.white;
 Marca marca;
+File saF;
 
 //Create an instance of ScreenshotController
 ScreenshotController screenshotController = ScreenshotController();
@@ -140,12 +142,166 @@ class _ProductScreenState extends State<ProductScreen> {
             padding: EdgeInsets.all(12.0),
             icon: Icon(Icons.pages),
             onPressed: () {
-              screenshotController.capture().then((File image) {
-                //share 
-                Share.shareFiles(['${image.path}']);
-              }).catchError((onError) {
-                print(onError);
-              });
+              
+              // Get available height and width of the build area of this widget. Make a choice depending on the size.
+              var height = MediaQuery.of(context).size.height;
+              var width = MediaQuery.of(context).size.width;
+
+              showGeneralDialog(
+                  context: context,
+                  barrierDismissible: true,
+                  barrierLabel: MaterialLocalizations.of(context)
+                      .modalBarrierDismissLabel,
+                  barrierColor: Colors.black45,
+                  transitionDuration: const Duration(milliseconds: 200),
+                  pageBuilder: (BuildContext buildContext, Animation animation,
+                      Animation secondaryAnimation) {
+
+                    Timer(Duration(seconds: 1), () {
+                      screenshotController.capture().then((File image) {
+                        Navigator.pop(buildContext);
+                        //share
+                        Share.shareFiles(['${image.path}']);
+                      }).catchError((onError) {
+                        print(onError);
+                      });
+                    });
+
+                    return Screenshot(
+                      controller: screenshotController,
+                      child: SafeArea(
+                        child: Container(
+                          color: Colors.grey[900],
+                          padding: EdgeInsets.all(20),
+                          child: Center(
+                            child: Container(
+                              height: height * 0.60,
+                              width: width * 0.60,
+                              child: Card(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(20.0))),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                        height: width * 0.60,
+                                        width: width * 0.60,
+                                        child: WidgetImagen(
+                                            producto: widget.producto,
+                                            marca: marca)),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 20.0),
+                                          child: Column(
+                                            children: [
+                                              widget.producto.titulo != ""
+                                                  ? Container(
+                                                      child: Text(
+                                                          widget
+                                                              .producto.titulo,
+                                                          style: TextStyle(
+                                                              height: 2,
+                                                              fontSize: 30,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                          textAlign: TextAlign .center,
+                                                          overflow:TextOverflow.fade,
+                                                          softWrap: false),
+                                                    )
+                                                  : Container(),
+                                              SizedBox(
+                                                height: 8.0,
+                                                width: 8.0,
+                                              ),
+                                              widget.producto.descripcion != ""
+                                                  ? Text(
+                                                      widget
+                                                          .producto.descripcion,
+                                                      style: TextStyle(
+                                                          height: 1,
+                                                          fontSize: 16,
+                                                          fontWeight: FontWeight
+                                                              .normal),
+                                                              textAlign: TextAlign .center,)
+                                                  : Container(),
+                                            ],
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 12.0,
+                                          width: 12.0,
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          textDirection: TextDirection.ltr,
+                                          children: [
+                                            widget.producto.precio_venta !=
+                                                        null &&
+                                                    widget.producto
+                                                            .precio_venta !=
+                                                        0.0
+                                                ? Text(
+                                                    Publicaciones
+                                                        .getFormatoPrecio(
+                                                            monto: widget
+                                                                .producto
+                                                                .precio_venta),
+                                                    style: TextStyle(
+                                                        fontSize: 30,
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                    textAlign: TextAlign.end)
+                                                : Container(),
+                                            widget.producto.precio_comparacion !=
+                                                        null &&
+                                                    widget.producto
+                                                            .precio_comparacion !=
+                                                        0.0
+                                                ? Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    child: Text(
+                                                      Publicaciones
+                                                          .getFormatoPrecio(
+                                                              monto: widget
+                                                                  .producto
+                                                                  .precio_comparacion),
+                                                      style: TextStyle(
+                                                          decoration:
+                                                              TextDecoration
+                                                                  .lineThrough,
+                                                          fontSize: 15,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                      textAlign: TextAlign.end,
+                                                    ),
+                                                  )
+                                                : Container(),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  });
             },
           ),
           Global.oPerfilNegocio != null
@@ -165,13 +321,10 @@ class _ProductScreenState extends State<ProductScreen> {
               : Container(),
         ],
       ),
-      body: Screenshot(
-        controller: screenshotController,
-        child: ExpandableBottomSheet(
-          background: background(),
-          persistentHeader: persistentHeader(),
-          expandableContent: expandableContent(),
-        ),
+      body: ExpandableBottomSheet(
+        background: background(),
+        persistentHeader: persistentHeader(),
+        expandableContent: expandableContent(),
       ),
     );
   }
