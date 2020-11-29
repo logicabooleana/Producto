@@ -312,6 +312,7 @@ class PagePrincipal extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.all(12.0),
       child: Card(
+        color: Theme.of(buildContext).brightness==Brightness.dark?Colors.black12:Colors.white,
         semanticContainer: true,
         clipBehavior: Clip.antiAliasWithSaveLayer,
         child: InkWell(
@@ -326,10 +327,7 @@ class PagePrincipal extends StatelessWidget {
                 Text(
                   'Buscar "galletita"',
                   style: TextStyle(
-                      color:
-                          Theme.of(buildContext).brightness == Brightness.dark
-                              ? Colors.white38
-                              : Colors.black54),
+                      color:Theme.of(buildContext).brightness==Brightness.dark?Colors.white38:Colors.black54),
                 ),
               ],
             ),

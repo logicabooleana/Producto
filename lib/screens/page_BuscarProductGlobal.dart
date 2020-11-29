@@ -110,7 +110,7 @@ class _WidgetSeachProductState extends State<WidgetSeachProduct> {
                 ),
                 IconButton(
                   padding: EdgeInsets.all(12.0),
-                  icon: Icon(Icons.content_copy,color: Theme.of(context).primaryColorLight),
+                  icon: Icon(Icons.content_copy,color: Theme.of(context).primaryColor),
                   onPressed: () {
                     FlutterClipboard.paste().then((value) {
                       // Do what ever you want with the value.

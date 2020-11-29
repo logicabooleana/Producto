@@ -43,7 +43,7 @@ class DynamicTheme extends StatefulWidget {
 
 class DynamicThemeState extends State<DynamicTheme> {
   /* Declarar variables */
-  Color colorBlack = Color.fromARGB(255, 20, 20, 20);
+  Color colorBlack =  Color.fromARGB(255,43, 45, 57);
   Color colorLight = Color.fromARGB(255, 238, 238, 238);
   ThemeData _themeData;
   Brightness _brightness = Brightness.light;
@@ -95,11 +95,12 @@ class DynamicThemeState extends State<DynamicTheme> {
     setState(() {
       _themeData = widget.data(brightness).copyWith(
           primaryColor: _themeData!=null?_themeData.primaryColor:Colors.deepPurple,
-          primaryColorLight: Colors.deepPurple[200],
           accentColor: _themeData!=null?_themeData.accentColor:Colors.deepPurpleAccent,
-          scaffoldBackgroundColor:
-              brightness == Brightness.dark ? colorBlack : colorLight,
-          canvasColor: brightness == Brightness.dark ? colorBlack : colorLight);
+          scaffoldBackgroundColor:brightness == Brightness.dark ? colorBlack : colorLight,
+          canvasColor: brightness == Brightness.dark ? colorBlack : colorLight,
+          primaryColorDark: Color.fromARGB(255, 19, 20,24),
+          primaryColorLight: Color.fromARGB(255, 43, 45,57),
+      );
       _brightness = brightness;
     });
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -205,9 +206,10 @@ class DynamicThemeState extends State<DynamicTheme> {
   /* Acción : Cambia el brillo del tema a oscuro o luz */
   Widget getViewListTileSelectTheme({BuildContext buildContext}) {
     return ListTile( 
+      contentPadding:EdgeInsets.all(12.0)  ,
               leading: (brightness != Brightness.dark)
-                      ? const Icon(Icons.brightness_3, size: 30.0)
-                      : const Icon(Icons.brightness_7,size: 30.0),
+                      ? const Icon(Icons.brightness_3, size: 35.0)
+                      : const Icon(Icons.brightness_7,size: 35.0),
               title: (brightness != Brightness.dark)
                     ? Text("Aplicar tema oscuro")
                     : Text("Aplicar tema claro"),

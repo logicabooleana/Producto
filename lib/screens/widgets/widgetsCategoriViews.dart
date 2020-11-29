@@ -618,12 +618,11 @@ class _ViewConfigState extends State<ViewConfig> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        margin: const EdgeInsets.all(12.0),
+        margin: const EdgeInsets.all(0.0),
         child: ListView(
           children: [
             ListTile(
-              contentPadding:
-                  EdgeInsets.symmetric(vertical: 8.0, horizontal: 13.0),
+              contentPadding:EdgeInsets.all(12.0),
               leading: Global.oPerfilNegocio.imagen_perfil == "" ||
                       Global.oPerfilNegocio.imagen_perfil == "default"
                   ? CircleAvatar(
