@@ -10,7 +10,7 @@ class DataSearch extends SearchDelegate {
   }
 
   @override
-  String get searchFieldLabel => 'Buscar producto';
+  String get searchFieldLabel => 'Buscar producto ${this.listOBJ.length}';
 
   @override
  ThemeData appBarTheme(BuildContext context) {
@@ -55,7 +55,7 @@ class DataSearch extends SearchDelegate {
       return Container(child: Center(child: Icon(Icons.search)));
     }
     List<ProductoNegocio> resutlList = new List();
-    for (int i = 0; i < listOBJ.length; i++) {
+    for (int i = 0; i < this.listOBJ.length; i++) {
       if (Buscardor.buscar(listOBJ[i].titulo, query)||Buscardor.buscar(listOBJ[i].descripcion, query)) { 
         resutlList.add(listOBJ[i]);
       }

@@ -23,7 +23,7 @@ class _WidgetCatalogoGridListState extends State<WidgetCatalogoGridList> {
         child: Text("Cargando..."),
       ),
       builder: (comsumerContext, catalogo, child) {
-        Global.listProudctosNegocio = catalogo.getCatalogo;
+        //Global.listProudctosNegocio = catalogo.getCatalogo;
         return _gridListProductos(buildContext: context, providerCatalogo: catalogo);
       },
     );
@@ -147,7 +147,7 @@ class WidgetContentInfo extends StatelessWidget {
       borderRadius: BorderRadius.only(
           topLeft: Radius.circular(13), topRight: Radius.circular(13)),
       child: Container(
-        color: Colors.black54,
+        color: Theme.of(context).primaryColorDark.withOpacity(0.70),//Colors.black54,
         child: ClipRect(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

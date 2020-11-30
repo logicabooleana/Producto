@@ -31,6 +31,8 @@ import 'package:producto/utils/dynamicTheme_lb.dart';
 /*  DESCRIPCIÓN */
 /*  Pantalla principal de la aplicación Catalogo app  */
 
+
+
 class PagePrincipal extends StatelessWidget {
   /* Declarar variables */
   double get randHeight => math.Random().nextInt(100).toDouble();
@@ -320,12 +322,12 @@ class PagePrincipal extends StatelessWidget {
             padding: EdgeInsets.all(16.0),
             child: Row(
               children: <Widget>[
-                Icon(Icons.search),
+                Icon(Icons.search,color: Theme.of(buildContext).brightness==Brightness.dark?Colors.white38:Colors.black54),
                 SizedBox(
                   width: 12.0,
                 ),
                 Text(
-                  'Buscar "galletita"',
+                  'Buscar',
                   style: TextStyle(
                       color:Theme.of(buildContext).brightness==Brightness.dark?Colors.white38:Colors.black54),
                 ),
@@ -520,10 +522,10 @@ class PagePrincipal extends StatelessWidget {
                     });
               },
               tabs: [
-                Consumer<ProviderCatalogo>(
+                Consumer<ProviderCatalogo>( 
                   child: Tab(text: "Todos (${Global.listProudctosNegocio.length.toString()})"),
                   builder: (context, catalogo, child) {
-                    return Tab(text: catalogo.sNombreFiltro +" (${Global.listProudctosNegocio.length.toString()})");
+                    return Tab(text: catalogo.sNombreFiltro +" (${ catalogo.categoria!=null?catalogo.cataloLoadMore.length.toString():Global.listProudctosNegocio.length.toString()})");
                   },
                 ),
               ],
