@@ -125,7 +125,10 @@ class _WidgetSeachProductState extends State<WidgetSeachProduct> {
                 ),
               ],
             ),
-            SizedBox(height:12.0),
+            Expanded(
+              child: Column(
+                children: [
+                  SizedBox(height:12.0),
             !buscando
                 ? FadeInRight(
                     child: Container(
@@ -192,6 +195,9 @@ class _WidgetSeachProductState extends State<WidgetSeachProduct> {
                     ),
                   )
                 : Container(),
+                ],
+              ),
+            ),
           ] //your list view content here
           ),
     );
