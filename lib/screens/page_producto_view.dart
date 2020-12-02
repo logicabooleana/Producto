@@ -152,14 +152,16 @@ class _ProductScreenState extends State<ProductScreen> {
                   barrierColor: Colors.black45,
                   transitionDuration: const Duration(milliseconds: 200),
                   pageBuilder: (BuildContext buildContext, Animation animation,Animation secondaryAnimation) {
+                    
                     Timer(Duration(seconds: 1), () {
-                      /* screenshotController.capture().then((File image) {
+                      // Captura de widgets
+                      screenshotController.capture().then((File image) {
                         Navigator.pop(buildContext);
                         //share
                         Share.shareFiles(['${image.path}']);
                       }).catchError((onError) {
                         print(onError);
-                      }); */
+                      });
                     });
 
                     // Get available height and width of the build area of this widget. Make a choice depending on the size.
