@@ -1,13 +1,14 @@
 import 'dart:io';
 import 'dart:async';
 import 'dart:ui';
+import 'package:flutter/material.dart';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:producto/models/models_catalogo.dart';
 import 'package:producto/models/models_profile.dart';
 import 'package:producto/screens/page_producto_edit.dart';
 import 'package:producto/services/models.dart';
 import 'package:producto/shared/widgets_load.dart';
-import 'package:flutter/material.dart';
 import 'package:producto/utils/utils.dart';
 import 'package:producto/services/globals.dart';
 import 'package:geolocator/geolocator.dart';
@@ -93,8 +94,9 @@ class _ProductScreenState extends State<ProductScreen> {
 
   @override
   Widget build(BuildContext context) {
-
-    colorExpandableBottomSheet=Theme.of(context).brightness==Brightness.dark?Theme.of(context).primaryColorDark:Theme.of(context).primaryColorLight;
+    colorExpandableBottomSheet = Theme.of(context).brightness == Brightness.dark
+        ? Theme.of(context).primaryColorDark
+        : Theme.of(context).primaryColorLight;
     if (Global.oPerfilNegocio != null) {
       for (ProductoNegocio item in Global.listProudctosNegocio) {
         if (item.id == widget.producto.id) {
@@ -141,25 +143,23 @@ class _ProductScreenState extends State<ProductScreen> {
         actions: [
           IconButton(
             padding: EdgeInsets.all(12.0),
-            icon: Icon(Icons.pages),
+            icon: Icon(Icons.center_focus_strong),
             onPressed: () {
               showGeneralDialog(
                   context: context,
                   barrierDismissible: true,
-                  barrierLabel: MaterialLocalizations.of(context)
-                      .modalBarrierDismissLabel,
+                  barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
                   barrierColor: Colors.black45,
                   transitionDuration: const Duration(milliseconds: 200),
-                  pageBuilder: (BuildContext buildContext, Animation animation,
-                      Animation secondaryAnimation) {
-                        Timer(Duration(seconds: 1), () {
-                      screenshotController.capture().then((File image) {
+                  pageBuilder: (BuildContext buildContext, Animation animation,Animation secondaryAnimation) {
+                    Timer(Duration(seconds: 1), () {
+                      /* screenshotController.capture().then((File image) {
                         Navigator.pop(buildContext);
                         //share
                         Share.shareFiles(['${image.path}']);
                       }).catchError((onError) {
                         print(onError);
-                      });
+                      }); */
                     });
 
                     // Get available height and width of the build area of this widget. Make a choice depending on the size.
@@ -188,6 +188,51 @@ class _ProductScreenState extends State<ProductScreen> {
                   },
                 )
               : Container(),
+          IconButton(
+            padding: EdgeInsets.all(12.0),
+            icon: Icon(Icons.new_releases),
+            onPressed: () {
+              // show the dialog
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  TextStyle textStyleTitle = TextStyle(fontSize:16.0,fontStyle: FontStyle.normal,fontWeight: FontWeight.bold,color: Colors.white,fontFamily: "Poppins");
+                  // set up the AlertDialog
+                  return AlertDialog(
+                    titleTextStyle: TextStyle(color: Colors.white),
+                    backgroundColor: Colors.red[400],
+                    title: Row(
+                      children: [
+                        Icon(Icons.new_releases,color: Colors.white),
+                        SizedBox(
+                          height: 5.0,
+                          width: 5.0,
+                        ),
+                        Text("Algo no esta bien!",style: textStyleTitle)
+                      ],
+                    ),
+                    content: Text("Envíe una solicitud de revisión para este producto si:\n\n# La imagen no tiene relación con el codigo del producto\n\n# El nombre o descripción esta mal",style: TextStyle(color: Colors.white60),),
+                    actions: [
+                      // set up the button
+                      FlatButton(
+                        child: Text("Cancelar",style: TextStyle(color: Colors.white)),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                      FlatButton(
+                        child: Text("Enviar solicitud",style: TextStyle(color: Colors.white)),
+                        onPressed: () async{
+                          // Firebase set
+                          widget.producto.verificado=false;
+                          await Global.getProductosPrecargado(idProducto: widget.producto.id, isoPAis: "ARG").upSetPrecioProducto(widget.producto.convertProductoDefault().toJson());
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+          )
         ],
       ),
       body: ExpandableBottomSheet(
@@ -201,119 +246,144 @@ class _ProductScreenState extends State<ProductScreen> {
   Widget viewProducto({@required double height, @required double width}) {
     return Scaffold(
         body: Container(
-          color: Colors.white,
-          child: Container(
-            decoration: BoxDecoration(
+      color: Colors.white,
+      child: Container(
+        decoration: BoxDecoration(
             gradient: LinearGradient(
-              begin: Alignment.topRight,
-              end: Alignment.bottomLeft,
-              colors: [Theme.of(context).canvasColor.withOpacity(0.90),Theme.of(context).canvasColor])),
-            child: Column(
-              children: [
-                Expanded(child: Center(child:Text(Global.oPerfilNegocio.nombre_negocio,style: TextStyle(fontSize: 30,fontWeight: FontWeight.w900,color: Colors.black.withOpacity(0.50))))),
-                Card(
-                  color: Theme.of(context).canvasColor,
-                  clipBehavior: Clip.antiAlias,
-                  margin: EdgeInsets.only(
-                      left: width * 0.20,
-                      right: width * 0.20,
-                      bottom: height * 0.05,
-                      top: height * 0.05),
-                  elevation: 20,
-                  shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(32)), //<--custom shape
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                          height: width * 0.60,
-                          width: width * 0.60,
-                          child: WidgetImagen(
-                              producto: widget.producto,
-                              marca: marca,
-                              borderRadius: 30.0)),
-                      Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            widget.producto.descripcion != ""
-                                ? Text(
-                                    widget.producto.descripcion,
-                                    style: TextStyle(
-                                        color: Theme.of(context)
-                                            .textTheme
-                                            .bodyText1
-                                            .color
-                                            .withOpacity(0.50),
-                                        height: 1,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w900),
-                                    textAlign: TextAlign.center,
-                                  )
-                                : Container(),
-                            Padding(
-                              padding: const EdgeInsets.all(20.0),
-                              child: Wrap(
-                                crossAxisAlignment:WrapCrossAlignment.center ,
-                                children: [
-                                  widget.producto.precio_venta != null &&
-                                          widget.producto.precio_venta !=
-                                              0.0
-                                      ? Text(
-                                          Publicaciones.getFormatoPrecio(
-                                              monto: widget
-                                                  .producto.precio_venta),
-                                          style: TextStyle(
-                                              color: Theme.of(context).primaryColor.withOpacity(0.50),
-                                              fontSize: 40,
-                                              fontWeight: FontWeight.w900),
-                                          textAlign: TextAlign.end)
-                                      : Container(),
-                                  widget.producto.precio_comparacion !=
-                                              null &&
-                                          widget.producto
-                                                  .precio_comparacion !=
-                                              0.0
-                                      ? Padding(
-                                          padding:
-                                              const EdgeInsets.all(8.0),
-                                          child: Text(
-                                            Publicaciones.getFormatoPrecio(
-                                                monto: widget.producto
-                                                    .precio_comparacion),
-                                            style: TextStyle(
-                                                color: Theme.of(context)
-                                                    .primaryColor
-                                                    .withOpacity(0.30),
-                                                decoration: TextDecoration
-                                                    .lineThrough,
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.w900),
-                                            textAlign: TextAlign.end,
-                                          ),
-                                        )
-                                      : Container(),
-                                ],
-                              ),
-                            ),
-                          ],
+                begin: Alignment.topRight,
+                end: Alignment.bottomLeft,
+                colors: [
+              Theme.of(context).canvasColor.withOpacity(0.90),
+              Theme.of(context).canvasColor.withOpacity(0.50),
+            ])),
+        child: Column(
+          children: [
+            Expanded(
+                child: Center(
+                    child: Text(Global.oPerfilNegocio.nombre_negocio,
+                        style: TextStyle(
+                          fontFamily: "Poppins",
+                            fontSize: 30,
+                            fontWeight: FontWeight.w900,
+                            color: Theme.of(context).brightness==Brightness.dark?Colors.white.withOpacity(0.90):Colors.black.withOpacity(0.90))))),
+            Card(
+              color: Theme.of(context).canvasColor,
+              clipBehavior: Clip.antiAlias,
+              margin: EdgeInsets.only(
+                  left: width * 0.20,
+                  right: width * 0.20,
+                  bottom: height * 0.05,
+                  top: height * 0.05),
+              elevation: 20,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(32)), //<--custom shape
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                      height: width * 0.60,
+                      width: width * 0.60,
+                      child: WidgetImagen(
+                          producto: widget.producto,
+                          marca: marca,
+                          borderRadius: 30.0)),
+                  Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        widget.producto.descripcion != ""
+                            ? Text(
+                                widget.producto.descripcion,
+                                style: TextStyle(
+                                  fontFamily: "Poppins",
+                                  fontWeight: FontWeight.bold,
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .bodyText1
+                                        .color
+                                        .withOpacity(0.50),
+                                    height: 1,
+                                    fontSize: 16,
+                                ),
+                                textAlign: TextAlign.center,
+                              )
+                            : Container(),
+                        Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              widget.producto.precio_venta != null &&
+                                      widget.producto.precio_venta != 0.0
+                                  ? Text(
+                                      Publicaciones.getFormatoPrecio(
+                                          monto: widget.producto.precio_venta),
+                                      style: TextStyle(
+                                          color: Theme.of(context)
+                                              .primaryColor
+                                              .withOpacity(0.40),
+                                          fontSize: 40,
+                                          fontWeight: FontWeight.w900),
+                                      textAlign: TextAlign.end)
+                                  : Container(),
+                              widget.producto.precio_comparacion != null &&
+                                      widget.producto.precio_comparacion != 0.0
+                                  ? Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        Publicaciones.getFormatoPrecio(
+                                            monto: widget
+                                                .producto.precio_comparacion),
+                                        style: TextStyle(
+                                            color: Theme.of(context)
+                                                .primaryColor
+                                                .withOpacity(0.30),
+                                            decoration:
+                                                TextDecoration.lineThrough,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w900),
+                                        textAlign: TextAlign.end,
+                                      ),
+                                    )
+                                  : Container(),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                Expanded(child: Center(child: Row(crossAxisAlignment: CrossAxisAlignment.center,mainAxisAlignment: MainAxisAlignment.center,children: [Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Image.asset("assets/barcode.png",color: Colors.black.withOpacity(0.50),width: 50,height: 50.0),
-                ),Text("Producto",style: TextStyle(fontSize: 30,fontWeight: FontWeight.w900,color: Colors.black.withOpacity(0.50)),)],))),
-              ],
+                ],
+              ),
             ),
-          ),
-        ));
+            Expanded(
+                child: Center(
+                    child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Image.asset("assets/barcode.png",
+                      color: Colors.black.withOpacity(0.50),
+                      width: 50,
+                      height: 50.0),
+                ),
+                Text(
+                  "Producto",
+                  style: TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.black.withOpacity(0.50)),
+                )
+              ],
+            ))),
+          ],
+        ),
+      ),
+    ));
   }
 
   Widget background() {
@@ -523,7 +593,8 @@ class _ProductScreenState extends State<ProductScreen> {
                             avatar: CircleAvatar(
                               backgroundColor: Colors.grey.shade800,
                               child: Text(
-                                  this.categoria.nombre.substring(0, 1) ?? "C"),
+                                  this.categoria.nombre.substring(0, 1) ?? "C",
+                                  style: TextStyle(color: Colors.grey)),
                             ),
                             label: Text(
                               this.categoria.nombre,
@@ -539,7 +610,8 @@ class _ProductScreenState extends State<ProductScreen> {
                               backgroundColor: Colors.grey.shade800,
                               child: Text(
                                   this.subcategoria.nombre.substring(0, 1) ??
-                                      "C"),
+                                      "C",
+                                  style: TextStyle(color: Colors.grey)),
                             ),
                             label: Text(
                               this.subcategoria.nombre,
@@ -610,7 +682,8 @@ class WidgetImagen extends StatelessWidget {
       margin: EdgeInsets.all(0.0),
       elevation: 0.0,
       clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(borderRadius)),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(borderRadius)),
       child: Hero(
         tag: producto.id,
         child: Stack(

@@ -14,6 +14,7 @@ import 'package:producto/screens/widgets/widgetSeachMarcaProducto.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
 import 'package:producto/screens/widgets/widgets_notify.dart';
 import 'package:producto/shared/progress_bar.dart';
+import 'package:producto/screens/page_producto_view.dart';
 
 class ProductNew extends StatefulWidget {
   final String id;
@@ -34,7 +35,8 @@ class _ProductNewState extends State<ProductNew> {
   _ProductNewState(this.producto);
   // Variables
   TextStyle textStyle = new TextStyle(fontSize: 24.0);
-  bool enCatalogo =false; // verifica si el producto se encuentra en el catalogo o no
+  bool enCatalogo =
+      false; // verifica si el producto se encuentra en el catalogo o no
   Marca marca;
   Categoria categoria;
   Categoria subcategoria;
@@ -103,13 +105,25 @@ class _ProductNewState extends State<ProductNew> {
             backgroundColor: Theme.of(contextPrincipal).canvasColor,
             iconTheme: Theme.of(contextPrincipal).iconTheme.copyWith(
                 color: Theme.of(contextPrincipal).textTheme.bodyText1.color),
-            title: saveIndicador ?Text("Guardando...",style: TextStyle(fontSize: 18.0,color:Theme.of(contextPrincipal).textTheme.bodyText1.color)):Text(this.producto.id,
-                style: TextStyle(fontSize: 18.0,color:Theme.of(contextPrincipal).textTheme.bodyText1.color)),
+            title: saveIndicador
+                ? Text("Guardando...",
+                    style: TextStyle(
+                        fontSize: 18.0,
+                        color: Theme.of(contextPrincipal)
+                            .textTheme
+                            .bodyText1
+                            .color))
+                : Text(this.producto.id,
+                    style: TextStyle(
+                        fontSize: 18.0,
+                        color: Theme.of(contextPrincipal)
+                            .textTheme
+                            .bodyText1
+                            .color)),
             actions: <Widget>[
               IconButton(
-                  icon: saveIndicador == false
-                      ? Icon(Icons.check)
-                      : Container( ),
+                  icon:
+                      saveIndicador == false ? Icon(Icons.check) : Container(),
                   onPressed: () {
                     guardar(buildContext: contextBuilder);
                   }),
@@ -157,9 +171,11 @@ class _ProductNewState extends State<ProductNew> {
               child: RaisedButton.icon(
                   color: Theme.of(context).accentColor,
                   padding: const EdgeInsets.all(14.0),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(5.0))),
                   onPressed: () {
-                    _onImageButtonPressed(ImageSource.gallery,context: context);
+                    _onImageButtonPressed(ImageSource.gallery,
+                        context: context);
                   },
                   icon: const Icon(Icons.photo_library, color: Colors.white),
                   label: Text("Galeria",
@@ -190,90 +206,95 @@ class _ProductNewState extends State<ProductNew> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Global.prefs.getIdNegocio!=""?Consumer<ProviderCatalogo>(
-            child: Text("Cargando categorías"),
-            builder: (context, catalogo, child) {
+          Global.prefs.getIdNegocio != ""
+              ? Consumer<ProviderCatalogo>(
+                  child: Text("Cargando categorías"),
+                  builder: (context, catalogo, child) {
+                    // set ( values )
+                    this.categoria = catalogo.categoria;
+                    this.subcategoria = catalogo.subcategoria;
 
-              // set ( values )
-              this.categoria=catalogo.categoria;
-              this.subcategoria=catalogo.subcategoria;
-
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  new Flexible(
-                    child: InkWell(
-                      child: TextField(
-                        controller: TextEditingController()
-                          ..text = catalogo.categoria != null
-                              ? catalogo.categoria.nombre
-                              : "",
-                        enabled: false,
-                        enableInteractiveSelection: false,
-                        decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.green, width: 2)),
-                            labelText: "Categoría"),
-                        style: textStyle,
-                      ),
-                      onTap: () {
-                        showModalBottomSheet(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20.0)),
-                            backgroundColor:
-                                Theme.of(builderContext).canvasColor,
-                            context: builderContext,
-                            builder: (ctx) {
-                              return ClipRRect(
-                                child: ViewCategoria(buildContext: ctx),
-                              );
-                            });
-                      },
-                    ),
-                  ),
-                  new SizedBox(
-                    height: 12.0,
-                    width: 12.0,
-                  ),
-                  new Flexible(
-                    child: InkWell(
-                      child: TextField(
-                        controller: TextEditingController()
-                          ..text = catalogo.subcategoria != null
-                              ? catalogo.subcategoria.nombre
-                              : "",
-                        enabled: false,
-                        enableInteractiveSelection: false,
-                        decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.green, width: 2)),
-                            labelText: "Subcategoría"),
-                        style: textStyle,
-                      ),
-                      onTap: () {
-                        if (catalogo.categoria != null) {
-                          showModalBottomSheet(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20.0)),
-                            backgroundColor:
-                                Theme.of(builderContext).canvasColor,
-                            context: builderContext,
-                            builder: (ctx) {
-                              return ClipRRect(
-                                child: ViewSubCategoria(buildContextCategoria: ctx,categoria:this.categoria),
-                              );
-                            });
-                        }
-                      },
-                    ),
-                  ),
-                ],
-              );
-            },
-          ):Container(),
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        new Flexible(
+                          child: InkWell(
+                            child: TextField(
+                              controller: TextEditingController()
+                                ..text = catalogo.categoria != null
+                                    ? catalogo.categoria.nombre
+                                    : "",
+                              enabled: false,
+                              enableInteractiveSelection: false,
+                              decoration: InputDecoration(
+                                  border: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.green, width: 2)),
+                                  labelText: "Categoría"),
+                              style: textStyle,
+                            ),
+                            onTap: () {
+                              showModalBottomSheet(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(20.0)),
+                                  backgroundColor:
+                                      Theme.of(builderContext).canvasColor,
+                                  context: builderContext,
+                                  builder: (ctx) {
+                                    return ClipRRect(
+                                      child: ViewCategoria(buildContext: ctx),
+                                    );
+                                  });
+                            },
+                          ),
+                        ),
+                        new SizedBox(
+                          height: 12.0,
+                          width: 12.0,
+                        ),
+                        new Flexible(
+                          child: InkWell(
+                            child: TextField(
+                              controller: TextEditingController()
+                                ..text = catalogo.subcategoria != null
+                                    ? catalogo.subcategoria.nombre
+                                    : "",
+                              enabled: false,
+                              enableInteractiveSelection: false,
+                              decoration: InputDecoration(
+                                  border: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.green, width: 2)),
+                                  labelText: "Subcategoría"),
+                              style: textStyle,
+                            ),
+                            onTap: () {
+                              if (catalogo.categoria != null) {
+                                showModalBottomSheet(
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(20.0)),
+                                    backgroundColor:
+                                        Theme.of(builderContext).canvasColor,
+                                    context: builderContext,
+                                    builder: (ctx) {
+                                      return ClipRRect(
+                                        child: ViewSubCategoria(
+                                            buildContextCategoria: ctx,
+                                            categoria: this.categoria),
+                                      );
+                                    });
+                              }
+                            },
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                )
+              : Container(),
           SizedBox(
             height: 12.0,
             width: 12.0,
@@ -287,9 +308,9 @@ class _ProductNewState extends State<ProductNew> {
               : Container(),
           this.marca == null
               ? TextField(
-                minLines: 1,
-            maxLines: 5,
-            keyboardType: TextInputType.multiline,
+                  minLines: 1,
+                  maxLines: 5,
+                  keyboardType: TextInputType.multiline,
                   enabled: !producto.verificado,
                   onChanged: (value) => producto.titulo = value,
                   decoration: InputDecoration(
@@ -313,45 +334,51 @@ class _ProductNewState extends State<ProductNew> {
             style: textStyle,
             controller: controllerTextEdit_descripcion,
           ),
-          Global.prefs.getIdNegocio!=""?Column(
-            children: [
-              SizedBox(height: 16.0),
-          TextField(
-            //inputFormatters: [DecimalTextInputFormatter(decimalRange: 2)],
-            keyboardType: TextInputType.numberWithOptions(decimal: true),
-            onChanged: (value) => producto.precio_venta =
-                controllerTextEdit_precio_venta.numberValue,
-            decoration: InputDecoration(
-                border: OutlineInputBorder(), labelText: "Precio de venta"),
-            style: textStyle,
-            controller: controllerTextEdit_precio_venta,
-          ),
-          SizedBox(height: 16.0),
-          TextField(
-            //inputFormatters: [DecimalTextInputFormatter(decimalRange: 2)],
-            keyboardType: TextInputType.numberWithOptions(decimal: true),
-            onChanged: (value) => producto.precio_compra =
-                controllerTextEdit_precio_venta.numberValue,
-            decoration: InputDecoration(
-                border: OutlineInputBorder(), labelText: "Precio de compra"),
-            style: textStyle,
-            controller: controllerTextEdit_compra,
-          ),
-          SizedBox(height: 16.0),
-          TextField(
-            //inputFormatters: [DecimalTextInputFormatter(decimalRange: 2)],
-            keyboardType: TextInputType.numberWithOptions(decimal: true),
-            onChanged: (value) => producto.precio_comparacion =
-                controllerTextEdit_precio_venta.numberValue,
-            decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: "Precio de comparación"),
-            style: textStyle,
-            controller: controllerTextEdit_comparacion,
-          ),
-            ],
-          ):Container(),
-          
+          Global.prefs.getIdNegocio != ""
+              ? Column(
+                  children: [
+                    SizedBox(height: 16.0),
+                    TextField(
+                      //inputFormatters: [DecimalTextInputFormatter(decimalRange: 2)],
+                      keyboardType:
+                          TextInputType.numberWithOptions(decimal: true),
+                      onChanged: (value) => producto.precio_venta =
+                          controllerTextEdit_precio_venta.numberValue,
+                      decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: "Precio de venta"),
+                      style: textStyle,
+                      controller: controllerTextEdit_precio_venta,
+                    ),
+                    SizedBox(height: 16.0),
+                    TextField(
+                      //inputFormatters: [DecimalTextInputFormatter(decimalRange: 2)],
+                      keyboardType:
+                          TextInputType.numberWithOptions(decimal: true),
+                      onChanged: (value) => producto.precio_compra =
+                          controllerTextEdit_precio_venta.numberValue,
+                      decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: "Precio de compra"),
+                      style: textStyle,
+                      controller: controllerTextEdit_compra,
+                    ),
+                    SizedBox(height: 16.0),
+                    TextField(
+                      //inputFormatters: [DecimalTextInputFormatter(decimalRange: 2)],
+                      keyboardType:
+                          TextInputType.numberWithOptions(decimal: true),
+                      onChanged: (value) => producto.precio_comparacion =
+                          controllerTextEdit_precio_venta.numberValue,
+                      decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: "Precio de comparación"),
+                      style: textStyle,
+                      controller: controllerTextEdit_comparacion,
+                    ),
+                  ],
+                )
+              : Container(),
           SizedBox(height: 25.0),
         ],
       ),
@@ -398,13 +425,18 @@ class _ProductNewState extends State<ProductNew> {
       ],
     );
   }
+
   void guardar({@required BuildContext buildContext}) async {
-    if (this.categoria != null || (this.categoria == null && Global.prefs.getIdNegocio=="") ) {
-      if (this.subcategoria != null || (this.categoria == null && Global.prefs.getIdNegocio=="") ) {
+    if (this.categoria != null ||
+        (this.categoria == null && Global.prefs.getIdNegocio == "")) {
+      if (this.subcategoria != null ||
+          (this.categoria == null && Global.prefs.getIdNegocio == "")) {
         if (producto.titulo != "") {
           if (producto.descripcion != "") {
             if (this.marca != null) {
-              if (producto.precio_venta != 0.0 || (producto.precio_venta == 0.0 && Global.prefs.getIdNegocio=="") ) {
+              if (controllerTextEdit_precio_venta.numberValue != 0.0 ||
+                  (controllerTextEdit_precio_venta.numberValue == 0.0 &&
+                      Global.prefs.getIdNegocio == "")) {
                 setState(() {
                   saveIndicador = true;
                 });
@@ -429,29 +461,48 @@ class _ProductNewState extends State<ProductNew> {
 
                 // TODO: Por defecto verificado es TRUE // Cambiar esto cuando se lanze a producción
                 producto.verificado = true;
-                producto.timestamp_actualizacion=Timestamp.fromDate(new DateTime.now());
-                producto.timestamp_creation=Timestamp.fromDate(new DateTime.now());
-                producto.categoria = this.categoria==null?"":this.categoria.id;
-                producto.subcategoria = this.subcategoria==null?"":this.subcategoria.id;
-                producto.id_marca = this.marca==null?"":this.marca.id;
-                producto.codigo=producto.id;
+                producto.precio_venta =
+                    controllerTextEdit_precio_venta.numberValue;
+                producto.precio_compra = controllerTextEdit_compra.numberValue;
+                producto.precio_comparacion =
+                    controllerTextEdit_comparacion.numberValue;
+                producto.timestamp_actualizacion =
+                    Timestamp.fromDate(new DateTime.now());
+                producto.timestamp_creation =
+                    Timestamp.fromDate(new DateTime.now());
+                producto.categoria =
+                    this.categoria == null ? "" : this.categoria.id;
+                producto.subcategoria =
+                    this.subcategoria == null ? "" : this.subcategoria.id;
+                producto.id_marca = this.marca == null ? "" : this.marca.id;
+                producto.codigo = producto.id;
                 savevProductoGlobal();
                 // Firebase set
-                if( Global.prefs.getIdNegocio!="" ){
-                  await Global.getDataProductoNegocio(idNegocio: Global.prefs.getIdNegocio,idProducto: producto.id).upSetProducto(producto.toJson());
+                if (Global.prefs.getIdNegocio != "") {
+                  await Global.getDataProductoNegocio(
+                          idNegocio: Global.prefs.getIdNegocio,
+                          idProducto: producto.id)
+                      .upSetProducto(producto.toJson());
                 }
                 
-                Navigator.pop(context);
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (BuildContext context) => ProductScreen(
+                        producto: producto),
+                  ),
+                );
               } else {
                 showSnackBar(
                     context: buildContext,
                     message: 'Asigne un precio de venta');
               }
             } else {
-              showSnackBar(context: buildContext, message: 'Debe seleccionar una marca');
+              showSnackBar(
+                  context: buildContext, message: 'Debe seleccionar una marca');
             }
           } else {
-            showSnackBar(context: buildContext, message: 'Debe elegir una descripción');
+            showSnackBar(
+                context: buildContext, message: 'Debe elegir una descripción');
           }
         } else {
           showSnackBar(context: buildContext, message: 'Debe elegir un titulo');
@@ -467,32 +518,31 @@ class _ProductNewState extends State<ProductNew> {
 
   void savevProductoGlobal() async {
     // Valores para registrar el precio
-    if( Global.prefs.getIdNegocio!="" ){
+    if (Global.prefs.getIdNegocio != "") {
       Precio precio = new Precio(
-        id_negocio: Global.oPerfilNegocio.id,
-        precio: producto.precio_venta,
-        moneda: producto.signo_moneda,
-        provincia: Global.oPerfilNegocio.provincia,
-        ciudad: Global.oPerfilNegocio.ciudad,
-        timestamp: Timestamp.fromDate(new DateTime.now()));
-    // Firebase set
-    await Global.getPreciosProducto(
-            idNegocio: Global.oPerfilNegocio.id,
-            idProducto: producto.id,
-            isoPAis: "ARG")
-        .upSetPrecioProducto(precio.toJson());
+          id_negocio: Global.oPerfilNegocio.id,
+          precio: producto.precio_venta,
+          moneda: producto.signo_moneda,
+          provincia: Global.oPerfilNegocio.provincia,
+          ciudad: Global.oPerfilNegocio.ciudad,
+          timestamp: Timestamp.fromDate(new DateTime.now()));
+      // Firebase set
+      await Global.getPreciosProducto(
+              idNegocio: Global.oPerfilNegocio.id,
+              idProducto: producto.id,
+              isoPAis: "ARG")
+          .upSetPrecioProducto(precio.toJson());
     }
-    
+
     if (urlIamgen == "") {
-      producto.timestamp_actualizacion=Timestamp.fromDate(new DateTime.now());
-      producto.urlimagen="default";
+      producto.timestamp_actualizacion = Timestamp.fromDate(new DateTime.now());
+      producto.urlimagen = "default";
     } else {
-      producto.timestamp_actualizacion=Timestamp.fromDate(new DateTime.now());
-      producto.urlimagen=urlIamgen;
+      producto.timestamp_actualizacion = Timestamp.fromDate(new DateTime.now());
+      producto.urlimagen = urlIamgen;
     }
     // Firebase set
-    await Global.getProductosPrecargado(idProducto: producto.id, isoPAis: "ARG")
-        .upSetPrecioProducto(producto.convertProductoDefault().toJson());
+    await Global.getProductosPrecargado(idProducto: producto.id, isoPAis: "ARG").upSetPrecioProducto(producto.convertProductoDefault().toJson());
   }
 
   void _onImageButtonPressed(ImageSource source, {BuildContext context}) async {
@@ -556,8 +606,6 @@ class _ProductNewState extends State<ProductNew> {
     }
   }
 
-  
-
   showModalSelectMarca({@required BuildContext buildContext}) {
     showModalBottomSheet(
         shape:
@@ -573,14 +621,17 @@ class _ProductNewState extends State<ProductNew> {
               actions: [
                 IconButton(
                   icon: Icon(Icons.add),
-                  onPressed:() {
-                    Navigator.of(buildContext).push(MaterialPageRoute(
-                    builder: (BuildContext context) => PageCreateMarca())).then((value){
+                  onPressed: () {
+                    Navigator.of(buildContext)
+                        .push(MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                PageCreateMarca()))
+                        .then((value) {
                       setState(() {
                         Navigator.of(buildContext).pop();
-                            this.marca = value;
-                            this.producto.titulo=this.marca.titulo;
-                          });
+                        this.marca = value;
+                        this.producto.titulo = this.marca.titulo;
+                      });
                     });
                   },
                 ),
@@ -597,7 +648,7 @@ class _ProductNewState extends State<ProductNew> {
                         if (value != null) {
                           setState(() {
                             this.marca = value;
-                            this.producto.titulo=this.marca.titulo;
+                            this.producto.titulo = this.marca.titulo;
                             Navigator.pop(buildContext);
                           });
                         }
@@ -637,7 +688,7 @@ class _ProductNewState extends State<ProductNew> {
                               onTap: () {
                                 setState(() {
                                   this.marca = marcaSelect;
-                                  this.producto.titulo=this.marca.titulo;
+                                  this.producto.titulo = this.marca.titulo;
                                   Navigator.pop(buildContext);
                                 });
                               },
@@ -658,5 +709,4 @@ class _ProductNewState extends State<ProductNew> {
           );
         });
   }
-
 }

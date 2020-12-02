@@ -14,6 +14,7 @@ import 'package:flutter_masked_text/flutter_masked_text.dart';
 import 'package:producto/screens/widgets/widgets_notify.dart';
 import 'package:producto/shared/progress_bar.dart';
 import 'package:producto/shared/widgets_image_circle.dart';
+import 'package:producto/screens/page_producto_view.dart';
 
 class ProductEdit extends StatefulWidget {
   final ProductoNegocio producto;
@@ -32,8 +33,10 @@ class _ProductEditState extends State<ProductEdit> {
 
   // Variables
   TextStyle textStyle = new TextStyle(fontSize: 24.0);
-  TextStyle textStyle_disabled =new TextStyle(fontSize: 24.0, color: Colors.grey);
-  bool enCatalogo =false; // verifica si el producto se encuentra en el catalogo o no
+  TextStyle textStyle_disabled =
+      new TextStyle(fontSize: 24.0, color: Colors.grey);
+  bool enCatalogo =
+      false; // verifica si el producto se encuentra en el catalogo o no
   bool editable = false; // TODO : Eliminar para produccion
   Marca marca;
   Categoria categoria;
@@ -42,8 +45,8 @@ class _ProductEditState extends State<ProductEdit> {
   bool deleteIndicador = false;
   ProductoNegocio producto;
   BuildContext contextPrincipal;
-  Color colorCargando=Colors.orangeAccent;
-  Color colorSaveOk=Colors.green;
+  Color colorCargando = Colors.orangeAccent;
+  Color colorSaveOk = Colors.green;
   _ProductEditState(this.producto);
 
   @override
@@ -139,33 +142,44 @@ class _ProductEditState extends State<ProductEdit> {
         return Scaffold(
           appBar: AppBar(
             elevation: 0.0,
-            backgroundColor: Theme.of(context).canvasColor ,
+            backgroundColor: Theme.of(context).canvasColor,
             iconTheme: Theme.of(contextPrincipal).iconTheme.copyWith(
                 color: Theme.of(contextPrincipal).textTheme.bodyText1.color),
-            title: saveIndicador ?Text("Actualizando...",style: TextStyle(fontSize: 18.0,color:Theme.of(contextPrincipal).textTheme.bodyText1.color)):Row(
-              children: <Widget>[
-                producto.verificado == true
-                    ? Padding(
-                        padding: EdgeInsets.only(right: 3.0),
-                        child: new Image.asset('assets/icon_verificado.png',
-                            width: 16.0, height: 16.0))
-                    : new Container(),
-                Text(widget.producto.id,
+            title: saveIndicador
+                ? Text("Actualizando...",
                     style: TextStyle(
                         fontSize: 18.0,
                         color: Theme.of(contextPrincipal)
                             .textTheme
                             .bodyText1
-                            .color)),
-              ],
-            ),
+                            .color))
+                : Row(
+                    children: <Widget>[
+                      producto.verificado == true
+                          ? Padding(
+                              padding: EdgeInsets.only(right: 3.0),
+                              child: new Image.asset(
+                                  'assets/icon_verificado.png',
+                                  width: 16.0,
+                                  height: 16.0))
+                          : new Container(),
+                      Text(widget.producto.id,
+                          style: TextStyle(
+                              fontSize: 18.0,
+                              color: Theme.of(contextPrincipal)
+                                  .textTheme
+                                  .bodyText1
+                                  .color)),
+                    ],
+                  ),
             actions: <Widget>[
               IconButton(
-                  icon: saveIndicador == false
-                      ? Icon(Icons.check)
-                      : Container(),
+                  icon:
+                      saveIndicador == false ? Icon(Icons.check) : Container(),
                   onPressed: () {
-                    editable?guardarDeveloper(buildContext: context):guardar(buildContext: contextBuilder);
+                    editable
+                        ? guardarDeveloper(buildContext: context)
+                        : guardar(buildContext: contextBuilder);
                   }),
             ],
             bottom: saveIndicador ? linearProgressBarApp() : null,
@@ -194,47 +208,43 @@ class _ProductEditState extends State<ProductEdit> {
       children: [
         _imageFile == null
             ? Container(
-                height: MediaQuery.of(context).size.width,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(0.0),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black26,
-                      offset: Offset(0.0, 0.0),
-                      blurRadius: 6.0,
-                    ),
-                  ],
-                ),
-                child: Hero(
-                  tag: widget.producto.id,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(0.0),
-                    child: CachedNetworkImage(
-                      width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.width,
-                      fadeInDuration: Duration(milliseconds: 200),
-                      fit: BoxFit.cover,
-                      imageUrl: widget.producto.urlimagen,
-                      placeholder: (context, url) => FadeInImage(
-                          image: AssetImage("assets/loading.gif"),
-                          placeholder: AssetImage("assets/loading.gif")),
-                      errorWidget: (context, url, error) => Container(
-                        color: Colors.grey,
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.width,
+              child: Card(
+                  clipBehavior: Clip.antiAlias,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30.0)),
+                  child: Hero(
+                    tag: widget.producto.id,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(0.0),
+                      child: CachedNetworkImage(
                         width: MediaQuery.of(context).size.width,
                         height: MediaQuery.of(context).size.width,
-                        child: Center(
-                          child: Text(
-                            widget.producto.titulo.substring(0, 3),
-                            style: TextStyle(
-                                fontSize:
-                                    MediaQuery.of(context).size.width * 0.25),
+                        fadeInDuration: Duration(milliseconds: 200),
+                        fit: BoxFit.cover,
+                        imageUrl: widget.producto.urlimagen,
+                        placeholder: (context, url) => FadeInImage(
+                            image: AssetImage("assets/loading.gif"),
+                            placeholder: AssetImage("assets/loading.gif")),
+                        errorWidget: (context, url, error) => Container(
+                          color: Colors.grey,
+                          width: MediaQuery.of(context).size.width,
+                          height: MediaQuery.of(context).size.width,
+                          child: Center(
+                            child: Text(
+                              widget.producto.titulo.substring(0, 3),
+                              style: TextStyle(
+                                  fontSize:
+                                      MediaQuery.of(context).size.width * 0.25),
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              )
+            )
             : _previewImage(),
         producto.verificado == false
             ? Row(
@@ -323,7 +333,9 @@ class _ProductEditState extends State<ProductEdit> {
                     enabled: false,
                     enableInteractiveSelection: false,
                     decoration: InputDecoration(
-                        border: OutlineInputBorder(borderSide:BorderSide(color: Colors.grey, width: 2)),
+                        border: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.grey, width: 2)),
                         labelText: "Subcategoría"),
                     style: textStyle,
                   ),
@@ -344,9 +356,9 @@ class _ProductEditState extends State<ProductEdit> {
           ),
           widgetTextFieldMarca(),
           SizedBox(
-                  height: 16.0,
-                  width: 16.0,
-                ),
+            height: 16.0,
+            width: 16.0,
+          ),
           TextField(
             minLines: 1,
             maxLines: 5,
@@ -355,7 +367,10 @@ class _ProductEditState extends State<ProductEdit> {
             onChanged: (value) => producto.descripcion = value,
             decoration: InputDecoration(
                 border: OutlineInputBorder(),
-                disabledBorder: OutlineInputBorder(borderSide:BorderSide(color:editable? Colors.grey: Colors.transparent ,width: 2)),
+                disabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                        color: editable ? Colors.grey : Colors.transparent,
+                        width: 2)),
                 labelText: "Descripción"),
             style: producto.verificado ? textStyle_disabled : textStyle,
             controller: controllerTextEdit_descripcion,
@@ -378,7 +393,8 @@ class _ProductEditState extends State<ProductEdit> {
             onChanged: (value) => producto.precio_compra =
                 controllerTextEdit_precio_venta.numberValue,
             decoration: InputDecoration(
-                border: OutlineInputBorder(), labelText: "Precio de compra (opcional)"),
+                border: OutlineInputBorder(),
+                labelText: "Precio de compra (opcional)"),
             style: textStyle,
             controller: controllerTextEdit_compra,
           ),
@@ -423,10 +439,11 @@ class _ProductEditState extends State<ProductEdit> {
               enableInteractiveSelection: false,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
-                disabledBorder: OutlineInputBorder(borderSide:BorderSide(color:editable? Colors.grey: Colors.transparent )),
+                disabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                        color: editable ? Colors.grey : Colors.transparent)),
                 labelText: "Marca",
               ),
-              
               style: producto.verificado ? textStyle_disabled : textStyle,
             ),
             onTap: () {
@@ -507,62 +524,69 @@ class _ProductEditState extends State<ProductEdit> {
   void guardar({@required BuildContext buildContext}) async {
     if (this.categoria != null) {
       if (this.subcategoria != null) {
-          if (controllerTextEdit_descripcion.text != "") {
-            if (this.marca != null) {
-              if (controllerTextEdit_precio_venta.numberValue != 0.0) {
-                setState(() {
-                  saveIndicador = true;
-                });
-                urlIamgen = "";
-                // Si la "PickedFile" es distinto nulo procede a guardar la imagen en la base de dato de almacenamiento
-                if (_imageFile != null) {
-                  StorageReference ref = FirebaseStorage.instance
-                      .ref()
-                      .child("APP")
-                      .child("ARG")
-                      .child("PRODUCTOS")
-                      .child(producto.id);
-                  StorageUploadTask uploadTask =
-                      ref.putFile(File(_imageFile.path));
-                  // obtenemos la url de la imagen guardada
-                  urlIamgen =
-                      await (await uploadTask.onComplete).ref.getDownloadURL();
-                  // TODO: Por el momento los datos del producto se guarda junto a la referencia de la cuenta del negocio
-                  producto.urlimagen = urlIamgen;
-                }
-                // Set ( values )
-                // TODO: Por defecto verificado es TRUE // Cambiar esto cuando se lanze a producción
-                producto.verificado = true;
-                producto.titulo = this.marca.titulo;
-                producto.descripcion = controllerTextEdit_descripcion.text;
-                producto.precio_venta =controllerTextEdit_precio_venta.numberValue;
-                producto.precio_compra = controllerTextEdit_compra.numberValue;
-                producto.precio_comparacion =controllerTextEdit_comparacion.numberValue;
-                producto.timestamp_actualizacion =Timestamp.fromDate(new DateTime.now());
-                producto.categoria = this.categoria.id;
-                producto.subcategoria = this.subcategoria.id;
-                producto.id_marca = this.marca.id;
-                updateProductoGlobal();
-                // Firebase set
-                await Global.getDataProductoNegocio(
-                        idNegocio: Global.prefs.getIdNegocio,
-                        idProducto: producto.id)
-                    .upSetProducto(producto.toJson());
-
-                Navigator.pop(context);
-              } else {
-                showSnackBar(
-                    context: buildContext,
-                    message: 'Asigne un precio de venta');
+        if (controllerTextEdit_descripcion.text != "") {
+          if (this.marca != null) {
+            if (controllerTextEdit_precio_venta.numberValue != 0.0) {
+              setState(() {
+                saveIndicador = true;
+              });
+              urlIamgen = "";
+              // Si la "PickedFile" es distinto nulo procede a guardar la imagen en la base de dato de almacenamiento
+              if (_imageFile != null) {
+                StorageReference ref = FirebaseStorage.instance
+                    .ref()
+                    .child("APP")
+                    .child("ARG")
+                    .child("PRODUCTOS")
+                    .child(producto.id);
+                StorageUploadTask uploadTask =
+                    ref.putFile(File(_imageFile.path));
+                // obtenemos la url de la imagen guardada
+                urlIamgen =
+                    await (await uploadTask.onComplete).ref.getDownloadURL();
+                // TODO: Por el momento los datos del producto se guarda junto a la referencia de la cuenta del negocio
+                producto.urlimagen = urlIamgen;
               }
+              // Set ( values )
+              // TODO: Por defecto verificado es TRUE // Cambiar esto cuando se lanze a producción
+              producto.verificado = true;
+              producto.titulo = this.marca.titulo;
+              producto.descripcion = controllerTextEdit_descripcion.text;
+              producto.precio_venta =
+                  controllerTextEdit_precio_venta.numberValue;
+              producto.precio_compra = controllerTextEdit_compra.numberValue;
+              producto.precio_comparacion =
+                  controllerTextEdit_comparacion.numberValue;
+              producto.timestamp_actualizacion =
+                  Timestamp.fromDate(new DateTime.now());
+              producto.categoria = this.categoria.id;
+              producto.subcategoria = this.subcategoria.id;
+              producto.id_marca = this.marca.id;
+              updateProductoGlobal();
+              // Firebase set
+              await Global.getDataProductoNegocio(
+                      idNegocio: Global.prefs.getIdNegocio,
+                      idProducto: producto.id)
+                  .upSetProducto(producto.toJson());
+
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (BuildContext context) =>
+                      ProductScreen(producto: producto),
+                ),
+              );
             } else {
               showSnackBar(
-                  context: buildContext, message: 'Debe seleccionar una marca');
+                  context: buildContext, message: 'Asigne un precio de venta');
             }
           } else {
             showSnackBar(
-                context: buildContext, message: 'Debe elegir una descripción');
+                context: buildContext, message: 'Debe seleccionar una marca');
           }
+        } else {
+          showSnackBar(
+              context: buildContext, message: 'Debe elegir una descripción');
+        }
       } else {
         showSnackBar(
             context: buildContext, message: 'Debe elegir una subcategoría');
@@ -582,7 +606,11 @@ class _ProductEditState extends State<ProductEdit> {
         ciudad: Global.oPerfilNegocio.ciudad,
         timestamp: Timestamp.fromDate(new DateTime.now()));
     // Firebase set
-    await Global.getPreciosProducto(idNegocio: Global.oPerfilNegocio.id,idProducto: producto.id,isoPAis: "ARG").upSetPrecioProducto(precio.toJson());
+    await Global.getPreciosProducto(
+            idNegocio: Global.oPerfilNegocio.id,
+            idProducto: producto.id,
+            isoPAis: "ARG")
+        .upSetPrecioProducto(precio.toJson());
 
     Map timestampUpdatePrecio;
     if (urlIamgen == "") {
@@ -619,7 +647,15 @@ class _ProductEditState extends State<ProductEdit> {
 
   Widget _previewImage() {
     if (_imageFile != null) {
-      return Image.file(File(_imageFile.path));
+      return Container(
+        width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.width,
+              child: Card(
+            clipBehavior: Clip.antiAlias,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
+            child: Image.file(File(_imageFile.path),fit: BoxFit.cover,)),
+      );
     } else if (_pickImageError != null) {
       return Text(
         'Pick image error: $_pickImageError',
@@ -797,7 +833,8 @@ class _ProductEditState extends State<ProductEdit> {
                     loadSave = true;
                   });
                   subcategoria.nombre = controller.text;
-                  categoria.subcategorias[subcategoria.id]=subcategoria.nombre;
+                  categoria.subcategorias[subcategoria.id] =
+                      subcategoria.nombre;
                   await Global.getDataCatalogoCategoria(
                           idNegocio: Global.oPerfilNegocio.id,
                           idCategoria: categoria.id)
@@ -810,7 +847,8 @@ class _ProductEditState extends State<ProductEdit> {
     );
   }
 
-  getSubCategoria({@required BuildContext buildContext, @required Categoria categoria}) {
+  getSubCategoria(
+      {@required BuildContext buildContext, @required Categoria categoria}) {
     showModalBottomSheet(
         shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
@@ -822,10 +860,12 @@ class _ProductEditState extends State<ProductEdit> {
               title: Text("Subcategoria"),
               actions: [
                 IconButton(
-                  onPressed: () => _showDialogCreateSubCategoria(categoria: categoria),
+                  onPressed: () =>
+                      _showDialogCreateSubCategoria(categoria: categoria),
                   icon: Icon(Icons.add),
                 ),
-              ],),
+              ],
+            ),
             body: categoria.subcategorias != null
                 ? ListView.builder(
                     padding: EdgeInsets.symmetric(vertical: 15.0),
@@ -942,7 +982,10 @@ class _ProductEditState extends State<ProductEdit> {
                         return Column(
                           children: <Widget>[
                             ListTile(
-                              leading: viewCircleImage(texto:marcaSelect.titulo,url: marcaSelect.url_imagen,size:50.0 ),
+                              leading: viewCircleImage(
+                                  texto: marcaSelect.titulo,
+                                  url: marcaSelect.url_imagen,
+                                  size: 50.0),
                               dense: true,
                               title: Text(marcaSelect.titulo),
                               onTap: () {
@@ -1003,29 +1046,33 @@ class _ProductEditState extends State<ProductEdit> {
 
   // TODO: OPCIONES PARA EL DESARROLLADOR ( Eliminar para producción )
   Widget widgetSaveProductoOPTDeveloper({@required BuildContext context}) {
-    return editable==false?Column(
-      children: [
-        deleteIndicador == false
-            ? SizedBox(
-                width: double.infinity,
-                child: RaisedButton.icon(
-                  onPressed: () {
-                    setState(() {
-                        editable = true;
-                        producto.verificado = false;
-                      });
-                  },
-                  color: editable ? Colors.green[400] : Colors.orange[400],
-                  icon: Icon(Icons.security, color: Colors.white),
-                  padding: EdgeInsets.all(12.0),
-                  label: Text("Editar",
-                      style: TextStyle(fontSize: 18.0, color: Colors.white)),
-                ),
-              )
-            : Container(),
-        SizedBox(height: 25.0),
-      ],
-    ):Container();
+    return editable == false
+        ? Column(
+            children: [
+              deleteIndicador == false
+                  ? SizedBox(
+                      width: double.infinity,
+                      child: RaisedButton.icon(
+                        onPressed: () {
+                          setState(() {
+                            editable = true;
+                            producto.verificado = false;
+                          });
+                        },
+                        color:
+                            editable ? Colors.green[400] : Colors.orange[400],
+                        icon: Icon(Icons.security, color: Colors.white),
+                        padding: EdgeInsets.all(12.0),
+                        label: Text("Editar",
+                            style:
+                                TextStyle(fontSize: 18.0, color: Colors.white)),
+                      ),
+                    )
+                  : Container(),
+              SizedBox(height: 25.0),
+            ],
+          )
+        : Container();
   }
 
   Widget widgetDeleteProductoOPTDeveloper({@required BuildContext context}) {
@@ -1111,26 +1158,24 @@ class _ProductEditState extends State<ProductEdit> {
   void guardarDeveloper({@required BuildContext buildContext}) async {
     if (this.categoria != null) {
       if (this.subcategoria != null) {
-          if (controllerTextEdit_descripcion.text != "") {
-            if (this.marca != null) {
-              if (controllerTextEdit_precio_venta.numberValue != 0.0) {
-
-                // Firebase set
-                updateProductoGlobalDeveloper();
-                guardar(buildContext: buildContext);
-              } else {
-                showSnackBar(
-                    context: buildContext,
-                    message: 'Asigne un precio de venta');
-              }
+        if (controllerTextEdit_descripcion.text != "") {
+          if (this.marca != null) {
+            if (controllerTextEdit_precio_venta.numberValue != 0.0) {
+              // Firebase set
+              updateProductoGlobalDeveloper();
+              guardar(buildContext: buildContext);
             } else {
               showSnackBar(
-                  context: buildContext, message: 'Debe seleccionar una marca');
+                  context: buildContext, message: 'Asigne un precio de venta');
             }
           } else {
             showSnackBar(
-                context: buildContext, message: 'Debe elegir una descripción');
+                context: buildContext, message: 'Debe seleccionar una marca');
           }
+        } else {
+          showSnackBar(
+              context: buildContext, message: 'Debe elegir una descripción');
+        }
       } else {
         showSnackBar(
             context: buildContext, message: 'Debe elegir una subcategoría');
@@ -1143,7 +1188,7 @@ class _ProductEditState extends State<ProductEdit> {
   void updateProductoGlobalDeveloper() async {
     // set ( id del usuario que actualizo el producto )
     producto.id_negocio = Global.oPerfilNegocio.id;
-    producto.timestamp_actualizacion =Timestamp.fromDate(new DateTime.now());
+    producto.timestamp_actualizacion = Timestamp.fromDate(new DateTime.now());
     // Firebase set
     await Global.getProductosPrecargado(idProducto: producto.id)
         .upSetPrecioProducto(producto.convertProductoDefault().toJson());
