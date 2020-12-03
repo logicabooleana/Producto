@@ -479,6 +479,8 @@ class PagePrincipal extends StatelessWidget {
       length: 1,
       child: NestedScrollView(
         /* le permite crear una lista de elementos que se desplazarían hasta que el cuerpo alcanzara la parte superior */
+        floatHeaderSlivers: true,
+        physics: BouncingScrollPhysics(),
         headerSliverBuilder: (context, _) {
           return [
             SliverList(
