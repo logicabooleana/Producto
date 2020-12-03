@@ -132,6 +132,7 @@ class PagePrincipal extends StatelessWidget {
             future: Global.getNegocio(idNegocio: Global.prefs.getIdNegocio)
                 .getDataPerfilNegocio(),
             builder: (c, snapshot) {
+              
               if (snapshot.hasData) {
                 Global.oPerfilNegocio = snapshot.data;
                 return SafeArea(
