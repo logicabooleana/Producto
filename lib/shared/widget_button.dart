@@ -6,7 +6,6 @@ import 'package:producto/models/models_profile.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:producto/screens/profileCuenta.dart';
-import 'package:producto/shared/widgets_image_circle.dart' as image;
 
 /* Declarar variables */
 List<Color> colorGradientInstagram = [
@@ -259,7 +258,7 @@ class WidgetButtonListTile extends StatelessWidget {
   Widget buttonListTileItemCuenta(
       {@required BuildContext buildContext,
       @required PerfilNegocio perfilNegocio,
-      @required bool adminPropietario = false}) {
+      bool adminPropietario = false}) {
     if (perfilNegocio.id == null) {
       return Container();
     }

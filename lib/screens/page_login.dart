@@ -55,20 +55,20 @@ class PageLoginState extends State<PageLogin> {
               iconData: Icons.search,
               texto: "ESCANEAR",
               descripcion:
-                  "Solo tenes que enfocar el producto y obtenes la información en el acto",
+                  "Solo tenes que enfocar el producto para obtenes la información en el acto",
               brightness: Brightness.light),
           componente(
               color: Colors.orange[600],
               iconData: Icons.monetization_on,
               texto: "¿QUERES SABER EL PRECIO?",
               descripcion:
-                  "Compara el precios de diferentes comerciantes o compartir tu precio",
+                  "Compara el precios de diferentes comerciantes o compartir el tuyo",
               brightness: Brightness.light),
           componente(
               color: Colors.lightBlue[600],
               iconData: Icons.category,
               texto: "Crea tu catálogo",
-              descripcion: "Arma tu catalogo de productos",
+              descripcion: "Arma tu catalogo con tus productos",
               brightness: Brightness.light),
         ],
         /* Establecer las páginas / vistas / contenedores */

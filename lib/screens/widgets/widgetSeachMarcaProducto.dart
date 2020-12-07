@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:producto/utils/utils.dart';
 import 'package:producto/models/models_catalogo.dart';
 import 'package:producto/shared/widgets_image_circle.dart';
-
+import 'package:diacritic/diacritic.dart';
 
 
 class DataSearchMarcaProduct extends SearchDelegate {
@@ -60,7 +60,7 @@ class DataSearchMarcaProduct extends SearchDelegate {
     }
     List<Marca> resutlList = new List();
     for (int i = 0; i < listMarcas.length; i++) {
-      if (Buscardor.buscar(listMarcas[i].titulo, query)) {
+      if (Buscardor.buscar(removeDiacritics(listMarcas[i].titulo),removeDiacritics(query))) {
         resutlList.add(listMarcas[i]);
       }
     }

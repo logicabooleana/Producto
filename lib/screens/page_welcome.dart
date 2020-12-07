@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:producto/shared/progress_bar.dart';
+import 'package:producto/services/globals.dart';
 
 class SplashScreen extends StatefulWidget {
   createState() => SplashScreenState();
@@ -9,14 +10,13 @@ class SplashScreen extends StatefulWidget {
 
 class SplashScreenState extends State<SplashScreen> {
   navigateUser() {
-    //TODO: Verificar metodo de authenticacion
     FirebaseAuth.instance.authStateChanges().listen((User user) {
       if (user == null) {
-        Timer(Duration(seconds: 2),
-            () => Navigator.pushReplacementNamed(context, "/login"));
+        Global.user=null;
+        Timer(Duration(seconds: 2),() => Navigator.pushReplacementNamed(context, "/login"));
       } else {
-        Timer(Duration(seconds: 2),
-            () => Navigator.pushReplacementNamed(context, '/page_principal'));
+        Global.user=user;
+        Timer(Duration(seconds: 2),() => Navigator.pushReplacementNamed(context, '/page_principal'));
       }
     });
   }

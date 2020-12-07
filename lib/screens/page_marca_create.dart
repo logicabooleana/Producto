@@ -62,7 +62,7 @@ class _PageCreateMarcaState extends State<PageCreateMarca> {
   Widget body({@required BuildContext buildContext}) {
     return Container(
       padding: EdgeInsets.all(12.0),
-      child: Column(
+      child: ListView(
         children: [
           _imageFile == null
               ? CircleAvatar(
@@ -134,6 +134,7 @@ class _PageCreateMarcaState extends State<PageCreateMarca> {
         }
         // Firebase ( save)
         await Global.getMarca(idMarca: marca.id).upSetMarca(marca.toJson());
+
         // Cierra la actividad y devuelve el objeto en el caso que se requiera
         Navigator.pop(context, marca);
       } else {

@@ -56,7 +56,6 @@ class Publicaciones {
     var diffDt = fechaActual.difference(fechaPublicacion); 
     
     // Calcular tiempos (Feacha de pubicación)
-        var diff_segundos    =  diffDt.inSeconds;
         var diff_Munutos    = diffDt.inMinutes;
         var diff_Horas      = diffDt.inHours;
         var diff_Dias       = diffDt.inDays;
@@ -93,3 +92,5 @@ class Publicaciones {
         return sFecha;
   }
 }
+
+

@@ -29,7 +29,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.3
   # Firebase
-  firebase_analytics: ^6.0.0
+  firebase_analytics: ^6.3.0
   firebase_core: ^0.5.0
   firebase_auth: ^0.18.0+1
   cloud_firestore: ^0.14.0+2
@@ -64,6 +64,8 @@ dependencies:
   liquid_swipe: ^1.5.0
   shimmer: ^1.1.2 # Un paquete proporciona una manera fácil de agregar un efecto de brillo en el proyecto Flutter
   share: ^0.6.5+4
+  url_launcher: ^5.4.10
+  diacritic: ^0.1.1
   
   
 

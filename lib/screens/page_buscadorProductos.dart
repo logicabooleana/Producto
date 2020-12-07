@@ -2,6 +2,7 @@ import 'package:producto/services/models.dart';
 import 'package:flutter/material.dart';
 import 'package:producto/screens/page_producto_view.dart';
 import 'package:producto/utils/utils.dart';
+import 'package:diacritic/diacritic.dart';
 
 class DataSearch extends SearchDelegate {
   List listOBJ;
@@ -56,7 +57,7 @@ class DataSearch extends SearchDelegate {
     }
     List<ProductoNegocio> resutlList = new List();
     for (int i = 0; i < this.listOBJ.length; i++) {
-      if (Buscardor.buscar(listOBJ[i].titulo, query)||Buscardor.buscar(listOBJ[i].descripcion, query)) { 
+      if (Buscardor.buscar(removeDiacritics(listOBJ[i].titulo), removeDiacritics(query))||Buscardor.buscar(listOBJ[i].descripcion, query)) { 
         resutlList.add(listOBJ[i]);
       }
     }

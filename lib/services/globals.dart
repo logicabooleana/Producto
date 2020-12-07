@@ -2,6 +2,7 @@ import 'dart:async';
 import 'services.dart';
 
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:loadany/loadany_widget.dart';
 
 import 'package:producto/services/preferencias_usuario.dart';
@@ -13,6 +14,7 @@ import 'package:producto/models/models_profile.dart';
 /// Static global state. Immutable services that do not care about build context. 
 class Global {
   // App Data
+  static User user;
   static PerfilNegocio oPerfilNegocio;
   static List<PerfilNegocio> listAdminPerfilNegocio=new List();
   static List<ProductoNegocio> listProudctosNegocio=new List();

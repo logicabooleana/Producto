@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:io';
+import 'package:animate_do/animate_do.dart';
 import 'package:producto/screens/page_marca_create.dart';
 import 'package:producto/screens/widgets/widgetsCategoriViews.dart';
 import 'package:flutter/services.dart';
@@ -459,7 +461,7 @@ class _ProductNewState extends State<ProductNew> {
                   producto.urlimagen = urlIamgen;
                 }
 
-                // TODO: Por defecto verificado es TRUE // Cambiar esto cuando se lanze a producción
+                // TODO: Para desarrollo verificado es TRUE // Cambiar esto cuando se lanze a producción
                 producto.verificado = true;
                 producto.precio_venta =
                     controllerTextEdit_precio_venta.numberValue;
@@ -484,13 +486,77 @@ class _ProductNewState extends State<ProductNew> {
                           idProducto: producto.id)
                       .upSetProducto(producto.toJson());
                 }
-                
-                Navigator.of(context).pushReplacement(
+                // Da un agradecimiento por contribuir y procede a cerrar la actividad y reedirigir a la vista previa del producto
+                showGeneralDialog(
+                  context: context,
+                  barrierDismissible: true,
+                  barrierLabel: MaterialLocalizations.of(context)
+                      .modalBarrierDismissLabel,
+                  barrierColor: Colors.black45,
+                  transitionDuration: const Duration(milliseconds: 200),
+                  pageBuilder: (BuildContext buildContext, Animation animation,
+                      Animation secondaryAnimation) {
+
+                    Timer(Duration(seconds: 3), () {
+                      Navigator.pop(buildContext);
+                      Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
                     builder: (BuildContext context) => ProductScreen(
                         producto: producto),
                   ),
                 );
+                }); 
+
+                    return Scaffold(
+                      backgroundColor: Theme.of(context).primaryColor,
+                      body: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Column(
+                            
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Image.asset("assets/barcode.png",
+                                        color: Colors.black.withOpacity(0.25),
+                                        width: 50,
+                                        height: 50.0),
+                                  ),
+                                  Text(
+                                    "Producto",
+                                    style: TextStyle(
+                                        fontSize: 30,
+                                        fontWeight: FontWeight.w900,
+                                        color: Colors.black.withOpacity(0.25)),
+                                  )
+                                ],
+                              ),
+                              FadeInLeft(child:Text(
+                                "Gracias por contribuir y hacer esta aplicación aun más util para nuestra comunidad!",
+                                textAlign:TextAlign.center,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 25.0,
+                                  fontWeight: FontWeight.w900,
+                                  
+                                  ),
+                              ) ),
+                              FadeInUp(child:Icon(
+                                Icons.thumb_up,
+                                size: 50.0,color: Colors.white,
+                              )),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  });
               } else {
                 showSnackBar(
                     context: buildContext,
@@ -542,7 +608,8 @@ class _ProductNewState extends State<ProductNew> {
       producto.urlimagen = urlIamgen;
     }
     // Firebase set
-    await Global.getProductosPrecargado(idProducto: producto.id, isoPAis: "ARG").upSetPrecioProducto(producto.convertProductoDefault().toJson());
+    await Global.getProductosPrecargado(idProducto: producto.id, isoPAis: "ARG")
+        .upSetPrecioProducto(producto.convertProductoDefault().toJson());
   }
 
   void _onImageButtonPressed(ImageSource source, {BuildContext context}) async {

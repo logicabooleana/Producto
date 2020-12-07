@@ -76,7 +76,7 @@ class DashedCirclePainter extends CustomPainter {
   }
 }
 
-Widget viewCircleImage({@required String url,@required String texto ,@required double  size= 85.0}) {
+Widget viewCircleImage({@required String url,@required String texto ,double  size= 85.0}) {
   return Container(
     width: size,
     height: size,

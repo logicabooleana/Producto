@@ -189,7 +189,7 @@ class _WidgetSeachProductState extends State<WidgetSeachProduct> {
                                     width: 20.0,
                                     image: AssetImage('assets/barcode.png'),
                                     fit: BoxFit.contain),
-                                label: Text('Escanea el código',
+                                label: Text('Escanear código de barra',
                                     style: TextStyle(
                                       fontSize: 18.0,
                                         color: Theme.of(context)

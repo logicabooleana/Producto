@@ -4,8 +4,8 @@ import 'package:provider/provider.dart';
 
 import 'package:producto/services/preferencias_usuario.dart';
 import '../services/services.dart';
-import '../shared/shared.dart';
 
+// ignore: must_be_immutable
 class ProfileScreen extends StatelessWidget {
   final AuthService auth = AuthService();
 

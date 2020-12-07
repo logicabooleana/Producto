@@ -29,7 +29,6 @@ class _ProfileCuentaState extends State<ProfileCuenta> {
   // Image
   String urlIamgen = "";
   PickedFile _imageFile;
-  dynamic _pickImageError;
   final ImagePicker _picker = ImagePicker();
   User firebaseUser;
   bool createCuenta;
@@ -226,9 +225,6 @@ class _ProfileCuentaState extends State<ProfileCuenta> {
         _imageFile = pickedFile;
       });
     } catch (e) {
-      setState(() {
-        _pickImageError = e;
-      });
     }
   }
 
@@ -427,8 +423,7 @@ class _ProfileCuentaState extends State<ProfileCuenta> {
     perfilNegocio.pais=controllerTextEdit_pais.text;
     if (perfilNegocio.id != "") {
       if (perfilNegocio.nombre_negocio != "") {
-        if (true) {
-          if (perfilNegocio.ciudad != "") {
+        if (perfilNegocio.ciudad != "") {
             if (perfilNegocio.provincia!= "") {
               if (perfilNegocio.pais != "") {
                 perfilNegocio.direccion=controllerTextEdit_direccion.text;
@@ -477,12 +472,14 @@ class _ProfileCuentaState extends State<ProfileCuenta> {
                               id_usuario: firebaseUser.uid, tipocuenta: 0)
                           .toJson());
                   Global.actualizarPerfilNegocio(perfilNegocio: perfilNegocio);
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                      '/page_principal', (Route<dynamic> route) => false);
+                  // guarda los datos de la cuenta
+                  await Global.getNegocio(idNegocio: perfilNegocio.id).upSetPerfilNegocio(perfilNegocio.toJson());
+                  context.read<ProviderPerfilNegocio>().setCuentaNegocio=perfilNegocio;
+                  Navigator.of(context).pushNamedAndRemoveUntil('/page_principal', (Route<dynamic> route) => false);
                 } else {
                   // guarda los datos de la cuenta
-                  await Global.getNegocio(idNegocio: perfilNegocio.id)
-                      .upSetPerfilNegocio(perfilNegocio.toJson());
+                  await Global.getNegocio(idNegocio: perfilNegocio.id).upSetPerfilNegocio(perfilNegocio.toJson());
+                  context.read<ProviderPerfilNegocio>().setCuentaNegocio=perfilNegocio;
                   Navigator.pop(context);
                 }
               } else {
@@ -500,11 +497,6 @@ class _ProfileCuentaState extends State<ProfileCuenta> {
                 context: contextBuilder,
                 message: 'Debe proporcionar una ciudad');
           }
-        } else {
-          showSnackBar(
-              context: contextBuilder,
-              message: 'Debe proporcionar un nombre de usuario');
-        }
       } else {
         showSnackBar(
             context: contextBuilder, message: 'Debe proporcionar un nombre');

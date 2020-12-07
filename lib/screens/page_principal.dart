@@ -32,7 +32,6 @@ import 'package:producto/utils/dynamicTheme_lb.dart';
 /*  Pantalla principal de la aplicación "Producto"  */
 
 class PagePrincipal extends StatelessWidget {
-  
   /* Declarar variables */
   double get randHeight => math.Random().nextInt(100).toDouble();
   User firebaseUser;
@@ -41,104 +40,18 @@ class PagePrincipal extends StatelessWidget {
 
   @override
   Widget build(BuildContext buildContext) {
-
     // Initializate
     prefs = new PreferenciasUsuario();
     firebaseUser = Provider.of<User>(buildContext);
 
     return Global.prefs.getIdNegocio == ""
-        ? scaffoldScan(buildContext:buildContext)
-        : scaffondCatalogo(buildContext:buildContext);
+        ? scaffoldScan(buildContext: buildContext)
+        : scaffondCatalogo(buildContext: buildContext);
   }
-  Scaffold scaffoldScan({@required BuildContext buildContext}){
-    Color color = Theme.of(buildContext).brightness == Brightness.dark? Colors.white54: Colors.black38;
+
+  Scaffold scaffoldScan({@required BuildContext buildContext}) {
+    Color color = Theme.of(buildContext).brightness == Brightness.dark?Colors.white54: Colors.black38;
     return Scaffold(
-            appBar: AppBar(
-              elevation: 0.0,
-              backgroundColor: Theme.of(buildContext).canvasColor,
-              iconTheme: Theme.of(buildContext).iconTheme.copyWith(color: Theme.of(buildContext).textTheme.bodyText1.color),
-              title: InkWell(
-                onTap: () => selectCuenta(buildContext),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 12.0),
-                  child: Row(
-                    children: <Widget>[
-                      Text("Mi catálogo",style: TextStyle(color: Theme.of(buildContext).textTheme.bodyText1.color),overflow: TextOverflow.ellipsis,softWrap: false),
-                      Icon(Icons.keyboard_arrow_down),
-                    ],
-                  ),
-                ),
-              ),
-              actions: <Widget>[
-                DynamicTheme.of(buildContext).getIConButton(buildContext),
-              ],
-            ),
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  InkWell(
-                    borderRadius:  BorderRadius.all(Radius.circular(30.0)),
-                    splashColor: Theme.of(buildContext).primaryColor,
-                    onTap: ()=>scanBarcodeNormal(context: buildContext),
-                    child: Container(
-                      margin: const EdgeInsets.all(0.0),
-                      padding: const EdgeInsets.all(30.0),
-                      decoration: BoxDecoration(
-                          color: Colors.transparent,
-                          border: Border.all(width: 0.2, color: color),
-                          borderRadius:BorderRadius.all(Radius.circular(30.0))),
-                      child: Image(
-                          color: color,
-                          height: 200.0,
-                          width: 200.0,
-                          image: AssetImage('assets/barcode.png'),
-                          fit: BoxFit.contain),
-                    ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.symmetric(horizontal: 40.0),
-                    child: Text("Escanea un producto para conocer su precio",
-                        style: TextStyle(
-                            fontFamily: "POPPINS_FONT",
-                            fontWeight: FontWeight.bold,
-                            color: color,
-                            fontSize: 24.0),
-                        textAlign: TextAlign.center),
-                  ),
-                  RaisedButton(
-                    padding:EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
-                    color: Colors.deepPurple[200],
-                    child: Text("Buscar",style: TextStyle(fontSize: 24.0, color: Colors.deepPurple )),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30.0),
-                        side: BorderSide(color: Colors.transparent)),
-                    onPressed: () {
-                      Navigator.of(buildContext).push(MaterialPageRoute(builder: (BuildContext context) => WidgetSeachProduct(),));
-                    },
-                  ),
-                ],
-              ),
-            ),
-          );
-  }
-  Widget scaffondCatalogo({@required BuildContext buildContext, PerfilNegocio perfilNegocio}) {
-
-    return FutureBuilder(
-            future: Global.getNegocio(idNegocio: Global.prefs.getIdNegocio).getDataPerfilNegocio(),
-            builder: (c, snapshot) {
-
-              if (snapshot.hasData) {
-                Global.oPerfilNegocio = snapshot.data;
-                return SafeArea(
-                  child: Consumer<ProviderPerfilNegocio>(
-                      builder: (consumerContext, cuenta, snapshot) {
-                    if (cuenta.getCuentaNegocio != null) {
-                      Global.oPerfilNegocio = cuenta.getCuentaNegocio;
-                    }
-                    return Scaffold(
-      /* AppBar persistente que nunca se desplaza */
       appBar: AppBar(
         elevation: 0.0,
         backgroundColor: Theme.of(buildContext).canvasColor,
@@ -151,113 +64,219 @@ class PagePrincipal extends StatelessWidget {
             padding: EdgeInsets.symmetric(vertical: 12.0),
             child: Row(
               children: <Widget>[
-                Text(
-                    perfilNegocio == null? "Seleccionar cuenta": perfilNegocio.nombre_negocio != ""
-                            ? perfilNegocio.nombre_negocio
-                            : "Mi perfil",
+                Text("Mi catálogo",
                     style: TextStyle(
                         color:
                             Theme.of(buildContext).textTheme.bodyText1.color),
-                    overflow: TextOverflow.fade,
+                    overflow: TextOverflow.ellipsis,
                     softWrap: false),
-                Icon(Icons.keyboard_arrow_down)
+                Icon(Icons.keyboard_arrow_down),
               ],
             ),
           ),
         ),
         actions: <Widget>[
-          Container(
-            padding: EdgeInsets.all(12.0),
-            child: InkWell(
-              customBorder: new CircleBorder(),
-              splashColor: Colors.red,
-              onTap: () {
-                showModalBottomSheetConfig(buildContext: buildContext);
+          DynamicTheme.of(buildContext).getIConButton(buildContext),
+        ],
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            InkWell(
+              borderRadius: BorderRadius.all(Radius.circular(30.0)),
+              splashColor: Theme.of(buildContext).primaryColor,
+              onTap: () => scanBarcodeNormal(context: buildContext),
+              child: Container(
+                margin: const EdgeInsets.all(0.0),
+                padding: const EdgeInsets.all(30.0),
+                decoration: BoxDecoration(
+                    color: Colors.transparent,
+                    border: Border.all(width: 0.2, color: color),
+                    borderRadius: BorderRadius.all(Radius.circular(30.0))),
+                child: Image(
+                    color: color,
+                    height: 200.0,
+                    width: 200.0,
+                    image: AssetImage('assets/barcode.png'),
+                    fit: BoxFit.contain),
+              ),
+            ),
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 40.0),
+              child: Text("Escanea un producto para conocer su precio",
+                  style: TextStyle(
+                      fontFamily: "POPPINS_FONT",
+                      fontWeight: FontWeight.bold,
+                      color: color,
+                      fontSize: 24.0),
+                  textAlign: TextAlign.center),
+            ),
+            RaisedButton(
+              padding: EdgeInsets.symmetric(horizontal: 40.0, vertical: 20.0),
+              color: Colors.deepPurple,
+              child: Text("Buscar",style: TextStyle(fontSize: 24.0, color: Colors.white)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30.0),
+                  side: BorderSide(color: Colors.transparent)),
+              onPressed: () {
+                Navigator.of(buildContext).push(MaterialPageRoute(
+                  builder: (BuildContext context) => WidgetSeachProduct(),
+                ));
               },
-              child: Hero(
-                tag: "fotoperfiltoolbar",
-                child: CircleAvatar(
-                  radius: 17,
-                  child: CircleAvatar(
-                    radius: 15,
-                    backgroundColor: Colors.white,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10000.0),
-                      child: CachedNetworkImage(
-                        width: 35.0,
-                        height: 35.0,
-                        fadeInDuration: Duration(milliseconds: 200),
-                        fit: BoxFit.cover,
-                        imageUrl: Global.oPerfilNegocio.imagen_perfil,
-                        placeholder: (context, url) => FadeInImage(
-                            image: AssetImage("assets/loading.gif"),
-                            placeholder: AssetImage("assets/loading.gif")),
-                        errorWidget: (context, url, error) => Container(
-                          color: Colors.grey,
-                          width: MediaQuery.of(context).size.width,
-                          height: MediaQuery.of(context).size.width,
-                          child: Center(
-                            child: Text(
-                              firebaseUser.displayName.substring(0, 1),
-                              style: TextStyle(fontSize: 16.0),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget scaffondCatalogo({@required BuildContext buildContext}) {
+    return FutureBuilder(
+      future: Global.getNegocio(idNegocio: Global.prefs.getIdNegocio).getDataPerfilNegocio(),
+      builder: (c, snapshot) {
+        if (snapshot.hasData) {
+          Global.oPerfilNegocio = snapshot.data;
+          return SafeArea(
+            child: Consumer<ProviderPerfilNegocio>(
+                builder: (consumerContext, cuenta, snapshot) {
+              if (cuenta.getCuentaNegocio != null) {
+                Global.oPerfilNegocio = cuenta.getCuentaNegocio;
+              }
+              return Scaffold(
+                /* AppBar persistente que nunca se desplaza */
+                appBar: AppBar(
+                  elevation: 0.0,
+                  backgroundColor: Theme.of(buildContext).canvasColor,
+                  iconTheme: Theme.of(buildContext).iconTheme.copyWith(
+                      color: Theme.of(buildContext).textTheme.bodyText1.color),
+                  title: InkWell(
+                    onTap: () => selectCuenta(buildContext),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 12.0),
+                      child: Row(
+                        children: <Widget>[
+                          Text(
+                              Global.oPerfilNegocio == null
+                                  ? "Seleccionar cuenta"
+                                  : Global.oPerfilNegocio.nombre_negocio != ""
+                                      ? Global.oPerfilNegocio.nombre_negocio
+                                      : "Mi catalogo",
+                              style: TextStyle(
+                                  color: Theme.of(buildContext)
+                                      .textTheme
+                                      .bodyText1
+                                      .color),
+                              overflow: TextOverflow.fade,
+                              softWrap: false),
+                          Icon(Icons.keyboard_arrow_down)
+                        ],
+                      ),
+                    ),
+                  ),
+                  actions: <Widget>[
+                    Container(
+                      padding: EdgeInsets.all(12.0),
+                      child: InkWell(
+                        customBorder: new CircleBorder(),
+                        splashColor: Colors.red,
+                        onTap: () {
+                          showModalBottomSheetConfig(
+                              buildContext: buildContext);
+                        },
+                        child: Hero(
+                          tag: "fotoperfiltoolbar",
+                          child: CircleAvatar(
+                            radius: 17,
+                            child: CircleAvatar(
+                              radius: 15,
+                              backgroundColor: Colors.white,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(10000.0),
+                                child: CachedNetworkImage(
+                                  width: 35.0,
+                                  height: 35.0,
+                                  fadeInDuration: Duration(milliseconds: 200),
+                                  fit: BoxFit.cover,
+                                  imageUrl: Global.oPerfilNegocio.imagen_perfil,
+                                  placeholder: (context, url) => FadeInImage(
+                                      image: AssetImage("assets/loading.gif"),
+                                      placeholder:
+                                          AssetImage("assets/loading.gif")),
+                                  errorWidget: (context, url, error) =>
+                                      Container(
+                                    color: Colors.grey,
+                                    width: MediaQuery.of(context).size.width,
+                                    height: MediaQuery.of(context).size.width,
+                                    child: Center(
+                                      child: Text(
+                                        firebaseUser.displayName
+                                            .substring(0, 1),
+                                        style: TextStyle(fontSize: 16.0),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
-              ),
-            ),
-          ),
-        ],
-      ),
-      body: new StreamBuilder(
-        stream: Global.getCatalogoNegocio(idNegocio: perfilNegocio.id ?? "").streamDataProductoAll(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            Global.listProudctosNegocio = snapshot.data;
-            buildContext.read<ProviderCatalogo>().setCatalogo = snapshot.data;
-            return body(buildContext: buildContext);
-          } else {
-            return WidgetLoadingInit(appbar: false);
-          }
-        },
-      ),
-      floatingActionButton: AnimatedFloatingActionButton(
-          //Fab list
-          fabButtons: <Widget>[
-            FloatingActionButton(
-                heroTag: "Escanear codigo",
-                child: Image(
-                    color: Colors.white,
-                    height: 30.0,
-                    width: 30.0,
-                    image: AssetImage('assets/barcode.png'),
-                    fit: BoxFit.contain),
-                tooltip: 'Escanea el codigo del producto',
-                onPressed: () {
-                  scanBarcodeNormal(context: buildContext);
-                }),
-            FloatingActionButton(
-                heroTag: "Escribir codigo",
-                child: Icon(Icons.edit),
-                tooltip: 'Escribe el codigo del producto',
-                onPressed: () {
-                  Navigator.of(buildContext).push(MaterialPageRoute(builder: (BuildContext context) => WidgetSeachProduct(),));
-                })
-          ],
-          colorEndAnimation: Colors.grey,
-          animatedIconData: AnimatedIcons.menu_close //To principal button
-          ),
-    );
-                  }),
-                );
-              } else {
-                return WidgetLoadingInit();
-              }
-            },
+                body: new StreamBuilder(
+                  stream: Global.getCatalogoNegocio(idNegocio: Global.oPerfilNegocio.id ?? "").streamDataProductoAll(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      Global.listProudctosNegocio = snapshot.data;
+                      buildContext.read<ProviderCatalogo>().setCatalogo =
+                          snapshot.data;
+                      return body(buildContext: buildContext);
+                    } else {
+                      return WidgetLoadingInit(appbar: false);
+                    }
+                  },
+                ),
+                floatingActionButton: AnimatedFloatingActionButton(
+                    //Fab list
+                    fabButtons: <Widget>[
+                      FloatingActionButton(
+                          heroTag: "Escanear codigo",
+                          child: Image(
+                              color: Colors.white,
+                              height: 30.0,
+                              width: 30.0,
+                              image: AssetImage('assets/barcode.png'),
+                              fit: BoxFit.contain),
+                          tooltip: 'Escanea el codigo del producto',
+                          onPressed: () {
+                            scanBarcodeNormal(context: buildContext);
+                          }),
+                      FloatingActionButton(
+                          heroTag: "Escribir codigo",
+                          child: Icon(Icons.edit),
+                          tooltip: 'Escribe el codigo del producto',
+                          onPressed: () {
+                            Navigator.of(buildContext).push(MaterialPageRoute(
+                              builder: (BuildContext context) =>
+                                  WidgetSeachProduct(),
+                            ));
+                          })
+                    ],
+                    colorEndAnimation: Colors.grey,
+                    animatedIconData:
+                        AnimatedIcons.menu_close //To principal button
+                    ),
+              );
+            }),
           );
+        } else {
+          return WidgetLoadingInit(appbar: true);
+        }
+      },
+    );
   }
 
   // Widgets
@@ -299,7 +318,8 @@ class PagePrincipal extends StatelessWidget {
                   : Colors.black,
               onTap: (value) {
                 showModalBottomSheet(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20.0)),
                     backgroundColor: Theme.of(buildContext).canvasColor,
                     context: buildContext,
                     builder: (ctx) {
@@ -311,10 +331,14 @@ class PagePrincipal extends StatelessWidget {
                     });
               },
               tabs: [
-                Consumer<ProviderCatalogo>( 
-                  child: Tab(text: "Todos (${Global.listProudctosNegocio.length.toString()})"),
+                Consumer<ProviderCatalogo>(
+                  child: Tab(
+                      text:
+                          "Todos (${Global.listProudctosNegocio.length.toString()})"),
                   builder: (context, catalogo, child) {
-                    return Tab(text: catalogo.sNombreFiltro +" (${ catalogo.categoria!=null?catalogo.cataloLoadMore.length.toString():Global.listProudctosNegocio.length.toString()})");
+                    return Tab(
+                        text: catalogo.sNombreFiltro +
+                            " (${catalogo.categoria != null ? catalogo.cataloLoadMore.length.toString() : Global.listProudctosNegocio.length.toString()})");
                   },
                 ),
               ],
@@ -332,11 +356,14 @@ class PagePrincipal extends StatelessWidget {
       ),
     );
   }
+
   Widget widgetBuscadorView({@required BuildContext buildContext}) {
     return Padding(
       padding: EdgeInsets.all(12.0),
       child: Card(
-        color: Theme.of(buildContext).brightness==Brightness.dark?Colors.black12:Colors.white,
+        color: Theme.of(buildContext).brightness == Brightness.dark
+            ? Colors.black12
+            : Colors.white,
         semanticContainer: true,
         clipBehavior: Clip.antiAliasWithSaveLayer,
         child: InkWell(
@@ -344,14 +371,20 @@ class PagePrincipal extends StatelessWidget {
             padding: EdgeInsets.all(16.0),
             child: Row(
               children: <Widget>[
-                Icon(Icons.search,color: Theme.of(buildContext).brightness==Brightness.dark?Colors.white38:Colors.black54),
+                Icon(Icons.search,
+                    color: Theme.of(buildContext).brightness == Brightness.dark
+                        ? Colors.white38
+                        : Colors.black54),
                 SizedBox(
                   width: 12.0,
                 ),
                 Text(
                   'Buscar',
                   style: TextStyle(
-                      color:Theme.of(buildContext).brightness==Brightness.dark?Colors.white38:Colors.black54),
+                      color:
+                          Theme.of(buildContext).brightness == Brightness.dark
+                              ? Colors.white38
+                              : Colors.black54),
                 ),
               ],
             ),
@@ -370,6 +403,7 @@ class PagePrincipal extends StatelessWidget {
       ),
     );
   }
+
   Widget getAdminUserData({@required String idNegocio}) {
     return FutureBuilder(
       future: Global.getDataAdminUserNegocio(
@@ -388,10 +422,13 @@ class PagePrincipal extends StatelessWidget {
             default:
               return Text("Se produj un error al obtener los datos!");
           }
-        } else {return Text("Cargando datos...");}
+        } else {
+          return Text("Cargando datos...");
+        }
       },
     );
   }
+
   Widget widgetsListaHorizontalMarcas({@required BuildContext buildContext}) {
     /* Declarar variables */
     List<Color> colorGradientInstagram = [
@@ -497,16 +534,14 @@ class PagePrincipal extends StatelessWidget {
     bool createCuentaEmpresa = true;
     // muestre la hoja inferior modal
     showModalBottomSheet(
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+        shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
         backgroundColor: Theme.of(buildContext).canvasColor,
         context: buildContext,
         builder: (ctx) {
           return ClipRRect(
             child: Container(
               child: FutureBuilder(
-                future: Global.getListNegocioAdmin(idNegocio: firebaseUser.uid)
-                    .getDataAdminPerfilNegocioAll(),
+                future: Global.getListNegocioAdmin(idNegocio: firebaseUser.uid).getDataAdminPerfilNegocioAll(),
                 builder: (c, snapshot) {
                   if (snapshot.hasData) {
                     // Verificamos si ahi una cuenta creada
@@ -536,16 +571,20 @@ class PagePrincipal extends StatelessWidget {
                         shrinkWrap: true,
                         itemCount: Global.listAdminPerfilNegocio.length,
                         itemBuilder: (BuildContext context, int index) {
-                          if (index == 0) {
+                          if (Global.listAdminPerfilNegocio.length == 0) {
                             return Column(
                               children: <Widget>[
                                 createCuentaEmpresa
-                                    ? WidgetButtonListTile(buildContext: buildContext).buttonListTileCrearCuenta(context: buildContext)
+                                    ? WidgetButtonListTile(
+                                            buildContext: buildContext)
+                                        .buttonListTileCrearCuenta(
+                                            context: buildContext)
                                     : Container(),
                                 WidgetButtonListTile(buildContext: buildContext)
                                     .buttonListTileItemCuenta(
                                         buildContext: buildContext,
-                                        perfilNegocio: Global.listAdminPerfilNegocio[index],
+                                        perfilNegocio: Global
+                                            .listAdminPerfilNegocio[index],
                                         adminPropietario: Global
                                                 .listAdminPerfilNegocio[index]
                                                 .id ==
@@ -553,8 +592,7 @@ class PagePrincipal extends StatelessWidget {
                               ],
                             );
                           }
-                          if (index ==
-                              Global.listAdminPerfilNegocio.length - 1) {
+                          if (index ==Global.listAdminPerfilNegocio.length - 1) {
                             return Column(
                               children: <Widget>[
                                 WidgetButtonListTile(buildContext: buildContext)
@@ -585,6 +623,7 @@ class PagePrincipal extends StatelessWidget {
                                               .listAdminPerfilNegocio[index]
                                               .id ==
                                           firebaseUser.uid),
+                              
                             ],
                           );
                         },
@@ -599,6 +638,7 @@ class PagePrincipal extends StatelessWidget {
           );
         });
   }
+
   showAlertDialog(BuildContext context) {
     AlertDialog alert = AlertDialog(
       content: new Row(
@@ -624,7 +664,8 @@ class PagePrincipal extends StatelessWidget {
     String barcodeScanRes = "";
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
-      barcodeScanRes = await FlutterBarcodeScanner.scanBarcode("#ff6666", "Cancel", true, ScanMode.BARCODE);
+      barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
+          "#ff6666", "Cancel", true, ScanMode.BARCODE);
     } on PlatformException {
       barcodeScanRes = 'Failed to get platform version.';
     }

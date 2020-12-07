@@ -6,7 +6,6 @@ import 'package:animated_floatactionbuttons/animated_floatactionbuttons.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 
 /* Dependencias */
@@ -35,9 +34,7 @@ class _PageProfileState extends State<PageProfile> {
   String sCategoria = "Todas";
   String sIdCategoria = "todos";
   String sIdMarca = "";
-  FirebaseUser firebaseUser;
   PreferenciasUsuario prefs;
-  final AuthService auth = AuthService();
   BuildContext buildContext;
 
   @override
@@ -54,7 +51,6 @@ class _PageProfileState extends State<PageProfile> {
   Widget build(BuildContext context) {
     buildContext = context;
     prefs = new PreferenciasUsuario();
-    firebaseUser = Provider.of<FirebaseUser>(context);
 
     return Global.prefs.getIdNegocio == ""
         ? Scaffold(
@@ -201,7 +197,7 @@ class _PageProfileState extends State<PageProfile> {
           return ClipRRect(
             child: Container(
               child: FutureBuilder(
-                future: Global.getListNegocioAdmin(idNegocio: firebaseUser.uid)
+                future: Global.getListNegocioAdmin(idNegocio: Global.user.uid)
                     .getDataAdminPerfilNegocioAll(),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
@@ -485,10 +481,10 @@ class _PageProfileState extends State<PageProfile> {
                                         style: TextStyle(fontSize: 16.0)),
                                     onTap: () {},
                                   ),
-                                  Global.listCategoriasCatalogo != 0
+                                  Global.listCategoriasCatalogo.length != 0
                                       ? Divider(endIndent: 12.0, indent: 12.0)
                                       : Container(),
-                                  Global.listCategoriasCatalogo != 0
+                                  Global.listCategoriasCatalogo.length != 0
                                       ? ListTile(
                                           leading: CircleAvatar(
                                             radius: 24.0,
@@ -593,7 +589,7 @@ class _PageProfileState extends State<PageProfile> {
   Widget _getAdminUserData({@required String idNegocio}) {
     return FutureBuilder(
       future: Global.getDataAdminUserNegocio(
-              idNegocio: idNegocio, idUserAdmin: firebaseUser.uid)
+              idNegocio: idNegocio, idUserAdmin:Global.user.uid)
           .getDataAdminUsuarioCuenta(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
