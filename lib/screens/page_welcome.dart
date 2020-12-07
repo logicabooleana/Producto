@@ -1,8 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:producto/shared/loader.dart';
-import 'package:shimmer/shimmer.dart';
+import 'package:producto/shared/progress_bar.dart';
 
 class SplashScreen extends StatefulWidget {
   createState() => SplashScreenState();
@@ -37,7 +36,7 @@ class SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: LoadingInit(),
+        child: WidgetLoadingInit(),
       ),
     );
   }

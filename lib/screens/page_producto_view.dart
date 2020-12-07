@@ -8,7 +8,7 @@ import 'package:producto/models/models_catalogo.dart';
 import 'package:producto/models/models_profile.dart';
 import 'package:producto/screens/page_producto_edit.dart';
 import 'package:producto/services/models.dart';
-import 'package:producto/shared/widgets_load.dart';
+import 'package:producto/shared/progress_bar.dart';
 import 'package:producto/utils/utils.dart';
 import 'package:producto/services/globals.dart';
 import 'package:geolocator/geolocator.dart';
@@ -133,10 +133,13 @@ class _ProductScreenState extends State<ProductScreen> {
                       child: new Image.asset('assets/icon_verificado.png',
                           width: 20.0, height: 20.0))
                   : new Container(),
-              Text(this.widget.producto.id,
-                  style: TextStyle(
-                      fontSize: 18.0,
-                      color: Theme.of(context).textTheme.bodyText1.color)),
+              Expanded(
+                              child: Text(this.widget.producto.id,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                        fontSize: 18.0,
+                        color: Theme.of(context).textTheme.bodyText1.color)),
+              ),
             ],
           ),
         ),
@@ -167,7 +170,7 @@ class _ProductScreenState extends State<ProductScreen> {
                     // Get available height and width of the build area of this widget. Make a choice depending on the size.
                     var height = MediaQuery.of(buildContext).size.height;
                     var width = MediaQuery.of(buildContext).size.width;
-
+                    
                     return Screenshot(
                       controller: screenshotController,
                       child: viewProducto(height: height, width: width),
@@ -246,146 +249,130 @@ class _ProductScreenState extends State<ProductScreen> {
   }
 
   Widget viewProducto({@required double height, @required double width}) {
+    Color colorText=Theme.of(context).brightness==Brightness.dark?Colors.white.withOpacity(0.90):Colors.black.withOpacity(0.90);
+    Color colorCard = Theme.of(context).brightness==Brightness.dark?Theme.of(context).primaryColorDark:Colors.white;
     return Scaffold(
         body: Container(
-      color: Colors.white,
-      child: Container(
-        decoration: BoxDecoration(
-            gradient: LinearGradient(
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-                colors: [
-              Theme.of(context).canvasColor.withOpacity(0.90),
-              Theme.of(context).canvasColor.withOpacity(0.50),
-            ])),
-        child: Column(
-          children: [
-            Expanded(
-                child: Center(
-                    child: Text(Global.oPerfilNegocio.nombre_negocio,
-                        style: TextStyle(
-                          fontFamily: "Poppins",
-                            fontSize: 30,
-                            fontWeight: FontWeight.w900,
-                            color: Theme.of(context).brightness==Brightness.dark?Colors.white.withOpacity(0.90):Colors.black.withOpacity(0.90))))),
-            Card(
-              color: Theme.of(context).canvasColor,
-              clipBehavior: Clip.antiAlias,
-              margin: EdgeInsets.only(
-                  left: width * 0.20,
-                  right: width * 0.20,
-                  bottom: height * 0.05,
-                  top: height * 0.05),
-              elevation: 20,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(32)), //<--custom shape
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                      height: width * 0.60,
-                      width: width * 0.60,
-                      child: WidgetImagen(
-                          producto: widget.producto,
-                          marca: marca,
-                          borderRadius: 30.0)),
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        widget.producto.descripcion != ""
-                            ? Text(
-                                widget.producto.descripcion,
-                                style: TextStyle(
-                                  fontFamily: "Poppins",
-                                  fontWeight: FontWeight.bold,
-                                    color: Theme.of(context)
-                                        .textTheme
-                                        .bodyText1
-                                        .color
-                                        .withOpacity(0.50),
-                                    height: 1,
-                                    fontSize: 16,
-                                ),
-                                textAlign: TextAlign.center,
-                              )
-                            : Container(),
-                        Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: Wrap(
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            children: [
-                              widget.producto.precio_venta != null &&
-                                      widget.producto.precio_venta != 0.0
-                                  ? Text(
-                                      Publicaciones.getFormatoPrecio(
-                                          monto: widget.producto.precio_venta),
-                                      style: TextStyle(
-                                          color: Theme.of(context)
-                                              .primaryColor
-                                              .withOpacity(0.40),
-                                          fontSize: 40,
-                                          fontWeight: FontWeight.w900),
-                                      textAlign: TextAlign.end)
-                                  : Container(),
-                              widget.producto.precio_comparacion != null &&
-                                      widget.producto.precio_comparacion != 0.0
-                                  ? Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
+          color: Theme.of(context).primaryColorLight,
+          child: Column(
+            children: [
+              Expanded(
+                  child: Center(
+                      child: Text(Global.oPerfilNegocio!=null?Global.oPerfilNegocio.nombre_negocio:"",
+                          style: TextStyle(
+                            fontFamily: "Poppins",
+                              fontSize: 30,
+                              fontWeight: FontWeight.w900,
+                              color: Theme.of(context).brightness==Brightness.dark?Colors.white.withOpacity(0.90):Colors.black.withOpacity(0.90))))),
+              Card(
+                color: colorCard,
+                clipBehavior: Clip.antiAlias,
+                margin: EdgeInsets.only(
+                    left: width * 0.20,
+                    right: width * 0.20,
+                    bottom: height * 0.05,
+                    top: height * 0.05),
+                elevation: 20,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(32)), //<--custom shape
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                        height: width * 0.60,
+                        width: width * 0.60,
+                        child: WidgetImagen(
+                            producto: widget.producto,
+                            marca: marca,
+                            borderRadius: 30.0)),
+                    Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          widget.producto.descripcion != ""
+                              ? Text(
+                                  widget.producto.descripcion,
+                                  style: TextStyle(
+                                    fontFamily: "Poppins",
+                                    fontWeight: FontWeight.bold,
+                                      color:colorText,
+                                      height: 1,
+                                      fontSize: 16,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                )
+                              : Container(),
+                          Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                widget.producto.precio_venta != null &&
+                                        widget.producto.precio_venta != 0.0
+                                    ? Text(
                                         Publicaciones.getFormatoPrecio(
-                                            monto: widget
-                                                .producto.precio_comparacion),
+                                            monto: widget.producto.precio_venta),
                                         style: TextStyle(
-                                            color: Theme.of(context)
-                                                .primaryColor
-                                                .withOpacity(0.30),
-                                            decoration:
-                                                TextDecoration.lineThrough,
-                                            fontSize: 15,
+                                            color: Theme.of(context).primaryColor.withOpacity(0.50),
+                                            fontSize: 40,
                                             fontWeight: FontWeight.w900),
-                                        textAlign: TextAlign.end,
-                                      ),
-                                    )
-                                  : Container(),
-                            ],
+                                        textAlign: TextAlign.end)
+                                    : Container(),
+                                widget.producto.precio_comparacion != null &&
+                                        widget.producto.precio_comparacion != 0.0
+                                    ? Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          Publicaciones.getFormatoPrecio(
+                                              monto: widget
+                                                  .producto.precio_comparacion),
+                                          style: TextStyle(
+                                              color: colorText,
+                                              decoration:
+                                                  TextDecoration.lineThrough,
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w900),
+                                          textAlign: TextAlign.end,
+                                        ),
+                                      )
+                                    : Container(),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-                child: Center(
-                    child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Image.asset("assets/barcode.png",
-                      color: Colors.black.withOpacity(0.50),
-                      width: 50,
-                      height: 50.0),
+                  ],
                 ),
-                Text(
-                  "Producto",
-                  style: TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.black.withOpacity(0.50)),
-                )
-              ],
-            ))),
-          ],
-        ),
-      ),
-    ));
+              ),
+              Expanded(
+                  child: Center(
+                      child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Image.asset("assets/barcode.png",
+                        color: Colors.black.withOpacity(0.50),
+                        width: 50,
+                        height: 50.0),
+                  ),
+                  Text(
+                    "Producto",
+                    style: TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.black.withOpacity(0.50)),
+                  )
+                ],
+              ))),
+            ],
+          ),
+        ));
   }
 
   Widget background() {
@@ -647,7 +634,7 @@ class _ProductScreenState extends State<ProductScreen> {
     );
   }
 
-  Widget _buildIcon(int index) {
+  Widget buildIcon(int index) {
     return GestureDetector(
       onTap: () {},
       child: Container(

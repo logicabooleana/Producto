@@ -1,6 +1,6 @@
 import 'package:producto/screens/app_preferences/page_theme_preference.dart';
 import 'package:flutter/material.dart';
-import 'package:producto/shared/loader.dart';
+import 'package:producto/shared/progress_bar.dart';
 
 import 'package:provider/provider.dart';
 import 'services/services.dart';
@@ -55,7 +55,7 @@ class MyApp extends StatelessWidget {
           return WidgetMaterialApp();
         }
         // Otherwise, show something whilst waiting for initialization to complete
-        return MaterialApp(debugShowCheckedModeBanner:false,home:LoadingInit(appbar: false) ,);//LoadingInit(appbar: false);
+        return MaterialApp(debugShowCheckedModeBanner:false,home:WidgetLoadingInit(appbar: false) ,);//LoadingInit(appbar: false);
       },
     );
   }
