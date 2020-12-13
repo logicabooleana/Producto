@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:producto/services/services.dart';
-import 'package:producto/services/globals.dart';
-import 'package:producto/models/models_profile.dart';
-import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:producto/screens/profileCuenta.dart';
+import 'package:provider/provider.dart';
+import 'package:Producto/services/services.dart';
+import 'package:Producto/services/globals.dart';
+import 'package:Producto/models/models_profile.dart';
+import 'package:Producto/screens/profileCuenta.dart';
 
 /* Declarar variables */
 List<Color> colorGradientInstagram = [

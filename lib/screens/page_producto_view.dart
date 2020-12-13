@@ -4,24 +4,29 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:producto/models/models_catalogo.dart';
-import 'package:producto/models/models_profile.dart';
-import 'package:producto/screens/page_producto_edit.dart';
-import 'package:producto/services/models.dart';
-import 'package:producto/shared/progress_bar.dart';
-import 'package:producto/utils/utils.dart';
-import 'package:producto/services/globals.dart';
+import 'package:Producto/models/models_catalogo.dart';
+import 'package:Producto/models/models_profile.dart';
+import 'package:Producto/screens/page_producto_edit.dart';
+import 'package:Producto/services/models.dart';
+import 'package:Producto/shared/progress_bar.dart';
+import 'package:Producto/utils/utils.dart';
+import 'package:Producto/services/globals.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/services.dart';
-import 'package:producto/shared/widgets_image_circle.dart' as image;
+import 'package:Producto/shared/widgets_image_circle.dart' as image;
 import 'package:expandable_bottom_sheet/expandable_bottom_sheet.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share/share.dart';
+import 'package:firebase_admob/firebase_admob.dart';
 
 Color colorText = Colors.white;
 Marca marca;
 File saF;
 Color colorExpandableBottomSheet;
+
+// You can also test with your own ad unit IDs by registering your device as a
+// test device. Check the logs for your device's ID value.
+const String testDevice = '1ED2CFCE56BA5110EAD33DD25E7C8E78';
 
 //Create an instance of ScreenshotController
 ScreenshotController screenshotController = ScreenshotController();
@@ -37,7 +42,26 @@ class ProductScreen extends StatefulWidget {
   _ProductScreenState createState() => _ProductScreenState();
 }
 
+
 class _ProductScreenState extends State<ProductScreen> {
+
+
+  static const MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
+    testDevices: testDevice != null ? <String>[testDevice] : null,
+    keywords: <String>['soda', 'distributors',"wholesaler","Supermarket","snack","candies","gaseosas","supermercados","golosinas"],
+    childDirected: true,
+    nonPersonalizedAds: true,
+  );
+  BannerAd _bannerAd;
+  BannerAd createBannerAd() {
+    return BannerAd(
+      //TODO : AdMob ( Cambiar id para produccion )
+      adUnitId: BannerAd.testAdUnitId,
+      size: AdSize.banner,
+      targetingInfo: targetingInfo,
+    );
+  }
+
   Categoria categoria;
   Categoria subcategoria;
 
@@ -46,9 +70,19 @@ class _ProductScreenState extends State<ProductScreen> {
 
   @override
   void initState() {
+    FirebaseAdMob.instance.initialize(appId: FirebaseAdMob.testAppId);
+    _bannerAd = createBannerAd()..load().then((value) {
+      _bannerAd ??= createBannerAd();
+      _bannerAd..load()..show();
+    });
     getMarca();
     getCategoriaProducto();
     super.initState();
+  }
+  @override
+  void dispose() {
+    _bannerAd?.dispose();
+    super.dispose();
   }
 
   void getMarca() async {
@@ -106,7 +140,6 @@ class _ProductScreenState extends State<ProductScreen> {
         }
       }
     }
-
     return Scaffold(
       appBar: AppBar(
         elevation: 0.0,
@@ -115,7 +148,7 @@ class _ProductScreenState extends State<ProductScreen> {
             .iconTheme
             .copyWith(color: Theme.of(context).textTheme.bodyText1.color),
         title: InkWell(
-          onTap: () {
+          onTap: (){
             if (contextScaffold != null) {
               Clipboard.setData(new ClipboardData(text: widget.producto.codigo))
                   .then((_) {
@@ -414,7 +447,7 @@ class _ProductScreenState extends State<ProductScreen> {
           topLeft: Radius.circular(20), topRight: Radius.circular(20)),
       child: Container(
         color: colorExpandableBottomSheet,
-        padding: EdgeInsets.all(12.0),
+        padding: EdgeInsets.only(bottom: 50.0,left: 12.0,right: 12.0,top: 12.0),
         child: Center(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -523,7 +556,8 @@ class _ProductScreenState extends State<ProductScreen> {
                     )
                   : Container(),
               Text(
-                'Ultimos precios registrados',
+                'Deslice hacia arriba para ver los últimos precios publicados',
+                textAlign:TextAlign.center ,
                 style: TextStyle(color: colorText),
               ),
               Icon(Icons.keyboard_arrow_down, color: colorText),
@@ -558,7 +592,7 @@ class _ProductScreenState extends State<ProductScreen> {
             bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)),
         child: Container(
           color: colorExpandableBottomSheet,
-          padding: EdgeInsets.all(12.0),
+          padding: EdgeInsets.only(bottom: 50.0,left: 12.0,right: 12.0,top: 12.0),
           child: WidgetUltimosPrecios(producto: widget.producto),
         ));
   }

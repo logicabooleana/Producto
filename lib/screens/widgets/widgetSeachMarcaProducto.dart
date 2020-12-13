@@ -1,8 +1,8 @@
 
 import 'package:flutter/material.dart';
-import 'package:producto/utils/utils.dart';
-import 'package:producto/models/models_catalogo.dart';
-import 'package:producto/shared/widgets_image_circle.dart';
+import 'package:Producto/utils/utils.dart';
+import 'package:Producto/models/models_catalogo.dart';
+import 'package:Producto/shared/widgets_image_circle.dart';
 import 'package:diacritic/diacritic.dart';
 
 

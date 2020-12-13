@@ -1,7 +1,7 @@
-import 'package:producto/services/models.dart';
+import 'package:Producto/services/models.dart';
 import 'package:flutter/material.dart';
-import 'package:producto/screens/page_producto_view.dart';
-import 'package:producto/utils/utils.dart';
+import 'package:Producto/screens/page_producto_view.dart';
+import 'package:Producto/utils/utils.dart';
 import 'package:diacritic/diacritic.dart';
 
 class DataSearch extends SearchDelegate {

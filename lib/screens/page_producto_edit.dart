@@ -1,20 +1,21 @@
 import 'dart:io';
-import 'package:producto/screens/page_marca_create.dart';
+import 'package:Producto/screens/page_marca_create.dart';
 import 'package:flutter/services.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:producto/services/models.dart';
+import 'package:Producto/services/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:producto/services/globals.dart';
-import 'package:producto/models/models_catalogo.dart';
+import 'package:Producto/services/globals.dart';
+import 'package:Producto/models/models_catalogo.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:producto/screens/widgets/widgetSeachMarcaProducto.dart';
+import 'package:Producto/screens/widgets/widgetSeachMarcaProducto.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
-import 'package:producto/screens/widgets/widgets_notify.dart';
-import 'package:producto/shared/progress_bar.dart';
-import 'package:producto/shared/widgets_image_circle.dart';
-import 'package:producto/screens/page_producto_view.dart';
+import 'package:Producto/screens/widgets/widgets_notify.dart';
+import 'package:Producto/shared/progress_bar.dart';
+import 'package:Producto/shared/widgets_image_circle.dart';
+import 'package:Producto/screens/page_producto_view.dart';
+import 'package:provider/provider.dart';
 
 class ProductEdit extends StatefulWidget {
   final ProductoNegocio producto;
@@ -32,11 +33,10 @@ class _ProductEditState extends State<ProductEdit> {
   MoneyMaskedTextController controllerTextEdit_comparacion;
 
   // Variables
+  List<Marca> listMarcasAll=new List<Marca>();
   TextStyle textStyle = new TextStyle(fontSize: 24.0);
-  TextStyle textStyle_disabled =
-      new TextStyle(fontSize: 24.0, color: Colors.grey);
-  bool enCatalogo =
-      false; // verifica si el producto se encuentra en el catalogo o no
+  TextStyle textStyle_disabled =new TextStyle(fontSize: 24.0, color: Colors.grey);
+  bool enCatalogo =false; // verifica si el producto se encuentra en el catalogo o no
   bool editable = false; // TODO : Eliminar para produccion
   Marca marca;
   Categoria categoria;
@@ -87,13 +87,9 @@ class _ProductEditState extends State<ProductEdit> {
     this.marca = null;
     if (producto != null) {
       if (producto.id_marca != "") {
-        Global.getMarca(idMarca: producto.id_marca)
-            .getDataMarca()
-            .then((value) {
+        Global.getMarca(idMarca: producto.id_marca).getDataMarca().then((value) {
           if (value != null) {
-            setState(() {
-              this.marca = value;
-            });
+            setState((){this.marca = value;});
           }
         });
       }
@@ -102,16 +98,11 @@ class _ProductEditState extends State<ProductEdit> {
 
   void getCategoriaProducto() async {
     // Obtenemos la identificacion de la categoria del producto
-    Global.getDataCatalogoCategoria(
-            idNegocio: Global.oPerfilNegocio.id,
-            idCategoria: producto.categoria)
-        .getDataCategoria()
-        .then((value) {
+    Global.getDataCatalogoCategoria( idNegocio: Global.oPerfilNegocio.id,idCategoria: producto.categoria ).getDataCategoria().then((value) {
       this.categoria = value ?? Categoria();
       if (this.categoria.subcategorias != null) {
         this.categoria.subcategorias.forEach((k, v) {
-          Categoria subcategoria =
-              new Categoria(id: k.toString(), nombre: v.toString());
+          Categoria subcategoria = new Categoria(id: k.toString(), nombre: v.toString());
           if (subcategoria.id == this.producto.subcategoria) {
             setState(() {
               this.subcategoria = subcategoria ?? Categoria();
@@ -123,7 +114,7 @@ class _ProductEditState extends State<ProductEdit> {
   }
 
   @override
-  void dispose() {
+  void dispose(){
     controllerTextEdit_descripcion.dispose();
     controllerTextEdit_precio_venta.dispose();
     controllerTextEdit_compra.dispose();
@@ -133,9 +124,13 @@ class _ProductEditState extends State<ProductEdit> {
 
   @override
   Widget build(BuildContext contextPrincipal) {
-    textStyle_disabled =
-        new TextStyle(fontSize: 24.0, color: Theme.of(context).hintColor);
+
+    textStyle_disabled=new TextStyle(fontSize: 24.0, color: Theme.of(context).hintColor);
     this.contextPrincipal = contextPrincipal;
+    if(enCatalogo==false){
+      this.categoria = contextPrincipal.read<ProviderCatalogo>().getCategoria;
+      this.subcategoria = contextPrincipal.read<ProviderCatalogo>().getSubcategoria;
+    }
 
     return Scaffold(
       body: Builder(builder: (contextBuilder) {
@@ -451,6 +446,7 @@ class _ProductEditState extends State<ProductEdit> {
                 showModalSelectMarca(buildContext: contextPrincipal);
               }
             },
+            
           ),
         ),
         this.marca != null && producto.verificado == false
@@ -467,6 +463,62 @@ class _ProductEditState extends State<ProductEdit> {
               )
             : Container(),
       ],
+    );
+  }
+  Widget popupMenuItemCategoria({@required Marca marca}) {
+    return new PopupMenuButton(
+      icon: Icon(Icons.more_vert),
+      itemBuilder: (_) => <PopupMenuItem<String>>[
+        new PopupMenuItem<String>(child: const Text('Editar'), value: 'editar'),
+        new PopupMenuItem<String>(
+            child: const Text('Eliminar'), value: 'eliminar'),
+      ],
+      onSelected: (value) async {
+        switch (value) {
+          case "editar":
+             Navigator.of(contextPrincipal).push(MaterialPageRoute(builder: (BuildContext context) =>PageCreateMarca(marca: marca,)));
+            break;
+          case "eliminar":
+            await showDialog<String>(
+              context: context,
+              child: new AlertDialog(
+                contentPadding: const EdgeInsets.all(16.0),
+                content: new Row(
+                  children: <Widget>[
+                    new Expanded(
+                      child: new Text(
+                          "¿Desea continuar eliminando esta marca?"),
+                    )
+                  ],
+                ),
+                actions: <Widget>[
+                  new FlatButton(
+                      child: const Text('CANCEL'),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      }),
+                  new FlatButton(
+                      child: Text("ELIMINAR"),
+                      onPressed: () async {
+                        await Global.getMarca(idMarca:marca.id).deleteDoc();
+                        setState(() {
+                          for (var i = 0;
+                              i < listMarcasAll.length;
+                              i++) {
+                            if (listMarcasAll[i].id ==
+                                categoria.id) {
+                              listMarcasAll.remove(i);
+                            }
+                          }
+                          Navigator.pop(context);
+                        });
+                      })
+                ],
+              ),
+            );
+            break;
+        }
+      },
     );
   }
 
@@ -688,9 +740,7 @@ class _ProductEditState extends State<ProductEdit> {
               ],
             ),
             body: FutureBuilder(
-              future: Global.getCatalogoCategorias(
-                      idNegocio: Global.oPerfilNegocio.id)
-                  .getDataCategoriaAll(),
+              future: Global.getCatalogoCategorias(idNegocio: Global.oPerfilNegocio.id).getDataCategoriaAll(),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   Global.listCategoriasCatalogo = snapshot.data;
@@ -719,12 +769,12 @@ class _ProductEditState extends State<ProductEdit> {
                               title: Text(categoriaSelect.nombre),
                               onTap: () {
                                 setState(() {
+                                  buildContext.read<ProviderCatalogo>().setNombreFiltro = categoria.nombre;
+                                  buildContext.read<ProviderCatalogo>().setCategoria = categoria;
                                   this.categoria = categoriaSelect;
                                   this.subcategoria = null;
                                   Navigator.pop(ctx);
-                                  getSubCategoria(
-                                      buildContext: buildContext,
-                                      categoria: this.categoria);
+                                  getSubCategoria(buildContext: buildContext,categoria: this.categoria);
                                 });
                               },
                             ),
@@ -734,7 +784,7 @@ class _ProductEditState extends State<ProductEdit> {
                       },
                     );
                   } else {
-                    return Center(child: Text("Cargando..."));
+                    return Center(child: Text("Sin categoría"));
                   }
                 } else {
                   return Center(child: Text("Cargando..."));
@@ -923,7 +973,7 @@ class _ProductEditState extends State<ProductEdit> {
         context: buildContext,
         builder: (_) {
           // Variables
-          List<Marca> listMarcasAll = new List<Marca>();
+          listMarcasAll = new List<Marca>();
           return Scaffold(
             appBar: AppBar(
               title: Text("Marcas"),
@@ -931,10 +981,7 @@ class _ProductEditState extends State<ProductEdit> {
                 IconButton(
                   icon: Icon(Icons.add),
                   onPressed: () {
-                    Navigator.of(buildContext)
-                        .push(MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                PageCreateMarca()))
+                    Navigator.of(buildContext).push(MaterialPageRoute(builder: (BuildContext context) =>PageCreateMarca()))
                         .then((value) {
                       setState(() {
                         Navigator.of(buildContext).pop();
@@ -995,6 +1042,7 @@ class _ProductEditState extends State<ProductEdit> {
                                   Navigator.pop(buildContext);
                                 });
                               },
+                              trailing:popupMenuItemCategoria(marca:marcaSelect ),
                             ),
                             Divider(endIndent: 12.0, indent: 12.0),
                           ],

@@ -9,16 +9,16 @@ import 'dart:math' as math;
 import 'package:provider/provider.dart';
 
 /* Dependencias */
-import 'package:producto/screens/page_producto_view.dart';
-import 'package:producto/services/preferencias_usuario.dart';
+import 'package:Producto/screens/page_producto_view.dart';
+import 'package:Producto/services/preferencias_usuario.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart'; /* font_awesome_flutter: ^x.x.x */
-import 'package:producto/utils/utils.dart';
-import 'package:producto/utils/dynamicTheme_lb.dart';
-import 'package:producto/services/services.dart';
-import 'package:producto/screens/page_buscadorProductos.dart';
-import 'package:producto/models/models_profile.dart';
-import 'package:producto/services/globals.dart';
-import 'package:producto/models/models_catalogo.dart';
+import 'package:Producto/utils/utils.dart';
+import 'package:Producto/utils/dynamicTheme_lb.dart';
+import 'package:Producto/services/services.dart';
+import 'package:Producto/screens/page_buscadorProductos.dart';
+import 'package:Producto/models/models_profile.dart';
+import 'package:Producto/services/globals.dart';
+import 'package:Producto/models/models_catalogo.dart';
 
 /*  DESCRIPCIÓN */
 /*  Pantalla principal de la aplicación Catalogo app  */

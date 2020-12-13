@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:producto/services/globals.dart';
-import 'package:producto/screens/page_producto_view.dart';
-import 'package:producto/screens/page_producto_new.dart';
+import 'package:Producto/services/globals.dart';
+import 'package:Producto/screens/page_producto_view.dart';
+import 'package:Producto/screens/page_producto_new.dart';
 import 'package:flutter/services.dart';
 import 'package:clipboard/clipboard.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:animate_do/animate_do.dart';
-import 'package:producto/shared/progress_bar.dart';
+import 'package:Producto/shared/progress_bar.dart';
 
 class WidgetSeachProduct extends StatefulWidget {
   String codigo;

@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:producto/shared/progress_bar.dart';
-import 'package:producto/services/globals.dart';
+import 'package:Producto/shared/progress_bar.dart';
+import 'package:Producto/services/globals.dart';
 
 class SplashScreen extends StatefulWidget {
   createState() => SplashScreenState();

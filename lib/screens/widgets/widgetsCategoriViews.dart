@@ -1,11 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:producto/models/models_catalogo.dart';
-import 'package:producto/services/globals.dart';
-import 'package:producto/utils/dynamicTheme_lb.dart';
+import 'package:Producto/models/models_catalogo.dart';
+import 'package:Producto/services/globals.dart';
+import 'package:Producto/utils/dynamicTheme_lb.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:producto/screens/profileCuenta.dart';
+import 'package:Producto/screens/profileCuenta.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ViewCategoria extends StatefulWidget {
@@ -48,12 +48,11 @@ class _ViewCategoriaState extends State<ViewCategoria> {
         ],
       ),
       body: FutureBuilder(
-        future:
-            Global.getCatalogoCategorias(idNegocio: Global.oPerfilNegocio.id)
-                .getDataCategoriaAll(),
+        future:Global.getCatalogoCategorias(idNegocio: Global.oPerfilNegocio.id).getDataCategoriaAll(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             Global.listCategoriasCatalogo = snapshot.data;
+            if(Global.listCategoriasCatalogo.length==0){return Center(child: Text("Sin categoría"),);}
             return ListView.builder(
               padding: EdgeInsets.symmetric(vertical: 15.0),
               shrinkWrap: true,
@@ -78,8 +77,7 @@ class _ViewCategoriaState extends State<ViewCategoria> {
                                     buildContext
                                         .read<ProviderCatalogo>()
                                         .setNombreFiltro = "Todos";
-                                    buildContext
-                                        .read<ProviderCatalogo>()
+                                    buildContext.read<ProviderCatalogo>()
                                         .setCategoria = null;
                                     buildContext
                                         .read<ProviderCatalogo>()
@@ -105,30 +103,18 @@ class _ViewCategoriaState extends State<ViewCategoria> {
                             dense: true,
                             title: Text(categoria.nombre),
                             onTap: () {
-                              buildContext
-                                  .read<ProviderCatalogo>()
-                                  .setNombreFiltro = categoria.nombre;
-                              buildContext
-                                  .read<ProviderCatalogo>()
-                                  .setCategoria = categoria;
+                              buildContext.read<ProviderCatalogo>().setNombreFiltro = categoria.nombre;
+                              buildContext.read<ProviderCatalogo>().setCategoria = categoria;
                               showModalBottomSheet(
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(20.0)),
-                                  backgroundColor:
-                                      Theme.of(buildContext).canvasColor,
+                                  shape: RoundedRectangleBorder(borderRadius:BorderRadius.circular(20.0)),
+                                  backgroundColor:Theme.of(buildContext).canvasColor,
                                   context: buildContextPrincipal,
                                   builder: (ctx) {
-                                    return ClipRRect(
-                                      child: ViewSubCategoria(
-                                        categoria: categoria,
-                                        buildContextCategoria: buildContext,
-                                      ),
-                                    );
-                                  });
+                                    return ClipRRect(child: ViewSubCategoria(categoria: categoria,buildContextCategoria: buildContext));
+                                  }
+                              );
                             },
-                            trailing:
-                                popupMenuItemCategoria(categoria: categoria),
+                            trailing:popupMenuItemCategoria(categoria: categoria),
                           ),
                           Divider(endIndent: 12.0, indent: 12.0, height: 0.0),
                         ],
@@ -173,8 +159,7 @@ class _ViewCategoriaState extends State<ViewCategoria> {
                                     );
                                   });
                             },
-                            trailing:
-                                popupMenuItemCategoria(categoria: categoria),
+                            trailing:popupMenuItemCategoria(categoria: categoria),
                           ),
                           Divider(endIndent: 12.0, indent: 12.0, height: 0.0),
                         ],
@@ -239,6 +224,7 @@ class _ViewCategoriaState extends State<ViewCategoria> {
                               Global.listCategoriasCatalogo.remove(i);
                             }
                           }
+                          Navigator.pop(context);
                         });
                       })
                 ],
@@ -599,9 +585,7 @@ Future<void> showModalBottomSheetConfig(
       builder: (ctx) {
         return ClipRRect(
           borderRadius: BorderRadius.circular(20),
-          child: ViewConfig(
-            buildContext: buildContext,
-          ),
+          child: ViewConfig(buildContext: buildContext),
         );
       });
 }
@@ -647,7 +631,7 @@ class _ViewConfigState extends State<ViewConfig> {
                       radius: 18.0,
                     ),
                   ),
-            title: Text('Editar'),
+            title: Text('Editar perfil'),
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
@@ -660,15 +644,38 @@ class _ViewConfigState extends State<ViewConfig> {
           ),
           Divider(endIndent: 12.0, indent: 12.0, height: 0.0),
           DynamicTheme.of(buildContext).getViewListTileSelectTheme(buildContext: buildContext),
-          Divider(endIndent: 12.0, indent: 12.0, height: 0.0),
+          Row(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Text("Contacto",style: TextStyle(fontSize: 20.0,fontWeight: FontWeight.bold)),
+              ),
+              Expanded(child: Divider(endIndent: 12.0, indent: 12.0, height: 2.0,thickness: 2.0,),),
+            ],
+          ),
           ListTile(
             contentPadding: EdgeInsets.all(12.0),
             leading: Padding(padding: EdgeInsets.symmetric(horizontal: 6.0),child: FaIcon(FontAwesomeIcons.instagram)),
-            title: Text(
-              'Instagram',
-            ),
+            title: Text('Instagram'),
+            subtitle: Text('Contacta con el desarrollador 👨‍💻'),
             onTap: () async {
               String url = "https://www.instagram.com/logica.booleana/";
+              if (await canLaunch(url)) {
+                await launch(url);
+              } else {
+                throw 'Could not launch $url';
+              }
+            },
+          ),
+          Divider(endIndent: 12.0, indent: 12.0, height: 0.0),
+          ListTile(
+            contentPadding: EdgeInsets.all(12.0),
+            leading: Padding(padding: EdgeInsets.symmetric(horizontal: 6.0),child: FaIcon(FontAwesomeIcons.googlePlay)),
+            title: Text(
+              'Déjanos un comentario o sugerencia',
+            ),
+            onTap: () async {
+              String url = "https://play.google.com/store/apps/details?id=com.logicabooleana.commer.producto";
               if (await canLaunch(url)) {
                 await launch(url);
               } else {

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 
-import 'package:producto/services/preferencias_usuario.dart';
+import 'package:Producto/services/preferencias_usuario.dart';
 import '../services/services.dart';
 
 // ignore: must_be_immutable

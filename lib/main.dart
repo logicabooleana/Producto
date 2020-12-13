@@ -1,15 +1,15 @@
-import 'package:producto/screens/app_preferences/page_theme_preference.dart';
+import 'package:Producto/screens/app_preferences/page_theme_preference.dart';
 import 'package:flutter/material.dart';
-import 'package:producto/shared/progress_bar.dart';
+import 'package:Producto/shared/progress_bar.dart';
 
 import 'package:provider/provider.dart';
 import 'services/services.dart';
 import 'screens/screens.dart';
-import 'package:producto/utils/dynamicTheme_lb.dart';
-import 'package:producto/services/preferencias_usuario.dart';
-import 'package:producto/screens/page_principal.dart';
-import 'package:producto/screens/page_welcome.dart';
-import 'package:producto/screens/page_login.dart';
+import 'package:Producto/utils/dynamicTheme_lb.dart';
+import 'package:Producto/services/preferencias_usuario.dart';
+import 'package:Producto/screens/page_principal.dart';
+import 'package:Producto/screens/page_welcome.dart';
+import 'package:Producto/screens/page_login.dart';
 // Import the firebase_core plugin
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';

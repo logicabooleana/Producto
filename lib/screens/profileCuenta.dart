@@ -6,13 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:image_picker/image_picker.dart';
 import '../services/services.dart';
-import 'package:producto/services/globals.dart';
-import 'package:producto/models/models_profile.dart';
+import 'package:Producto/services/globals.dart';
+import 'package:Producto/models/models_profile.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:producto/screens/widgets/widgets_notify.dart';
+import 'package:Producto/screens/widgets/widgets_notify.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:producto/shared/progress_bar.dart';
+import 'package:Producto/shared/progress_bar.dart';
 
 class ProfileCuenta extends StatefulWidget {
   PerfilNegocio perfilNegocio;

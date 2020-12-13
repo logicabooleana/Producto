@@ -8,25 +8,25 @@ import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
-import 'package:producto/shared/progress_bar.dart';
+import 'package:Producto/shared/progress_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
 
 /* Dependencias */
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
-import 'package:producto/shared/widget_button.dart';
-import 'package:producto/shared/widgets_image_circle.dart' as image;
-import 'package:producto/services/preferencias_usuario.dart';
-import 'package:producto/screens/page_BuscarProductGlobal.dart';
-import 'package:producto/screens/page_producto_view.dart';
-import 'package:producto/screens/widgets/widget_CatalogoGridList.dart';
-import 'package:producto/services/services.dart';
-import 'package:producto/screens/page_buscadorProductos.dart';
-import 'package:producto/models/models_profile.dart';
-import 'package:producto/services/globals.dart';
-import 'package:producto/models/models_catalogo.dart';
-import 'package:producto/screens/widgets/widgetsCategoriViews.dart';
-import 'package:producto/utils/dynamicTheme_lb.dart';
+import 'package:Producto/shared/widget_button.dart';
+import 'package:Producto/shared/widgets_image_circle.dart' as image;
+import 'package:Producto/services/preferencias_usuario.dart';
+import 'package:Producto/screens/page_BuscarProductGlobal.dart';
+import 'package:Producto/screens/page_producto_view.dart';
+import 'package:Producto/screens/widgets/widget_CatalogoGridList.dart';
+import 'package:Producto/services/services.dart';
+import 'package:Producto/screens/page_buscadorProductos.dart';
+import 'package:Producto/models/models_profile.dart';
+import 'package:Producto/services/globals.dart';
+import 'package:Producto/models/models_catalogo.dart';
+import 'package:Producto/screens/widgets/widgetsCategoriViews.dart';
+import 'package:Producto/utils/dynamicTheme_lb.dart';
 
 /*  DESCRIPCIÓN */
 /*  Pantalla principal de la aplicación "Producto"  */
@@ -50,7 +50,9 @@ class PagePrincipal extends StatelessWidget {
   }
 
   Scaffold scaffoldScan({@required BuildContext buildContext}) {
-    Color color = Theme.of(buildContext).brightness == Brightness.dark?Colors.white54: Colors.black38;
+    Color color = Theme.of(buildContext).brightness == Brightness.dark
+        ? Colors.white54
+        : Colors.black38;
     return Scaffold(
       appBar: AppBar(
         elevation: 0.0,
@@ -116,7 +118,8 @@ class PagePrincipal extends StatelessWidget {
             RaisedButton(
               padding: EdgeInsets.symmetric(horizontal: 40.0, vertical: 20.0),
               color: Colors.deepPurple,
-              child: Text("Buscar",style: TextStyle(fontSize: 24.0, color: Colors.white)),
+              child: Text("Buscar",
+                  style: TextStyle(fontSize: 24.0, color: Colors.white)),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30.0),
                   side: BorderSide(color: Colors.transparent)),
@@ -134,7 +137,8 @@ class PagePrincipal extends StatelessWidget {
 
   Widget scaffondCatalogo({@required BuildContext buildContext}) {
     return FutureBuilder(
-      future: Global.getNegocio(idNegocio: Global.prefs.getIdNegocio).getDataPerfilNegocio(),
+      future: Global.getNegocio(idNegocio: Global.prefs.getIdNegocio)
+          .getDataPerfilNegocio(),
       builder: (c, snapshot) {
         if (snapshot.hasData) {
           Global.oPerfilNegocio = snapshot.data;
@@ -227,7 +231,9 @@ class PagePrincipal extends StatelessWidget {
                   ],
                 ),
                 body: new StreamBuilder(
-                  stream: Global.getCatalogoNegocio(idNegocio: Global.oPerfilNegocio.id ?? "").streamDataProductoAll(),
+                  stream: Global.getCatalogoNegocio(
+                          idNegocio: Global.oPerfilNegocio.id ?? "")
+                      .streamDataProductoAll(),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       Global.listProudctosNegocio = snapshot.data;
@@ -347,7 +353,11 @@ class PagePrincipal extends StatelessWidget {
             Expanded(
               child: TabBarView(
                 children: [
-                  WidgetCatalogoGridList(),
+                  Global.listProudctosNegocio.length != 0
+                      ? WidgetCatalogoGridList()
+                      : Center(
+                          child: Text("Todavía no has añadido ningún producto"),
+                        ),
                 ],
               ),
             ),
@@ -448,82 +458,82 @@ class PagePrincipal extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             itemCount: catalogo.getMarcas.length,
             itemBuilder: (BuildContext c, int index) {
-              return Container(
+              return catalogo.getMarcas[index]!=null&& catalogo.getMarcas[index]!=""?Container(
                 width: 81.0,
                 height: 100.0,
                 padding: EdgeInsets.all(5.0),
-                child: new Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Stack(
-                      alignment: Alignment.bottomCenter,
-                      children: <Widget>[
-                        FutureBuilder(
-                          future: Global.getMarca(
-                                  idMarca: catalogo.getMarcas[index])
-                              .getDataMarca(),
-                          builder: (context, snapshot) {
-                            if (snapshot.hasData) {
-                              Marca marca = snapshot.data;
-                              return GestureDetector(
-                                onTap: () {
-                                  buildContext
-                                      .read<ProviderCatalogo>()
-                                      .setIdMarca = marca.id;
-                                  buildContext
-                                      .read<ProviderCatalogo>()
-                                      .setNombreFiltro = marca.titulo;
-                                },
-                                child: Column(
-                                  children: <Widget>[
-                                    image.DashedCircle(
-                                      dashes:
-                                          catalogo.getNumeroDeProductosDeMarca(
-                                              id: marca.id),
-                                      gradientColor: colorGradientInstagram,
-                                      child: Padding(
-                                        padding: EdgeInsets.all(5.0),
-                                        child: image.viewCircleImage(
-                                            url: marca.url_imagen,
-                                            texto: marca.titulo,
-                                            size: 50),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: 8.0,
-                                    ),
-                                    Text(marca.titulo,
-                                        style: TextStyle(
-                                            fontSize:
-                                                catalogo.getIdMarca == marca.id
-                                                    ? 14
-                                                    : 12,
-                                            fontWeight:
-                                                catalogo.getIdMarca == marca.id
-                                                    ? FontWeight.bold
-                                                    : FontWeight.normal),
-                                        overflow: TextOverflow.fade,
-                                        softWrap: false)
-                                  ],
-                                ),
-                              );
-                            } else {
-                              return image.DashedCircle(
-                                dashes: 1,
-                                gradientColor: colorGradientInstagram,
-                                child: CircleAvatar(
-                                  backgroundColor: Colors.black26,
-                                  radius: 30,
-                                ),
-                              );
-                            }
-                          },
+                child: FutureBuilder(
+                  future: Global.getMarca(idMarca: catalogo.getMarcas[index]??"default").getDataMarca(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      Marca marca = snapshot.data;
+                      return GestureDetector(
+                        onTap: () {
+                          buildContext
+                              .read<ProviderCatalogo>()
+                              .setIdMarca = marca.id;
+                          buildContext
+                              .read<ProviderCatalogo>()
+                              .setNombreFiltro = marca.titulo;
+                        },
+                        child: Column(
+                          children: <Widget>[
+                            image.DashedCircle(
+                              dashes:
+                                  catalogo.getNumeroDeProductosDeMarca(id: marca.id),
+                              gradientColor: colorGradientInstagram,
+                              child: Padding(
+                                padding: EdgeInsets.all(5.0),
+                                child: image.viewCircleImage(
+                                    url: marca.url_imagen,
+                                    texto: marca.titulo,
+                                    size: 50),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 8.0,
+                            ),
+                            Text(marca.titulo,
+                                style: TextStyle(
+                                    fontSize:
+                                        catalogo.getIdMarca == marca.id
+                                            ? 14
+                                            : 12,
+                                    fontWeight:
+                                        catalogo.getIdMarca == marca.id
+                                            ? FontWeight.bold
+                                            : FontWeight.normal),
+                                overflow: TextOverflow.fade,
+                                softWrap: false)
+                          ],
                         ),
-                      ],
-                    ),
-                  ],
+                      );
+                    } else {
+                      return Column(
+                        children: <Widget>[
+                          image.DashedCircle(
+                            dashes: 1,
+                            gradientColor: colorGradientInstagram,
+                            child: CircleAvatar(
+                              backgroundColor: Colors.black26,
+                              radius: 30,
+                            ),
+                          ),
+                          SizedBox(
+                            height: 8.0,
+                          ),
+                          Text("null",
+                              style: TextStyle(
+                                  fontSize:12,
+                                  fontWeight: FontWeight.normal),
+                              overflow: TextOverflow.fade,
+                              softWrap: false)
+                        ],
+                      );
+                    }
+                  },
                 ),
-              );
+              ):Container();
             }),
       );
     });
@@ -534,14 +544,16 @@ class PagePrincipal extends StatelessWidget {
     bool createCuentaEmpresa = true;
     // muestre la hoja inferior modal
     showModalBottomSheet(
-        shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
         backgroundColor: Theme.of(buildContext).canvasColor,
         context: buildContext,
         builder: (ctx) {
           return ClipRRect(
             child: Container(
               child: FutureBuilder(
-                future: Global.getListNegocioAdmin(idNegocio: firebaseUser.uid).getDataAdminPerfilNegocioAll(),
+                future: Global.getListNegocioAdmin(idNegocio: firebaseUser.uid)
+                    .getDataAdminPerfilNegocioAll(),
                 builder: (c, snapshot) {
                   if (snapshot.hasData) {
                     // Verificamos si ahi una cuenta creada
@@ -592,7 +604,8 @@ class PagePrincipal extends StatelessWidget {
                               ],
                             );
                           }
-                          if (index ==Global.listAdminPerfilNegocio.length - 1) {
+                          if (index ==
+                              Global.listAdminPerfilNegocio.length - 1) {
                             return Column(
                               children: <Widget>[
                                 WidgetButtonListTile(buildContext: buildContext)
@@ -623,7 +636,6 @@ class PagePrincipal extends StatelessWidget {
                                               .listAdminPerfilNegocio[index]
                                               .id ==
                                           firebaseUser.uid),
-                              
                             ],
                           );
                         },

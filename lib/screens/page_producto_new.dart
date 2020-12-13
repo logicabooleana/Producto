@@ -1,22 +1,22 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:animate_do/animate_do.dart';
-import 'package:producto/screens/page_marca_create.dart';
-import 'package:producto/screens/widgets/widgetsCategoriViews.dart';
+import 'package:Producto/screens/page_marca_create.dart';
+import 'package:Producto/screens/widgets/widgetsCategoriViews.dart';
 import 'package:flutter/services.dart';
-import 'package:producto/services/models.dart';
+import 'package:Producto/services/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:producto/services/globals.dart';
-import 'package:producto/models/models_catalogo.dart';
+import 'package:Producto/services/globals.dart';
+import 'package:Producto/models/models_catalogo.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:provider/provider.dart';
-import 'package:producto/screens/widgets/widgetSeachMarcaProducto.dart';
+import 'package:Producto/screens/widgets/widgetSeachMarcaProducto.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
-import 'package:producto/screens/widgets/widgets_notify.dart';
-import 'package:producto/shared/progress_bar.dart';
-import 'package:producto/screens/page_producto_view.dart';
+import 'package:Producto/screens/widgets/widgets_notify.dart';
+import 'package:Producto/shared/progress_bar.dart';
+import 'package:provider/provider.dart';
+import 'package:Producto/screens/page_producto_view.dart';
 
 class ProductNew extends StatefulWidget {
   final String id;
@@ -497,8 +497,7 @@ class _ProductNewState extends State<ProductNew> {
                   pageBuilder: (BuildContext buildContext, Animation animation,
                       Animation secondaryAnimation) {
 
-                    Timer(Duration(seconds: 3), () {
-                      Navigator.pop(buildContext);
+                    Timer(Duration(seconds: 4), () {                      Navigator.pop(buildContext);
                       Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
                     builder: (BuildContext context) => ProductScreen(

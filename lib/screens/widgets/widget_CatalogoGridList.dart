@@ -1,7 +1,7 @@
 
 import 'package:cached_network_image/cached_network_image.dart';
-import "package:producto/services/services.dart";
-import 'package:producto/utils/utils.dart';
+import "package:Producto/services/services.dart";
+import 'package:Producto/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:loadany/loadany_widget.dart';
 import 'package:provider/provider.dart';

@@ -1,22 +1,28 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:producto/models/models_catalogo.dart';
-import 'package:producto/services/globals.dart';
-import 'package:producto/screens/widgets/widgets_notify.dart';
+import 'package:Producto/models/models_catalogo.dart';
+import 'package:Producto/services/globals.dart';
+import 'package:Producto/screens/widgets/widgets_notify.dart';
 import 'package:image_picker/image_picker.dart';
 
 class PageCreateMarca extends StatefulWidget {
+  Marca marca;
+  PageCreateMarca({this.marca});
   @override
-  _PageCreateMarcaState createState() => _PageCreateMarcaState();
+  _PageCreateMarcaState createState() => _PageCreateMarcaState(marca: marca);
 }
 
 class _PageCreateMarcaState extends State<PageCreateMarca> {
+  
+  Marca marca;
+  _PageCreateMarcaState({this.marca});
   // Variables
+  bool marcaEditable=false;
   bool saveIndicador = false;
   TextStyle textStyle = new TextStyle(fontSize: 24.0);
-  Marca marca = new Marca();
   Size screenSize;
 
   // Variables de imagen
@@ -28,7 +34,13 @@ class _PageCreateMarcaState extends State<PageCreateMarca> {
 
   @override
   Widget build(BuildContext buildContext) {
-    marca.id = new DateTime.now().millisecondsSinceEpoch.toString();
+    if( marca==null ){
+      marcaEditable=false;
+      marca=new Marca();
+      marca.id = new DateTime.now().millisecondsSinceEpoch.toString();
+    }else{
+      marcaEditable=true;
+    }
     // Toma los pixeles del ancho y alto de la pantalla
     screenSize = MediaQuery.of(context).size;
 
@@ -36,7 +48,7 @@ class _PageCreateMarcaState extends State<PageCreateMarca> {
       builder: (context) {
         return Scaffold(
           appBar: AppBar(
-            title: Text("Crear marca"),
+            title: Text(marcaEditable==false?"Crear marca":"Actualizar marca"),
             actions: <Widget>[
               IconButton(
                   icon: saveIndicador == false
@@ -60,20 +72,43 @@ class _PageCreateMarcaState extends State<PageCreateMarca> {
   }
 
   Widget body({@required BuildContext buildContext}) {
+
+    // Toma los pixeles del ancho y alto de la pantalla
+    final screenSize = MediaQuery.of(buildContext).size;
+
     return Container(
       padding: EdgeInsets.all(12.0),
       child: ListView(
         children: [
-          _imageFile == null
-              ? CircleAvatar(
-                  child: Icon(Icons.image),
-                  backgroundColor: Colors.grey,
-                  radius: 100.0,
-                )
+          Container(
+            width: screenSize.width*0.90,
+            height: screenSize.width*0.90,
+            child:_imageFile == null
+              ? this.marca.url_imagen!=""?CachedNetworkImage(
+                      fit: BoxFit.cover,
+                      imageUrl: this.marca.url_imagen != ""
+                          ? this.marca.url_imagen
+                          : "default",
+                      placeholder: (context, url) => CircleAvatar(
+                        backgroundColor: Colors.grey,
+                        radius: 100.0,
+                      ),
+                      imageBuilder: (context, image) => CircleAvatar(
+                        backgroundImage: image,
+                        radius: 100.0,
+                      ),
+                      errorWidget: (context, url, error) => CircleAvatar(
+                        backgroundColor: Colors.grey,
+                        radius: 100.0,
+                      ),
+                    ):CircleAvatar(
+                        backgroundColor: Colors.grey,
+                        radius: 100.0,
+                      )
               : _previewImage(),
+          ),
           SizedBox(height: 20.0, width: 20.0),
           RaisedButton.icon(
-          
                 color: Theme.of(context).accentColor,
                 padding: const EdgeInsets.all(14.0),
                 shape: RoundedRectangleBorder(
@@ -86,13 +121,14 @@ class _PageCreateMarcaState extends State<PageCreateMarca> {
                     style: TextStyle(fontSize: 18.0, color: Colors.white))),
           SizedBox(height: 12.0, width: 12.0),
           TextField(
-            onChanged: (value) => marca.titulo = value,
-            decoration: InputDecoration(
-                border: OutlineInputBorder(), labelText: "Titulo"),
+            controller: new TextEditingController(text: this.marca.titulo),
+            onChanged: (value) => this.marca.titulo = value,
+            decoration: InputDecoration(border: OutlineInputBorder(), labelText: "Titulo"),
             style: textStyle,
           ),
           SizedBox(height: 12.0, width: 12.0),
           TextField(
+            controller: new TextEditingController(text: this.marca.descripcion),
             onChanged: (value) => marca.descripcion = value,
             decoration: InputDecoration(
                 border: OutlineInputBorder(), labelText: "Descripción (opcional)"),
@@ -100,6 +136,7 @@ class _PageCreateMarcaState extends State<PageCreateMarca> {
           ),
           SizedBox(height: 12.0, width: 12.0),
           TextField(
+            controller: new TextEditingController(text: this.marca.codigo_empresa),
             onChanged: (value) => marca.codigo_empresa = value,
             decoration: InputDecoration(
                 border: OutlineInputBorder(),
