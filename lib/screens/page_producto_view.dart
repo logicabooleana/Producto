@@ -216,12 +216,8 @@ class _ProductScreenState extends State<ProductScreen> {
                   padding: EdgeInsets.all(12.0),
                   icon: Icon(productoEnCatalogo ? Icons.edit : Icons.add_box),
                   onPressed: () {
-                    Navigator.of(context).pushReplacement(MaterialPageRoute(
-                      builder: (BuildContext context) => widget.producto != null
-                          ? ProductEdit(producto: widget.producto)
-                          : Scaffold(
-                              body:
-                                  Center(child: Text("Se produjo un Error!"))),
+                    _bannerAd?.dispose();
+                    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) => widget.producto != null ? ProductEdit(producto: widget.producto):Scaffold(body:Center(child: Text("Se produjo un Error!"))),
                     ));
                   },
                 )
@@ -432,8 +428,8 @@ class _ProductScreenState extends State<ProductScreen> {
               ),
             ),
             const SizedBox(
-              height: 140.0,
-              width: 140.0,
+              height: 190.0,
+              width: 190.0,
             ),
           ],
         ),

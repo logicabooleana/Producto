@@ -127,10 +127,6 @@ class _ProductEditState extends State<ProductEdit> {
 
     textStyle_disabled=new TextStyle(fontSize: 24.0, color: Theme.of(context).hintColor);
     this.contextPrincipal = contextPrincipal;
-    if(enCatalogo==false){
-      this.categoria = contextPrincipal.read<ProviderCatalogo>().getCategoria;
-      this.subcategoria = contextPrincipal.read<ProviderCatalogo>().getSubcategoria;
-    }
 
     return Scaffold(
       body: Builder(builder: (contextBuilder) {
