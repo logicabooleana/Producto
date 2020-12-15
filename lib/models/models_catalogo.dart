@@ -68,7 +68,7 @@ class Marca {
     String descripcion = "";
     String url_imagen = "";
     String codigo_empresa = "";
-    Timestamp timestamp_seleccion ; // Marca de tiempo de la seleccion
+    bool verificado;
 
     // Datos de la creación
     String id_usuario_creador=""; // ID el usuaruio que creo el productos
@@ -81,7 +81,7 @@ class Marca {
     this.descripcion="",
     this.url_imagen="",
     this.codigo_empresa="",
-    this.timestamp_seleccion,
+    this.verificado,
   });
   Marca.fromMap(Map data) {
     id= data['id'] ?? '';
@@ -89,7 +89,7 @@ class Marca {
       descripcion= data['descripcion'] ?? '';
       url_imagen= data['url_imagen'] ?? 'default';
       codigo_empresa= data['codigo_empresa'] ?? '';
-      timestamp_seleccion= data['timestamp_seleccion'] ;
+      verificado= data['verificado']??false ;
       id_usuario_creador= data['id_usuario_creador'] ?? '';
       timestamp_creacion= data['timestamp_creacion'];
       id_usuario_actualizado= data['id_usuario_actualizado'] ?? '';
@@ -101,7 +101,7 @@ class Marca {
         "descripcion": descripcion??"",
         "url_imagen": url_imagen??"",
         "codigo_empresa": codigo_empresa??"",
-        "timestamp_seleccion": timestamp_seleccion,
+        "verificado": verificado,
         
     };
 

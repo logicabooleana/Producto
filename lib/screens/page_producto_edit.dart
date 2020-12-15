@@ -1025,12 +1025,30 @@ class _ProductEditState extends State<ProductEdit> {
                         return Column(
                           children: <Widget>[
                             ListTile(
-                              leading: viewCircleImage(
-                                  texto: marcaSelect.titulo,
-                                  url: marcaSelect.url_imagen,
-                                  size: 50.0),
+                              leading: viewCircleImage(texto: marcaSelect.titulo,url: marcaSelect.url_imagen,size: 50.0),
                               dense: true,
-                              title: Text(marcaSelect.titulo),
+                              title: Row(
+                                children: <Widget>[
+                                  marcaSelect.verificado == true
+                                      ? Padding(
+                                          padding: EdgeInsets.all(5.0),
+                                          child: new Image.asset(
+                                              'assets/icon_verificado.png',
+                                              width: 16.0,
+                                              height: 16.0))
+                                      : new Container(),
+                                  Expanded(
+                                    child: Text(marcaSelect.titulo,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                            fontSize: 16.0,
+                                            color: Theme.of(context)
+                                                .textTheme
+                                                .bodyText1
+                                                .color)),
+                                  ),
+                                ],
+                              ),
                               onTap: () {
                                 setState(() {
                                   this.marca = marcaSelect;

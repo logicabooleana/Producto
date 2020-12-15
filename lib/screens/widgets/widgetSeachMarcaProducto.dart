@@ -73,7 +73,28 @@ class DataSearchMarcaProduct extends SearchDelegate {
           final Marca itemMarca = resutlList[index];
           return ListTile(
             leading: viewCircleImage(texto:itemMarca.titulo,url: itemMarca.url_imagen,size:50.0 ),
-            title: Text(itemMarca.titulo),
+            title: Row(
+                                children: <Widget>[
+                                  itemMarca.verificado == true
+                                      ? Padding(
+                                          padding: EdgeInsets.all(5.0),
+                                          child: new Image.asset(
+                                              'assets/icon_verificado.png',
+                                              width: 16.0,
+                                              height: 16.0))
+                                      : new Container(),
+                                  Expanded(
+                                    child: Text(itemMarca.titulo,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                            fontSize: 16.0,
+                                            color: Theme.of(context)
+                                                .textTheme
+                                                .bodyText1
+                                                .color)),
+                                  ),
+                                ],
+                              ),
             subtitle: Text(itemMarca.descripcion),
             onTap: () {
               Navigator.pop(context, itemMarca);

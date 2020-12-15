@@ -169,6 +169,8 @@ class _PageCreateMarcaState extends State<PageCreateMarca> {
           // TODO: Por el momento los datos del producto se guarda junto a la referencia de la cuenta del negocio
           marca.url_imagen = urlIamgen;
         }
+        // TODO : Eliminar verificacion para produccion
+          marca.verificado=true;
         // Firebase ( save)
         await Global.getMarca(idMarca: marca.id).upSetMarca(marca.toJson());
 
