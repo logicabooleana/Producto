@@ -33,11 +33,11 @@ class _ProductEditState extends State<ProductEdit> {
   MoneyMaskedTextController controllerTextEdit_comparacion;
 
   // Variables
+   bool editable = false; // TODO : Eliminar para produccion
   List<Marca> listMarcasAll=new List<Marca>();
   TextStyle textStyle = new TextStyle(fontSize: 24.0);
   TextStyle textStyle_disabled =new TextStyle(fontSize: 24.0, color: Colors.grey);
   bool enCatalogo =false; // verifica si el producto se encuentra en el catalogo o no
-  bool editable = false; // TODO : Eliminar para produccion
   Marca marca;
   Categoria categoria;
   Categoria subcategoria;
@@ -294,8 +294,7 @@ class _ProductEditState extends State<ProductEdit> {
                 child: InkWell(
                   child: TextField(
                     controller: TextEditingController()
-                      ..text =
-                          this.categoria != null ? this.categoria.nombre : "",
+                      ..text =this.categoria != null ? this.categoria.nombre : "",
                     enabled: false,
                     enableInteractiveSelection: false,
                     decoration: InputDecoration(
@@ -360,7 +359,7 @@ class _ProductEditState extends State<ProductEdit> {
                 border: OutlineInputBorder(),
                 disabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(
-                        color: editable ? Colors.grey : Colors.transparent,
+                        color:  editable ? Colors.grey : Colors.transparent,
                         width: 2)),
                 labelText: "Descripción"),
             style: producto.verificado ? textStyle_disabled : textStyle,
@@ -402,15 +401,12 @@ class _ProductEditState extends State<ProductEdit> {
             controller: controllerTextEdit_comparacion,
           ),
           SizedBox(height: 25.0),
-          widgetSaveProductoOPTDeveloper(context: builderContext),
           enCatalogo
               ? saveIndicador == false
                   ? widgetDeleteProducto(context: builderContext)
                   : Container()
               : Container(),
-          saveIndicador == false
-              ? widgetDeleteProductoOPTDeveloper(context: builderContext)
-              : Container(),
+          SizedBox(height: 50.0),
         ],
       ),
     );
@@ -597,7 +593,7 @@ class _ProductEditState extends State<ProductEdit> {
               }
               // Set ( values )
               // TODO: Por defecto verificado es TRUE // Cambiar esto cuando se lanze a producción
-              producto.verificado = true;
+              producto.verificado = false;
               producto.titulo = this.marca.titulo;
               producto.descripcion = controllerTextEdit_descripcion.text;
               producto.precio_venta =
@@ -765,8 +761,8 @@ class _ProductEditState extends State<ProductEdit> {
                               title: Text(categoriaSelect.nombre),
                               onTap: () {
                                 setState(() {
-                                  buildContext.read<ProviderCatalogo>().setNombreFiltro = categoria.nombre;
-                                  buildContext.read<ProviderCatalogo>().setCategoria = categoria;
+                                  buildContext.read<ProviderCatalogo>().setNombreFiltro = categoriaSelect.nombre;
+                                  buildContext.read<ProviderCatalogo>().setCategoria = categoriaSelect;
                                   this.categoria = categoriaSelect;
                                   this.subcategoria = null;
                                   Navigator.pop(ctx);
@@ -1106,7 +1102,7 @@ class _ProductEditState extends State<ProductEdit> {
     );
   }
 
-  // TODO: OPCIONES PARA EL DESARROLLADOR ( Eliminar para producción )
+   // TODO: OPCIONES PARA EL DESARROLLADOR ( Eliminar para producción )
   Widget widgetSaveProductoOPTDeveloper({@required BuildContext context}) {
     return editable == false
         ? Column(
@@ -1255,4 +1251,5 @@ class _ProductEditState extends State<ProductEdit> {
     await Global.getProductosPrecargado(idProducto: producto.id)
         .upSetPrecioProducto(producto.convertProductoDefault().toJson());
   }
+
 }

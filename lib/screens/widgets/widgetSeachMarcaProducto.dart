@@ -1,10 +1,8 @@
-
 import 'package:flutter/material.dart';
 import 'package:Producto/utils/utils.dart';
 import 'package:Producto/models/models_catalogo.dart';
 import 'package:Producto/shared/widgets_image_circle.dart';
 import 'package:diacritic/diacritic.dart';
-
 
 class DataSearchMarcaProduct extends SearchDelegate {
   List<Marca> listMarcas;
@@ -60,7 +58,8 @@ class DataSearchMarcaProduct extends SearchDelegate {
     }
     List<Marca> resutlList = new List();
     for (int i = 0; i < listMarcas.length; i++) {
-      if (Buscardor.buscar(removeDiacritics(listMarcas[i].titulo),removeDiacritics(query))) {
+      if (Buscardor.buscar(
+          removeDiacritics(listMarcas[i].titulo), removeDiacritics(query))) {
         resutlList.add(listMarcas[i]);
       }
     }
@@ -72,37 +71,29 @@ class DataSearchMarcaProduct extends SearchDelegate {
         itemBuilder: (context, index) {
           final Marca itemMarca = resutlList[index];
           return ListTile(
-            leading: viewCircleImage(texto:itemMarca.titulo,url: itemMarca.url_imagen,size:50.0 ),
+            leading: viewCircleImage(texto: itemMarca.titulo, url: itemMarca.url_imagen, size: 50.0),
             title: Row(
-                                children: <Widget>[
-                                  itemMarca.verificado == true
-                                      ? Padding(
-                                          padding: EdgeInsets.all(5.0),
-                                          child: new Image.asset(
-                                              'assets/icon_verificado.png',
-                                              width: 16.0,
-                                              height: 16.0))
-                                      : new Container(),
-                                  Expanded(
-                                    child: Text(itemMarca.titulo,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                            fontSize: 16.0,
-                                            color: Theme.of(context)
-                                                .textTheme
-                                                .bodyText1
-                                                .color)),
-                                  ),
-                                ],
-                              ),
+              children: <Widget>[
+                itemMarca.verificado == true
+                    ? Padding(
+                        padding: EdgeInsets.all(5.0),
+                        child: new Image.asset('assets/icon_verificado.png',
+                            width: 16.0, height: 16.0))
+                    : new Container(),
+                Expanded(
+                  child: Text(itemMarca.titulo,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                          fontSize: 16.0,
+                          color: Theme.of(context).textTheme.bodyText1.color)),
+                ),
+              ],
+            ),
             subtitle: Text(itemMarca.descripcion),
             onTap: () {
               Navigator.pop(context, itemMarca);
             },
           );
         });
-
-
-        
   }
 }

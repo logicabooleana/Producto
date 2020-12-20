@@ -56,7 +56,7 @@ class _ProductScreenState extends State<ProductScreen> {
   BannerAd createBannerAd() {
     return BannerAd(
       //TODO : AdMob ( Cambiar id para produccion )
-      adUnitId: BannerAd.testAdUnitId,
+      adUnitId:BannerAd.testAdUnitId,//"ca-app-pub-8441738551183357/5642900263",//
       size: AdSize.banner,
       targetingInfo: targetingInfo,
     );

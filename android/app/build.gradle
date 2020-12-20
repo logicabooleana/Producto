@@ -13,12 +13,12 @@ if (flutterRoot == null) {
 
 def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
 if (flutterVersionCode == null) {
-    flutterVersionCode = '1'
+    flutterVersionCode = '5'
 }
 
 def flutterVersionName = localProperties.getProperty('flutter.versionName')
 if (flutterVersionName == null) {
-    flutterVersionName = '1.0'
+    flutterVersionName = '1.0.5'
 }
 
 apply plugin: 'com.android.application'
@@ -59,7 +59,7 @@ android {
             signingConfig signingConfigs.debug
         } 
         
-    }
+    } 
     /* // TODO: Configuración de firma para la compilación de lanzamiento.
     signingConfigs {
         release {
@@ -73,7 +73,7 @@ android {
         release {
             signingConfig signingConfigs.release
         }
-    }   */
+    } */
 }
 
 flutter {

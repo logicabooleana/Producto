@@ -245,36 +245,39 @@ class PagePrincipal extends StatelessWidget {
                     }
                   },
                 ),
-                floatingActionButton: AnimatedFloatingActionButton(
-                    //Fab list
-                    fabButtons: <Widget>[
-                      FloatingActionButton(
-                          heroTag: "Escanear codigo",
-                          child: Image(
-                              color: Colors.white,
-                              height: 30.0,
-                              width: 30.0,
-                              image: AssetImage('assets/barcode.png'),
-                              fit: BoxFit.contain),
-                          tooltip: 'Escanea el codigo del producto',
-                          onPressed: () {
-                            scanBarcodeNormal(context: buildContext);
-                          }),
-                      FloatingActionButton(
-                          heroTag: "Escribir codigo",
-                          child: Icon(Icons.edit),
-                          tooltip: 'Escribe el codigo del producto',
-                          onPressed: () {
-                            Navigator.of(buildContext).push(MaterialPageRoute(
-                              builder: (BuildContext context) =>
-                                  WidgetSeachProduct(),
-                            ));
-                          })
-                    ],
-                    colorEndAnimation: Colors.grey,
-                    animatedIconData:
-                        AnimatedIcons.menu_close //To principal button
-                    ),
+                floatingActionButton: Padding(
+                  padding: const EdgeInsets.only(bottom: 35.0),
+                  child: AnimatedFloatingActionButton(
+                      //Fab list
+                      fabButtons: <Widget>[
+                        FloatingActionButton(
+                            heroTag: "Escanear codigo",
+                            child: Image(
+                                color: Colors.white,
+                                height: 30.0,
+                                width: 30.0,
+                                image: AssetImage('assets/barcode.png'),
+                                fit: BoxFit.contain),
+                            tooltip: 'Escanea el codigo del producto',
+                            onPressed: () {
+                              scanBarcodeNormal(context: buildContext);
+                            }),
+                        FloatingActionButton(
+                            heroTag: "Escribir codigo",
+                            child: Icon(Icons.edit),
+                            tooltip: 'Escribe el codigo del producto',
+                            onPressed: () {
+                              Navigator.of(buildContext).push(MaterialPageRoute(
+                                builder: (BuildContext context) =>
+                                    WidgetSeachProduct(),
+                              ));
+                            })
+                      ],
+                      colorEndAnimation: Colors.grey,
+                      animatedIconData:
+                          AnimatedIcons.menu_close //To principal button
+                      ),
+                ),
               );
             }),
           );
@@ -604,8 +607,7 @@ class PagePrincipal extends StatelessWidget {
                               ],
                             );
                           }
-                          if (index ==
-                              Global.listAdminPerfilNegocio.length - 1) {
+                          if (index ==Global.listAdminPerfilNegocio.length - 1) {
                             return Column(
                               children: <Widget>[
                                 WidgetButtonListTile(buildContext: buildContext)
@@ -622,6 +624,7 @@ class PagePrincipal extends StatelessWidget {
                                 WidgetButtonListTile(buildContext: buildContext)
                                     .buttonListTileCerrarSesion(
                                         buildContext: buildContext),
+                                SizedBox(width: 50.0, height: 50.0),
                               ],
                             );
                           }

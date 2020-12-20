@@ -699,6 +699,7 @@ class _ViewConfigState extends State<ViewConfig> {
               }
             },
           ),
+          SizedBox(width: 50.0, height: 50.0),
         ],
       ),
     );

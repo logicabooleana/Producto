@@ -170,7 +170,7 @@ class _PageCreateMarcaState extends State<PageCreateMarca> {
           marca.url_imagen = urlIamgen;
         }
         // TODO : Eliminar verificacion para produccion
-          marca.verificado=true;
+          marca.verificado=false;
         // Firebase ( save)
         await Global.getMarca(idMarca: marca.id).upSetMarca(marca.toJson());
 

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:Producto/shared/widgets_image_circle.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:Producto/screens/page_marca_create.dart';
 import 'package:Producto/screens/widgets/widgetsCategoriViews.dart';
@@ -462,7 +463,7 @@ class _ProductNewState extends State<ProductNew> {
                 }
 
                 // TODO: Para desarrollo verificado es TRUE // Cambiar esto cuando se lanze a producción
-                producto.verificado = true;
+                producto.verificado = false;
                 producto.precio_venta =
                     controllerTextEdit_precio_venta.numberValue;
                 producto.precio_compra = controllerTextEdit_compra.numberValue;
@@ -740,15 +741,7 @@ class _ProductNewState extends State<ProductNew> {
                         return Column(
                           children: <Widget>[
                             ListTile(
-                              leading: CircleAvatar(
-                                backgroundColor: Colors.black26,
-                                radius: 24.0,
-                                child: Text(marcaSelect.titulo.substring(0, 1),
-                                    style: TextStyle(
-                                        fontSize: 18.0,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold)),
-                              ),
+                              leading: viewCircleImage(texto: marcaSelect.titulo, url: marcaSelect.url_imagen, size: 50.0),
                               dense: true,
                               title: Row(
                                 children: <Widget>[

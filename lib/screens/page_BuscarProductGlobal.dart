@@ -140,97 +140,108 @@ class _WidgetSeachProductState extends State<WidgetSeachProduct> {
                   ],
                 ),
               ),
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    SizedBox(height: 12.0),
-                    !buscando
-                        ? FadeInRight(
-                            child: Container(
-                            width: double.infinity,
-                            child: RaisedButton.icon(
-                              color: colorTextButton,
-                              padding: EdgeInsets.all(16.0),
-                              icon: Icon(
-                                Icons.search,
-                                color: Theme.of(context).primaryColorLight,
-                              ),
-                              onPressed: () {
-                                if (textEditingController.text != "") {
-                                  setState(() {
-                                    getIdProducto(id: codigoBar ?? "");
-                                  });
-                                }
-                              },
-                              label: Text("Buscar",
-                                  style: TextStyle(
-                                    fontSize: 18.0,
-                                      color:
-                                          Theme.of(context).primaryColorLight)),
-                              textColor: Theme.of(context).primaryColorLight,
-                            ),
-                          ))
-                        : Container(),
-                    !buscando
-                        ? SizedBox(width: 12.0, height: 12.0)
-                        : Container(),
-                    !buscando
-                        ? FadeInLeft(
-                            child: Container(
-                            width: double.infinity,
-                            child: RaisedButton.icon(
+              ListView(
+                shrinkWrap: true,
+                children: [
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(height: 12.0),
+                      !buscando
+                          ? FadeInRight(
+                              child: Container(
+                              width: double.infinity,
+                              child: RaisedButton.icon(
                                 color: colorTextButton,
                                 padding: EdgeInsets.all(16.0),
-                                icon: Image(
-                                    color: Theme.of(context).primaryColorLight,
-                                    height: 20.0,
-                                    width: 20.0,
-                                    image: AssetImage('assets/barcode.png'),
-                                    fit: BoxFit.contain),
-                                label: Text('Escanear código de barra',
+                                icon: Icon(
+                                  Icons.search,
+                                  color: Theme.of(context).primaryColorLight,
+                                ),
+                                onPressed: () {
+                                  if (textEditingController.text != "") {
+                                    setState(() {
+                                      getIdProducto(id: codigoBar ?? "");
+                                    });
+                                  }
+                                },
+                                label: Text("Buscar",
                                     style: TextStyle(
                                       fontSize: 18.0,
-                                        color: Theme.of(context)
-                                            .primaryColorLight)),
+                                        color:
+                                            Theme.of(context).primaryColorLight)),
                                 textColor: Theme.of(context).primaryColorLight,
-                                onPressed: () {
-                                  scanBarcodeNormal(context: context);
-                                }),
-                          ))
-                        : Container(),
-                    buttonAddProduct
-                        ? SizedBox(width: 12.0, height: 60.0)
-                        : Container(),
-                    buttonAddProduct
-                        ? Container(
-                            width: double.infinity,
-                            child: RaisedButton.icon(
-                              onPressed: () {
-                                Navigator.of(context)
-                                    .pushReplacement(MaterialPageRoute(
-                                  builder: (BuildContext context) => ProductNew(
-                                    id: this.codigoBar,
-                                  ),
-                                ));
-                              },
-                              color: colorTextButton,
-                              padding: EdgeInsets.all(12.0),
-                              label: Text("Agregar nuevo producto",
-                                  style: TextStyle(
-                                      fontSize: 18.0,
-                                      color: Theme.of(context).primaryColorLight)),
-                              icon: Icon(
-                                Icons.add,
-                                color: Theme.of(context).primaryColorLight,
                               ),
-                              textColor: Theme.of(context).primaryColorLight,
+                            ))
+                          : Container(),
+                      !buscando
+                          ? SizedBox(width: 12.0, height: 12.0)
+                          : Container(),
+                      !buscando
+                          ? FadeInLeft(
+                              child: Container(
+                              width: double.infinity,
+                              child: RaisedButton.icon(
+                                  color: colorTextButton,
+                                  padding: EdgeInsets.all(16.0),
+                                  icon: Image(
+                                      color: Theme.of(context).primaryColorLight,
+                                      height: 20.0,
+                                      width: 20.0,
+                                      image: AssetImage('assets/barcode.png'),
+                                      fit: BoxFit.contain),
+                                  label: Text('Escanear código de barra',
+                                      style: TextStyle(fontSize: 18.0,color: Theme.of(context).primaryColorLight)),
+                                  textColor: Theme.of(context).primaryColorLight,
+                                  onPressed: () {
+                                    scanBarcodeNormal(context: context);
+                                  }),
+                            ))
+                          : Container(),
+                      buttonAddProduct
+                          ? SizedBox(width: 12.0, height: 60.0)
+                          : Container(),
+                      buttonAddProduct
+                          ? Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              "Si el producto aún no existe, ayúdenos con contribuciones de contenido para que esta aplicación sea aún más útil para la comunidad 💪",
+                              textAlign:TextAlign.center,
+                              style: TextStyle(fontSize: 18.0),
                             ),
                           )
-                        : Container(),
-                  ],
-                ),
+                          :Container(),
+                      buttonAddProduct
+                          ? Container(
+                              width: double.infinity,
+                              child: RaisedButton.icon(
+                                onPressed: () {
+                                  Navigator.of(context)
+                                      .pushReplacement(MaterialPageRoute(
+                                    builder: (BuildContext context) => ProductNew(
+                                      id: this.codigoBar,
+                                    ),
+                                  ));
+                                },
+                                color: colorTextButton,
+                                padding: EdgeInsets.all(12.0),
+                                label: Text("Agregar nuevo producto",
+                                    style: TextStyle(
+                                        fontSize: 18.0,
+                                        color: Theme.of(context).primaryColorLight)),
+                                icon: Icon(
+                                  Icons.add,
+                                  color: Theme.of(context).primaryColorLight,
+                                ),
+                                textColor: Theme.of(context).primaryColorLight,
+                              ),
+                            )
+                          : Container(),
+                      SizedBox(width: 50.0, height: 50.0),
+                    ],
+                  ),
+                ],
               ),
             ] //your list view content here
             ),

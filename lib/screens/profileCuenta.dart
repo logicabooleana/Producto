@@ -359,6 +359,7 @@ class _ProfileCuentaState extends State<ProfileCuenta> {
               onChanged: (value) => perfilNegocio.pais = value,
             ),
           ),
+          SizedBox(width: 50.0, height: 50.0),
         ],
       ),
     );
