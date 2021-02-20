@@ -168,6 +168,7 @@ class _ProductEditState extends State<ProductEdit> {
                   icon:
                       saveIndicador == false ? Icon(Icons.check) : Container(),
                   onPressed: () {
+                    // TODO: Editar para produccion
                     editable
                         ? guardarDeveloper(buildContext: context)
                         : guardar(buildContext: contextBuilder);
@@ -406,6 +407,9 @@ class _ProductEditState extends State<ProductEdit> {
                   ? widgetDeleteProducto(context: builderContext)
                   : Container()
               : Container(),
+          SizedBox(height: 25.0),
+          !editable?widgetSaveProductoOPTDeveloper(context:builderContext ):Container(),
+          editable?widgetDeleteProductoOPTDeveloper(context:builderContext):Container(),
           SizedBox(height: 50.0),
         ],
       ),
@@ -889,8 +893,7 @@ class _ProductEditState extends State<ProductEdit> {
     );
   }
 
-  getSubCategoria(
-      {@required BuildContext buildContext, @required Categoria categoria}) {
+  getSubCategoria({@required BuildContext buildContext, @required Categoria categoria}) {
     showModalBottomSheet(
         shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
@@ -1247,6 +1250,7 @@ class _ProductEditState extends State<ProductEdit> {
     // set ( id del usuario que actualizo el producto )
     producto.id_negocio = Global.oPerfilNegocio.id;
     producto.timestamp_actualizacion = Timestamp.fromDate(new DateTime.now());
+    producto.verificado=true;
     // Firebase set
     await Global.getProductosPrecargado(idProducto: producto.id)
         .upSetPrecioProducto(producto.convertProductoDefault().toJson());

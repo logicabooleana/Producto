@@ -74,8 +74,7 @@ class ProductoItem extends StatelessWidget {
         tag: producto.id,
         child: Card(
           elevation: 1,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+          shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
           clipBehavior: Clip.antiAlias,
           child: InkWell(
             onTap: () {

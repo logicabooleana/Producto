@@ -607,8 +607,7 @@ class _ProductScreenState extends State<ProductScreen> {
                   children: <Widget>[
                     this.categoria != null && this.categoria.nombre != ""
                         ? Chip(
-                            materialTapTargetSize:
-                                MaterialTapTargetSize.shrinkWrap,
+                            materialTapTargetSize:MaterialTapTargetSize.shrinkWrap,
                             avatar: CircleAvatar(
                               backgroundColor: Colors.grey.shade800,
                               child: Text(
