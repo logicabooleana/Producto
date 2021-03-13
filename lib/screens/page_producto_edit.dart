@@ -402,14 +402,17 @@ class _ProductEditState extends State<ProductEdit> {
             controller: controllerTextEdit_comparacion,
           ),
           SizedBox(height: 25.0),
-          enCatalogo
-              ? saveIndicador == false
-                  ? widgetDeleteProducto(context: builderContext)
-                  : Container()
-              : Container(),
-          SizedBox(height: 25.0),
-          !editable?widgetSaveProductoOPTDeveloper(context:builderContext ):Container(),
-          editable?widgetDeleteProductoOPTDeveloper(context:builderContext):Container(),
+          enCatalogo?saveIndicador == false ? buttonDeleteProducto(context: builderContext):Container():Container(),
+          SizedBox(height: 20.0),
+          /* OPCIONES PARA DESARROLLADOR - ELIMINAR ESTE CÓDIGO PARA PRODUCCION */
+          SizedBox(height: 20.0),
+          Row(children: [Expanded(child: Divider(height:2.0,endIndent:12.0,indent: 12.0,)),Text("Opciones para desarrollador"),Expanded(child: Divider(height:1.0,endIndent:12.0,indent: 12.0))],),
+          SizedBox(height: 20.0),
+          buttonAddFavorite(context: builderContext),
+          SizedBox(height: !editable?20.0:0.0),
+          !editable?buttonEditProductoOPTDeveloper(context:builderContext ):Container(),
+          SizedBox(height: 20.0),
+          editable?buttonDeleteProductoOPTDeveloper(context:builderContext):Container(),
           SizedBox(height: 50.0),
         ],
       ),
@@ -477,7 +480,8 @@ class _ProductEditState extends State<ProductEdit> {
           case "eliminar":
             await showDialog<String>(
               context: context,
-              child: new AlertDialog(
+              builder: (context) {
+                return new AlertDialog(
                 contentPadding: const EdgeInsets.all(16.0),
                 content: new Row(
                   children: <Widget>[
@@ -510,49 +514,44 @@ class _ProductEditState extends State<ProductEdit> {
                         });
                       })
                 ],
-              ),
+              );
+              },
             );
             break;
         }
       },
     );
   }
-
-  Widget widgetDeleteProducto({@required BuildContext context}) {
-    return Column(
-      children: [
-        deleteIndicador == false
-            ? SizedBox(
-                width: double.infinity,
-                child: RaisedButton.icon(
-                  onPressed: () {
-                    showDialogDelete(buildContext: context);
-                  },
-                  color: Colors.red[400],
-                  icon: Icon(Icons.delete, color: Colors.white),
-                  padding: EdgeInsets.all(12.0),
-                  label: Text("Quitar de mi catalogo",
-                      style: TextStyle(fontSize: 18.0, color: Colors.white)),
-                ),
-              )
-            : SizedBox(
-                width: double.infinity,
-                child: RaisedButton.icon(
-                  onPressed: () {},
-                  color: Colors.red[400],
-                  icon: Container(
-                      width: 16.0,
-                      height: 16.0,
-                      child: CircularProgressIndicator(
-                          backgroundColor: Colors.white)),
-                  padding: EdgeInsets.all(12.0),
-                  label: Text("Borrando de su catalogo...",
-                      style: TextStyle(fontSize: 18.0, color: Colors.white)),
-                ),
-              ),
-        SizedBox(height: 25.0),
-      ],
-    );
+  Widget buttonDeleteProducto({@required BuildContext context}) {
+    return deleteIndicador == false
+        ? SizedBox(
+            width: double.infinity,
+            child: RaisedButton.icon(
+              onPressed: () {
+                showDialogDelete(buildContext: context);
+              },
+              color: Colors.red[400],
+              icon: Icon(Icons.delete, color: Colors.white),
+              padding: EdgeInsets.all(12.0),
+              label: Text("Quitar de mi catalogo",
+                  style: TextStyle(fontSize: 18.0, color: Colors.white)),
+            ),
+          )
+        : SizedBox(
+            width: double.infinity,
+            child: RaisedButton.icon(
+              onPressed: () {},
+              color: Colors.red[400],
+              icon: Container(
+                  width: 16.0,
+                  height: 16.0,
+                  child: CircularProgressIndicator(
+                      backgroundColor: Colors.white)),
+              padding: EdgeInsets.all(12.0),
+              label: Text("Borrando de su catalogo...",
+                  style: TextStyle(fontSize: 18.0, color: Colors.white)),
+            ),
+          );
   }
 
   void deleteProduct({@required BuildContext context}) async {
@@ -596,8 +595,8 @@ class _ProductEditState extends State<ProductEdit> {
                 producto.urlimagen = urlIamgen;
               }
               // Set ( values )
-              // TODO: Por defecto verificado es TRUE // Cambiar esto cuando se lanze a producción
-              producto.verificado = false;
+              // TODO: Para produccion es valor de verificado es FALSE // Cambiar esto cuando se lanze a producción
+              producto.verificado = true;
               producto.titulo = this.marca.titulo;
               producto.descripcion = controllerTextEdit_descripcion.text;
               producto.precio_venta =
@@ -799,7 +798,8 @@ class _ProductEditState extends State<ProductEdit> {
 
     await showDialog<String>(
       context: context,
-      child: new AlertDialog(
+      builder: (context) {
+        return new AlertDialog(
         contentPadding: const EdgeInsets.all(16.0),
         content: new Row(
           children: <Widget>[
@@ -837,7 +837,8 @@ class _ProductEditState extends State<ProductEdit> {
                 } else {}
               })
         ],
-      ),
+      );
+      },
     );
   }
 
@@ -849,7 +850,8 @@ class _ProductEditState extends State<ProductEdit> {
 
     await showDialog<String>(
       context: context,
-      child: new AlertDialog(
+      builder: (context) {
+        return new AlertDialog(
         contentPadding: const EdgeInsets.all(16.0),
         content: new Row(
           children: <Widget>[
@@ -864,12 +866,12 @@ class _ProductEditState extends State<ProductEdit> {
           ],
         ),
         actions: <Widget>[
-          new FlatButton(
+          new TextButton(
               child: const Text('CANCEL'),
               onPressed: () {
                 Navigator.pop(context);
               }),
-          new FlatButton(
+          new TextButton(
               child: loadSave == false
                   ? Text('GUARDAR')
                   : CircularProgressIndicator(),
@@ -889,7 +891,8 @@ class _ProductEditState extends State<ProductEdit> {
                 } else {}
               })
         ],
-      ),
+      );
+      },
     );
   }
 
@@ -1106,57 +1109,51 @@ class _ProductEditState extends State<ProductEdit> {
   }
 
    // TODO: OPCIONES PARA EL DESARROLLADOR ( Eliminar para producción )
-  Widget widgetSaveProductoOPTDeveloper({@required BuildContext context}) {
-    return editable == false
-        ? Column(
-            children: [
-              deleteIndicador == false
-                  ? SizedBox(
-                      width: double.infinity,
-                      child: RaisedButton.icon(
-                        onPressed: () {
-                          setState(() {
-                            editable = true;
-                            producto.verificado = false;
-                          });
-                        },
-                        color:
-                            editable ? Colors.green[400] : Colors.orange[400],
-                        icon: Icon(Icons.security, color: Colors.white),
-                        padding: EdgeInsets.all(12.0),
-                        label: Text("Editar",
-                            style:
-                                TextStyle(fontSize: 18.0, color: Colors.white)),
-                      ),
-                    )
-                  : Container(),
-              SizedBox(height: 25.0),
-            ],
+  Widget buttonAddFavorite({@required BuildContext context}) {
+    return this.producto.favorite? SizedBox(
+            width: double.infinity,
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () {setState(() {this.producto.favorite=!this.producto.favorite;});},
+                style: ElevatedButton.styleFrom(padding:EdgeInsets.all(12.0),primary: Colors.grey[900],onPrimary: Colors.white30,textStyle: TextStyle(color: Colors.black)),
+                icon: Icon(Icons.favorite, color: Colors.white),
+                label: Text("Quitar de favoritos",style: TextStyle(color: Colors.white)),
+              ),
+            ),
           )
-        : Container();
+        : SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () {setState(() {this.producto.favorite=!this.producto.favorite;});},
+              style: ElevatedButton.styleFrom(padding:EdgeInsets.all(12.0),primary: Colors.orange[400],onPrimary: Colors.white30,textStyle: TextStyle(color: Colors.black)),
+              icon: Icon(Icons.favorite, color: Colors.white),
+              label: Text("Agregar a favoritos",style: TextStyle( color: Colors.white)),
+            ),
+          );
+  }
+  Widget buttonEditProductoOPTDeveloper({@required BuildContext context}) {
+    return editable == false? deleteIndicador == false ?SizedBox(
+          width: double.infinity,
+          child: ElevatedButton.icon(
+            onPressed: () {setState(() { editable = true;producto.verificado = false; });},
+            style: ElevatedButton.styleFrom(padding:EdgeInsets.all(12.0),primary:editable ? Colors.green[400] : Colors.orange[400],onPrimary: Colors.white30,textStyle: TextStyle(color: Colors.black)),
+            icon: Icon(Icons.security, color: Colors.white),
+            label: Text("Editar",style: TextStyle( color: Colors.white)),
+          ),
+        ):Container():Container();
   }
 
-  Widget widgetDeleteProductoOPTDeveloper({@required BuildContext context}) {
-    return Column(
-      children: [
-        deleteIndicador == false
-            ? SizedBox(
-                width: double.infinity,
-                child: RaisedButton.icon(
-                  onPressed: () {
-                    showDialogDeleteOPTDeveloper(buildContext: context);
-                  },
-                  color: Colors.red[400],
-                  icon: Icon(Icons.security, color: Colors.white),
-                  padding: EdgeInsets.all(12.0),
-                  label: Text("Borrar producto (Moderador)",
-                      style: TextStyle(fontSize: 18.0, color: Colors.white)),
-                ),
-              )
-            : Container(),
-        SizedBox(height: 25.0),
-      ],
-    );
+  Widget buttonDeleteProductoOPTDeveloper({@required BuildContext context}) {
+    return deleteIndicador == false ?SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () {showDialogDeleteOPTDeveloper(buildContext: context);},
+              style: ElevatedButton.styleFrom(padding:EdgeInsets.all(12.0),primary:Colors.red[400],onPrimary: Colors.white30,textStyle: TextStyle(color: Colors.black)),
+              icon: Icon(Icons.security, color: Colors.white),
+              label: Text("Borrar producto (Moderador)",style: TextStyle( color: Colors.white)),
+            ),
+          ): Container();
   }
 
   void showDialogDeleteOPTDeveloper({@required BuildContext buildContext}) {

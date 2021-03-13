@@ -79,6 +79,7 @@ class ProductoNegocio  {
     // valores del producto
     String id="";
     bool verificado = false; // estado de verificación  al un moderador
+    bool favorite = false; 
     String id_marca=""; // ID de la marca por defecto esta vacia
     String urlimagen="https://default";  // URL imagen
     String titulo="";  // Titulo
@@ -118,6 +119,7 @@ class ProductoNegocio  {
       // Valores del producto 
       this.id="", 
       this.verificado=false,
+      this.favorite=false,
       this.id_marca="", 
       this.urlimagen="", 
       this.titulo="", 
@@ -153,6 +155,7 @@ class ProductoNegocio  {
       // Valores del producto 
       id: data['id'] ?? '',
       verificado: data['verificado'] ?? false,
+      favorite: data['favorite'] ?? false,
       id_marca: data['id_marca'] ?? '',
       urlimagen: data['urlimagen'] ?? 'https://default',
       titulo: data['titulo'] ?? '',
@@ -183,7 +186,8 @@ class ProductoNegocio  {
 
   Map<String, dynamic> toJson() => {
         "id": id??"",
-        "verificado": verificado??"",
+        "verificado": verificado??false,
+        "favorite": verificado??false,
         "id_marca": id_marca??"",
         "urlimagen": urlimagen??"https://default",
         "titulo": titulo??"",
@@ -213,12 +217,11 @@ class ProductoNegocio  {
     productoDefault.id=this.id??"";
     productoDefault.urlimagen=this.urlimagen??"";
     productoDefault.verificado=this.verificado??false;
+    productoDefault.favorite=this.favorite??false;
     productoDefault.id_marca=this.id_marca??"";
     productoDefault.titulo=this.titulo??"";
     productoDefault.descripcion=this.descripcion??"";
     productoDefault.codigo=this.codigo??"";
-    productoDefault.categoria=this.categoria??"";
-    productoDefault.subcategoria=this.subcategoria??"";
     productoDefault.timestamp_actualizacion=this.timestamp_actualizacion;
     productoDefault.timestamp_creation=this.timestamp_creation;
 
@@ -229,6 +232,7 @@ class ProductoNegocio  {
 class Producto {
     String id="";
     bool verificado = false; // estado de verificación  al un moderador
+    bool favorite=false;
     String id_marca=""; // ID de la marca por defecto esta vacia
     String id_negocio=""; // ID del negocios que actualizo el producto
     String urlimagen="https://default";  // URL imagen
@@ -244,6 +248,7 @@ class Producto {
   Producto({ 
     this.id="", 
     this.verificado=false,
+    this.favorite=false,
     this.id_marca="", 
     this.id_negocio="", 
     this.urlimagen="", 
@@ -258,7 +263,8 @@ class Producto {
 
       Map<String, dynamic> toJson() => {
         "id": id??"",
-        "verificado": verificado??"",
+        "verificado": verificado??false,
+        "favorite": verificado??false,
         "id_marca": id_marca??"",
         "id_negocio": id_negocio??"",
         "urlimagen": urlimagen??"https://default",
@@ -273,6 +279,7 @@ class Producto {
     return Producto(
       id: data['id'] ?? '',
       verificado: data['verificado'] ?? false,
+      favorite: data['favorite'] ?? false,
       id_marca: data['id_marca'] ?? '',
       id_negocio: data['id_negocio'] ?? '',
       urlimagen: data['urlimagen'] ?? 'https://default',
@@ -291,6 +298,7 @@ class Producto {
     productoNegocio.urlimagen=this.urlimagen??"";
      productoNegocio.id_negocio=this.id_negocio??"";
     productoNegocio.verificado=this.verificado??false;
+    productoNegocio.favorite=this.favorite??false;
     productoNegocio.id_marca=this.id_marca??"";
     productoNegocio.titulo=this.titulo??"";
     productoNegocio.descripcion=this.descripcion??"";

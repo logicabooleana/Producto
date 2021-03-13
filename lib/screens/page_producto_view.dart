@@ -90,9 +90,7 @@ class _ProductScreenState extends State<ProductScreen> {
     marca = null;
     if (widget.producto != null) {
       if (widget.producto.id_marca != "") {
-        Global.getMarca(idMarca: widget.producto.id_marca)
-            .getDataMarca()
-            .then((value) {
+        Global.getMarca(idMarca: widget.producto.id_marca).getDataMarca().then((value) {
           if (value != null) {
             setState(() {
               marca = value;
@@ -141,7 +139,14 @@ class _ProductScreenState extends State<ProductScreen> {
       }
     }
     return Scaffold(
-      appBar: AppBar(
+      appBar: appbar(),
+      body: body(),
+    );
+  }
+
+  /* WIDGETS */
+  Widget appbar(){
+    return AppBar(
         elevation: 0.0,
         backgroundColor: Theme.of(context).canvasColor,
         iconTheme: Theme.of(context)
@@ -152,7 +157,7 @@ class _ProductScreenState extends State<ProductScreen> {
             if (contextScaffold != null) {
               Clipboard.setData(new ClipboardData(text: widget.producto.codigo))
                   .then((_) {
-                Scaffold.of(contextScaffold).showSnackBar(SnackBar(
+                ScaffoldMessenger.of(contextScaffold).showSnackBar(SnackBar(
                     content: Text("Código copiado en portapapeles: " +
                         widget.producto.id)));
               });
@@ -268,15 +273,15 @@ class _ProductScreenState extends State<ProductScreen> {
             },
           )
         ],
-      ),
-      body: ExpandableBottomSheet(
+      );
+  }
+  Widget body(){
+    return ExpandableBottomSheet(
         background: background(),
         persistentHeader: persistentHeader(),
         expandableContent: expandableContent(),
-      ),
-    );
+      );
   }
-
   Widget viewProducto({@required double height, @required double width}) {
     Color colorText=Theme.of(context).brightness==Brightness.dark?Colors.white.withOpacity(0.90):Colors.black.withOpacity(0.90);
     Color colorCard = Theme.of(context).brightness==Brightness.dark?Theme.of(context).primaryColorDark:Colors.white;
@@ -404,6 +409,7 @@ class _ProductScreenState extends State<ProductScreen> {
         ));
   }
 
+
   Widget background() {
     return Builder(builder: (contextBuilder) {
       contextScaffold = contextBuilder;
@@ -436,7 +442,7 @@ class _ProductScreenState extends State<ProductScreen> {
       );
     });
   }
-
+  /* FUNCTIONS */
   Widget persistentHeader() {
     return ClipRRect(
       borderRadius: BorderRadius.only(
@@ -474,22 +480,11 @@ class _ProductScreenState extends State<ProductScreen> {
                                       children: [
                                         widget.producto.precio_compra != 0.0
                                             ? Text(
-                                                sProcentaje(
-                                                    precioCompra: widget
-                                                        .producto.precio_compra,
-                                                    precioVenta: widget
-                                                        .producto.precio_venta),
-                                                style: TextStyle(
-                                                    color: Colors.green,
-                                                    fontSize: 12.0,
-                                                    fontWeight:
-                                                        FontWeight.bold))
+                                                sProcentaje(precioCompra: widget.producto.precio_compra,precioVenta: widget.producto.precio_venta),
+                                                style: TextStyle(color: Colors.green,fontSize: 12.0,fontWeight:FontWeight.bold))
                                             : Container(),
                                         widget.producto.precio_compra != 0.0
-                                            ? Text(" > ",
-                                                style: TextStyle(
-                                                    color: Colors.green,
-                                                    fontSize: 12.0))
+                                            ? Text(" > ",style: TextStyle(color: Colors.green,fontSize: 12.0))
                                             : Container(),
                                         widget.producto.precio_compra != 0.0
                                             ? Text(
@@ -819,12 +814,10 @@ class WidgetOtrosProductosGlobal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: Global.getProductosPrecargadoAll()
-          .getDataProductoAll(idMarca: this.producto.id_marca),
+      future: Global.getProductAll().getDataProductoAll(idMarca: this.producto.id_marca),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           List<Producto> listProductos = snapshot.data;
-
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -892,6 +885,15 @@ class WidgetUltimosPrecios extends StatelessWidget {
     return expandableBottomSheet_1();
   }
 
+  String sProcentaje({double precioCompra, double precioVenta}) {
+    double porcentaje = 0.0;
+    double ganancia = 0.0;
+    if (precioCompra != 0.0) {
+      ganancia = precioVenta - precioCompra;
+    }
+    porcentaje = ganancia / precioCompra * 100;
+    return "%${porcentaje.round()}";
+  }
   Widget expandableBottomSheet_1() {
     return FutureBuilder(
       future: Global.getListPreciosProducto(idProducto: producto.id)
@@ -1039,6 +1041,100 @@ Future<String> getLocation({double latitude, double longitude}) async {
   return "ubicación desconocida";
 }
 
+class ProductoItemHorizontalSmall extends StatelessWidget {
+  final ProductoNegocio producto;
+  final double width;
+  const ProductoItemHorizontalSmall(
+      {Key key, this.producto, this.width = double.infinity})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding:EdgeInsets.all(8.0),
+      width: width,height: 200.0,
+      child: Card(
+        elevation: 1,
+        shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: () {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (BuildContext context) => producto != null
+                    ? ProductScreen(producto: producto)
+                    : Scaffold(
+                        body: Center(child: Text("Se produjo un Error!"))),
+              ),
+            );
+          },
+          child: Row(mainAxisSize:MainAxisSize.max ,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              AspectRatio(
+                aspectRatio: 100 / 100,
+                child: producto.urlimagen != ""
+                    ? CachedNetworkImage(
+                        fadeInDuration: Duration(milliseconds: 200),
+                        fit: BoxFit.cover,
+                        imageUrl: producto.urlimagen,
+                        placeholder: (context, url) => FadeInImage(
+                            fit: BoxFit.cover,
+                            image: AssetImage("assets/loading.gif"),
+                            placeholder: AssetImage("assets/loading.gif")),
+                        errorWidget: (context, url, error) =>
+                            Container(color: Colors.black12),
+                      )
+                    : Container(color: Colors.black26),
+              ),
+              Expanded(
+                child: Container(
+                  color: Colors.black54,
+                  child: Padding(
+                    padding:const EdgeInsets.symmetric(vertical: 8.0,horizontal: 4.0),
+                    child: Column(
+                      mainAxisAlignment:MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        producto.titulo != "" &&
+                                producto.titulo != "default"
+                            ? Text(producto.titulo,
+                                style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white),
+                                overflow: TextOverflow.clip,
+                                softWrap: false)
+                            : Container(),
+                        producto.descripcion != ""
+                            ? Text(producto.descripcion,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12.0,
+                                    color: Colors.white),
+                                overflow: TextOverflow.ellipsis,maxLines: 3,textAlign:TextAlign.center,
+                                softWrap: false)
+                            : Container(),
+                        producto.precio_venta != 0.0
+                            ? Text(
+                                "${Publicaciones.getFormatoPrecio(monto: producto.precio_venta)}",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16.0,
+                                    color: Colors.white),
+                                overflow: TextOverflow.fade,
+                                softWrap: false)
+                            : Container(),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
 class ProductoItemHorizontal extends StatelessWidget {
   final ProductoNegocio producto;
   final double width;
@@ -1049,11 +1145,11 @@ class ProductoItemHorizontal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: width,
+      padding:EdgeInsets.all(8.0),
+      width: 200.0,height: 200.0,
       child: Card(
         elevation: 1,
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+        shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: () {
@@ -1068,9 +1164,9 @@ class ProductoItemHorizontal extends StatelessWidget {
           },
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Stack(
+              Stack(fit: StackFit.passthrough,
                 alignment: Alignment.bottomCenter,
                 children: <Widget>[
                   AspectRatio(

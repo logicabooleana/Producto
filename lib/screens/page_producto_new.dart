@@ -38,8 +38,7 @@ class _ProductNewState extends State<ProductNew> {
   _ProductNewState(this.producto);
   // Variables
   TextStyle textStyle = new TextStyle(fontSize: 24.0);
-  bool enCatalogo =
-      false; // verifica si el producto se encuentra en el catalogo o no
+  bool enCatalogo =false; // verifica si el producto se encuentra en el catalogo o no
   Marca marca;
   Categoria categoria;
   Categoria subcategoria;
@@ -462,21 +461,16 @@ class _ProductNewState extends State<ProductNew> {
                   producto.urlimagen = urlIamgen;
                 }
 
-                // TODO: Para desarrollo verificado es TRUE // Cambiar esto cuando se lanze a producción
-                producto.verificado = false;
+                // TODO: Para desarrollo verificado es FALSE // Cambiar esto cuando se lanze a producción
+                producto.verificado = true;
                 producto.precio_venta =
                     controllerTextEdit_precio_venta.numberValue;
                 producto.precio_compra = controllerTextEdit_compra.numberValue;
-                producto.precio_comparacion =
-                    controllerTextEdit_comparacion.numberValue;
-                producto.timestamp_actualizacion =
-                    Timestamp.fromDate(new DateTime.now());
-                producto.timestamp_creation =
-                    Timestamp.fromDate(new DateTime.now());
-                producto.categoria =
-                    this.categoria == null ? "" : this.categoria.id;
-                producto.subcategoria =
-                    this.subcategoria == null ? "" : this.subcategoria.id;
+                producto.precio_comparacion =controllerTextEdit_comparacion.numberValue;
+                producto.timestamp_actualizacion =Timestamp.fromDate(new DateTime.now());
+                producto.timestamp_creation =Timestamp.fromDate(new DateTime.now());
+                producto.categoria = this.categoria == null ? "" : this.categoria.id;
+                producto.subcategoria = this.subcategoria == null ? "" : this.subcategoria.id;
                 producto.id_marca = this.marca == null ? "" : this.marca.id;
                 producto.codigo = producto.id;
                 savevProductoGlobal();

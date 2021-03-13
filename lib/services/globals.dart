@@ -139,7 +139,7 @@ class Global {
     // Firestore References for Writes
     return  Collection<Categoria>(path: '/NEGOCIOS/$idNegocio/EXTENSION_CATALOGO_CATEGORIA/$idCategoria/SUBCATEGORIA'); // '/APP/ARG/PRODUCTOS'
   }
-  static Collection<Producto> getProductosPrecargadoAll({String isoPAis="ARG"} ){
+  static Collection<Producto> getProductAll({String isoPAis="ARG"} ){
     // Firestore References for Writes
     return  Collection<Producto>(path: '/APP/$isoPAis/PRODUCTOS'); 
   }

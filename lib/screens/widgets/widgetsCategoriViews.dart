@@ -190,7 +190,8 @@ class _ViewCategoriaState extends State<ViewCategoria> {
           case "eliminar":
             await showDialog<String>(
               context: context,
-              child: new AlertDialog(
+              builder: (context) {
+                return new AlertDialog(
                 contentPadding: const EdgeInsets.all(16.0),
                 content: new Row(
                   children: <Widget>[
@@ -228,7 +229,8 @@ class _ViewCategoriaState extends State<ViewCategoria> {
                         });
                       })
                 ],
-              ),
+              );
+              },
             );
             break;
         }
@@ -249,7 +251,8 @@ class _ViewCategoriaState extends State<ViewCategoria> {
 
     await showDialog<String>(
       context: context,
-      child: new AlertDialog(
+      builder: (context) {
+        return new AlertDialog(
         contentPadding: const EdgeInsets.all(16.0),
         content: new Row(
           children: <Widget>[
@@ -287,7 +290,8 @@ class _ViewCategoriaState extends State<ViewCategoria> {
                 } else {}
               })
         ],
-      ),
+      );
+      },
     );
   }
 }
@@ -478,7 +482,8 @@ class ViewSubCategoriaState extends State<ViewSubCategoria> {
           case "eliminar":
             await showDialog<String>(
               context: context,
-              child: new AlertDialog(
+              builder: (context) {
+                return new AlertDialog(
                 contentPadding: const EdgeInsets.all(16.0),
                 content: new Row(
                   children: <Widget>[
@@ -509,7 +514,8 @@ class ViewSubCategoriaState extends State<ViewSubCategoria> {
                         });
                       })
                 ],
-              ),
+              );
+              },
             );
             break;
         }
@@ -531,7 +537,8 @@ class ViewSubCategoriaState extends State<ViewSubCategoria> {
 
     await showDialog<String>(
       context: context,
-      child: new AlertDialog(
+      builder: (context) {
+        return new AlertDialog(
         contentPadding: const EdgeInsets.all(16.0),
         content: new Row(
           children: <Widget>[
@@ -546,12 +553,12 @@ class ViewSubCategoriaState extends State<ViewSubCategoria> {
           ],
         ),
         actions: <Widget>[
-          new FlatButton(
+          new TextButton(
               child: const Text('CANCEL'),
               onPressed: () {
                 Navigator.pop(context);
               }),
-          new FlatButton(
+          new TextButton(
               child: loadSave == false
                   ? Text(newSubcategoria ? 'GUARDAR' : "ACTUALIZAR")
                   : CircularProgressIndicator(),
@@ -571,7 +578,8 @@ class ViewSubCategoriaState extends State<ViewSubCategoria> {
                 } else {}
               })
         ],
-      ),
+      );
+      },
     );
   }
 }
